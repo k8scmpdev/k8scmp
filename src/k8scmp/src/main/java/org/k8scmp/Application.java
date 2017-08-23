@@ -1,8 +1,6 @@
-package org.spring.springboot;
+package org.k8scmp;
 
 import org.mybatis.spring.annotation.MapperScan;
-import org.spring.springboot.dao.CityDao;
-import org.spring.springboot.domain.City;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +19,7 @@ public class Application {
     public static void main(String[] args) {
         // 程序启动入口
         // 启动嵌入式的 Tomcat 并初始化 Spring 环境及其各 Spring 组件
-    	System.out.println("hello world");
+    	//System.out.println("hello world");
         SpringApplication.run(Application.class,args);
     }
 }
