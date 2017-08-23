@@ -30,11 +30,13 @@
             <version>${spring-boot-starter-redis-version}</version>
         </dependency>
 
-        <!-- Spring Boot Web 依赖 -->
+		 <!-- Spring Boot web模板 依赖 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+	      <groupId>org.springframework.boot</groupId>
+	      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+	    </dependency>
+
+        
 
         <!-- Spring Boot Test 依赖 -->
         <dependency>

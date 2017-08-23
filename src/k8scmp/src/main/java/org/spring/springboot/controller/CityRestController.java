@@ -17,7 +17,6 @@ public class CityRestController {
     @Autowired
     private CityService cityService;
 
-
     @RequestMapping(value = "/api/city/{id}", method = RequestMethod.GET)
     public City findOneCity(@PathVariable("id") Long id) {
         return cityService.findCityById(id);
