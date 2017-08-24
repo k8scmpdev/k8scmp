@@ -85,7 +85,7 @@ public class AppInfo {
 
     public static class DeployCollectionInfoListComparator implements Comparator<AppInfo> {
         @Override
-        public int compare(AppInfo t1, AppInfo t2) {
+        public int compare(AppInfo t1, AppInfo t2) { 
             if (t2.getCreateTime() - t1.getCreateTime() > 0) {
                 return 1;
             } else if (t2.getCreateTime() - t1.getCreateTime() < 0) {
