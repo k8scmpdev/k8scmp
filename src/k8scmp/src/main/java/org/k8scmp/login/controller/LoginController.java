@@ -20,12 +20,5 @@ public class LoginController {
         return "demo/index";
     }
     
-    @RequestMapping(value = "/index")
-    public String index() {
-        return "demo/index";
-    }
-    
-    
-    
    
 }
