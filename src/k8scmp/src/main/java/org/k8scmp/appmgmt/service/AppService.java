@@ -1,6 +1,7 @@
 package org.k8scmp.appmgmt.service;
 
 import org.k8scmp.appmgmt.domain.AppInfo;
+import org.k8scmp.basemodel.HttpResponseTemp;
 
 /**
  * Created by KaiRen on 2016/9/22.
