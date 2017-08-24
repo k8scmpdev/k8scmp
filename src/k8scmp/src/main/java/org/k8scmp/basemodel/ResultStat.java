@@ -1,6 +1,6 @@
-package org.domeos.basemodel;
+package org.k8scmp.basemodel;
 
-import org.domeos.util.StringUtils;
+import org.k8scmp.util.StringUtils;
 
 /**
  */
