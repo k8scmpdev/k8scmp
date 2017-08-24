@@ -1,10 +1,5 @@
 package org.k8scmp.appmgmt.controller;
 
-import org.domeos.basemodel.HttpResponseTemp;
-import org.domeos.basemodel.ResultStat;
-import org.domeos.framework.api.consolemodel.deployment.AppDraft;
-import org.domeos.framework.api.controller.ApiController;
-import org.domeos.framework.api.service.deployment.AppService;
 import org.k8scmp.appmgmt.domain.AppInfo;
 import org.k8scmp.appmgmt.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
