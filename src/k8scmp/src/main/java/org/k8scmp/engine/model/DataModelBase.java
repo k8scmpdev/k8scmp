@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.domeos.framework.engine.exception.DaoConvertingException;
+import org.k8scmp.exception.DaoConvertingException;
 
 import java.util.HashSet;
 import java.util.Set;
