@@ -2,7 +2,7 @@ package org.k8scmp.appmgmt.dao.impl;
 
 import org.k8scmp.appmgmt.dao.AppDao;
 import org.k8scmp.appmgmt.domain.AppInfo;
-import org.k8scmp.appmgmt.mapper.AppMapper;
+import org.k8scmp.mapper.appmgmt.AppMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

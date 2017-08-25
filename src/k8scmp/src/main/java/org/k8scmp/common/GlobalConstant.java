@@ -56,8 +56,8 @@ public class GlobalConstant {
     public static String WITH_LB_VALUE = "TRUE";
 
     public static String BUILD_CODE_PATH = "/code";
-    public static String BUILD_GENERATE_PATH= "/domeos_created_file";
-    public static String NODATA_CONFIG_NAME = "domeos.agent.alive";
+    public static String BUILD_GENERATE_PATH= "/k8scmp_created_file";
+    public static String NODATA_CONFIG_NAME = "k8scmp.agent.alive";
     public static int alarmGroupId = 1000;
     public static final int K8S_POD_COUNTS = 100;
     public static int PROJECT_LIST_SIZE = 20;
@@ -66,8 +66,8 @@ public class GlobalConstant {
     public static String SECRET_DOCKERCFG_TYPE = "kubernetes.io/dockerconfigjson";
     public static String SECRET_DOCKERCFG_DATA_KEY = ".dockerconfigjson";
     public static String REGISTRY_TOKEN = "ZG9tZW9zOmRvbWVvcw==";
-    public static String REGISTRY_EMAIL = "domeos@xxx.com";
-    public static String SECRET_NAME_PREFIX = "domeos-";
+    public static String REGISTRY_EMAIL = "k8scmp@xxx.com";
+    public static String SECRET_NAME_PREFIX = "k8scmp-";
     public static final String LABEL_VALUE = "USER_LABEL_VALUE";
 
     public static int TIME_TO_LIVE_SECONDS = 3600;
@@ -77,11 +77,11 @@ public class GlobalConstant {
     public static int SHIRO_REDIS_TIMEOUT = 10000;
     public static int SHIRO_REDIS_MAXTOTAL = 500;
     public static int SHIRO_REDIS_SESSION_TIMEOUT = 3600000;
-    public static String DOMEOS_MYSQL_HOST = "MYSQL_HOST";
-    public static String DOMEOS_MYSQL_PORT = "MYSQL_PORT";
-    public static String DOMEOS_MYSQL_DB = "MYSQL_DB";
-    public static String DOMEOS_MYSQL_USERNAME = "MYSQL_USERNAME";
-    public static String DOMEOS_MYSQL_PASSWORD = "MYSQL_PASSWORD";
+    public static String k8scmp_MYSQL_HOST = "MYSQL_HOST";
+    public static String k8scmp_MYSQL_PORT = "MYSQL_PORT";
+    public static String k8scmp_MYSQL_DB = "MYSQL_DB";
+    public static String k8scmp_MYSQL_USERNAME = "MYSQL_USERNAME";
+    public static String k8scmp_MYSQL_PASSWORD = "MYSQL_PASSWORD";
     public static String PORTAL_MYSQL_HOST = "MYSQL_PORTAL_HOST";
     public static String PORTAL_MYSQL_PORT = "MYSQL_PORTAL_PORT";
     public static String PORTAL_MYSQL_DB = "MYSQL_PORTAL_DB";
@@ -93,7 +93,7 @@ public class GlobalConstant {
     public static String GRAPH_MYSQL_USERNAME = "MYSQL_GRAPH_USERNAME";
     public static String GRAPH_MYSQL_PASSWORD = "MYSQL_GRAPH_PASSWORD";
 
-    public static String UPDATE_JOB_CONTAINER = "pub.domeos.org/rolling-updater:v0.1";
+    public static String UPDATE_JOB_CONTAINER = "pub.k8scmp.org/rolling-updater:v0.1";
     public static String K8S_JOB_VERSION = "extensions/v1beta1";
     public static int GITLAB_PERPAGESIZE = 10;
     public static String TOMCAT_KEEPALIVETIMEOUT = "TOMCAT_KEEPALIVETIMEOUT";
@@ -112,6 +112,6 @@ public class GlobalConstant {
     public static String WITH_NEWLB_PREFIX = "withlb-";
     public static String LOAD_BALANCER_ID_STR = "loadBalancerId";
     
-    public static final String SSO_API="/api/ssologin";
+//    public static final String SSO_API="/api/ssologin";
 
 }
