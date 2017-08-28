@@ -3,11 +3,15 @@ package org.k8scmp.login.controller;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.k8scmp.basemodel.HttpResponseTemp;
+import org.k8scmp.login.domain.LoginType;
 import org.k8scmp.login.domain.UserPassword;
 import org.k8scmp.login.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,15 +19,25 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * Created by bysocket on 07/02/2017.
+ * Created by jason on 25/08/2017.
  */
 @Controller
 public class LoginController {
 
+	@GetMapping("/domain/UserPassword")
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String login() {
+    public String login(Model model) {
+    	model.addAttribute("UserPassword", new UserPassword());
         return "login/login";
     }
+    
+    @GetMapping("/domain/UserPassword")
+    @RequestMapping(value = "/lo", method = RequestMethod.GET)
+    public String login2(Model model) {
+    	model.addAttribute("UserPassword", new UserPassword());
+        return "demo/login";
+    }
+    
     
     @RequestMapping(value = "/index")
     public String index() {
@@ -33,10 +47,12 @@ public class LoginController {
     @Autowired
     UserService userService;
 
-    @ResponseBody
+    @PostMapping("/domain/UserPassword")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public HttpResponseTemp<?> normalLogin(@ModelAttribute UserPassword userPassword) {
-        return userService.normalLogin(userPassword);
+    public String normalLogin(@ModelAttribute UserPassword userPassword) {
+    	userPassword.setLoginType(LoginType.USER);
+    	HttpResponseTemp<?> resp = userService.normalLogin(userPassword);
+        return "overview/index";
     }
 
     @RequestMapping("/logout")
