@@ -1,4 +1,4 @@
-package org.k8scmp.appmgmt.mapper;
+package org.k8scmp.mapper.appmgmt;
 
 import org.apache.ibatis.annotations.*;
 import org.k8scmp.appmgmt.domain.AppInfo;
