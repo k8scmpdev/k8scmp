@@ -24,28 +24,17 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class LoginController {
 
+    @Autowired
+    UserService userService;
+    
+    
 	@GetMapping("/domain/UserPassword")	
     @RequestMapping(value="/login", method=RequestMethod.GET)
     public String login(Model model) {
     	model.addAttribute("UserPassword", new UserPassword());
         return "login/loginform";
     }
-	
-	@GetMapping("/domain/UserPassword")
-    @RequestMapping(value="/lo", method=RequestMethod.GET)
-    public String login2(Model model) {
-    	model.addAttribute("UserPassword", new UserPassword());
-        return "demo/login2";
-    }
     
-    
-    @RequestMapping(value="/index")
-    public String index() {
-        return "demo/index";
-    }
-    
-    @Autowired
-    UserService userService;
 
 	@PostMapping("/domain/UserPassword")
     @GetMapping("/domain/UserPassword")
