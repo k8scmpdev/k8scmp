@@ -79,13 +79,13 @@ public class ShiroConfig {
     public DmoShiroFilterFactoryBean shiroFilter() {
         DmoShiroFilterFactoryBean bean = new DmoShiroFilterFactoryBean();
         bean.setSecurityManager(securityManager());
-        bean.setLoginUrl("/login/login.html");
+        bean.setLoginUrl("/login");
         bean.setSuccessUrl("/");
 //        SsoFilter ssoFilter = new SsoFilter();
 //        ssoFilter.setSuccessUrl("/");
 //        ssoFilter.setFailureUrl("/login/login.html");
         DmoLogoutFilter dmoLogoutFilter = new DmoLogoutFilter();
-        dmoLogoutFilter.setRedirectUrl("/login/login.html");
+        dmoLogoutFilter.setRedirectUrl("/login");
 
         Map<String, Filter> filters = Maps.newLinkedHashMap();
         filters.put("front", new FrontFilter());

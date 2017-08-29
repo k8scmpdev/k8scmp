@@ -75,11 +75,14 @@ public class UserServiceImpl implements UserService {
         try {
             subject.login(token);
         } catch (UnknownAccountException e) {
-            throw ApiException.wrapMessage(ResultStat.USER_NOT_AUTHORIZED, "username wrong");
+        	return ResultStat.USER_NOT_AUTHORIZED.wrap(null,"username wrong");
+//            throw ApiException.wrapMessage(ResultStat.USER_NOT_AUTHORIZED, "username wrong");
         } catch (IncorrectCredentialsException e) {
-            throw ApiException.wrapMessage(ResultStat.USER_NOT_AUTHORIZED, "password wrong");
+        	return ResultStat.USER_NOT_AUTHORIZED.wrap(null,"password wrong");
+//            throw ApiException.wrapMessage(ResultStat.USER_NOT_AUTHORIZED, "password wrong");
         } catch (ExcessiveAttemptsException e) {
-            throw ApiException.wrapMessage(ResultStat.USER_NOT_AUTHORIZED, "login wrong too many times");
+        	return ResultStat.USER_NOT_AUTHORIZED.wrap(null,"login wrong too many times");
+//            throw ApiException.wrapMessage(ResultStat.USER_NOT_AUTHORIZED, "login wrong too many times");
         } catch (AuthenticationException e) {
             throw ApiException.wrapUnknownException(e);
         }

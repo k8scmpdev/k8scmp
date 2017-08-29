@@ -27,7 +27,7 @@ public class ShiroRedirectFilter extends FormAuthenticationFilter {
             String requestURI = request.getRequestURI();
             HttpServletResponse response = (HttpServletResponse) servletResponse;
             if (requestURI.equals("/")) {
-                WebUtils.issueRedirect(request, response, "/login/login.html");
+                WebUtils.issueRedirect(request, response, "/login/loginform");
             } else {
 
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -35,8 +35,8 @@ public class ShiroRedirectFilter extends FormAuthenticationFilter {
                 response.setContentType("text/html");
 
                 PrintWriter writer = response.getWriter();
-                writer.print("<html><head><meta http-equiv=\"refresh\" content=\"0; URL=/login/login.html\"></head><body>" +
-                        "<a href=\"login/login.html\">您尚未登录，请登录后再访问</a></body></html>");
+                writer.print("<html><head><meta http-equiv=\"refresh\" content=\"0; URL=/login/loginform\"></head><body>" +
+                        "<a href=\"login/loginforml\">您尚未登录，请登录后再访问</a></body></html>");
             }
 
         } catch (Exception e) {
