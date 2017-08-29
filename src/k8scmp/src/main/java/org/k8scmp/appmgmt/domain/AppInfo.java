@@ -1,37 +1,66 @@
 package org.k8scmp.appmgmt.domain;
 
-import java.util.Comparator;
-
-/**
- * Created by KaiRen on 2016/10/13.
- */
 public class AppInfo {
-    private String name;
-    private int id;
+    private String id;
+
+    private String appId;
+
+    private String namespace;
+
+    private String logicClusterId;
+
+    private String clusterId;
+
     private String description;
-    private int creatorId;
-    private String creatorName;
-    private long createTime;
-    private int memberCount;
-    private int deployCount;
 
-    public AppInfo() {
-    }
+    private String state;
 
-    public String getName() {
-        return name;
-    }
+    private String createTime;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    private String creatorId;
 
-    public int getId() {
+    private String lastModifiedTime;
+
+    private String lastModifierId;
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId == null ? null : appId.trim();
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace == null ? null : namespace.trim();
+    }
+
+    public String getLogicClusterId() {
+        return logicClusterId;
+    }
+
+    public void setLogicClusterId(String logicClusterId) {
+        this.logicClusterId = logicClusterId == null ? null : logicClusterId.trim();
+    }
+
+    public String getClusterId() {
+        return clusterId;
+    }
+
+    public void setClusterId(String clusterId) {
+        this.clusterId = clusterId == null ? null : clusterId.trim();
     }
 
     public String getDescription() {
@@ -39,60 +68,46 @@ public class AppInfo {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description == null ? null : description.trim();
     }
 
-    public int getCreatorId() {
-        return creatorId;
+    public String getState() {
+        return state;
     }
 
-    public void setCreatorId(int creatorId) {
-        this.creatorId = creatorId;
+    public void setState(String state) {
+        this.state = state == null ? null : state.trim();
     }
 
-    public String getCreatorName() {
-        return creatorName;
-    }
-
-    public void setCreatorName(String creatorName) {
-        this.creatorName = creatorName;
-    }
-
-    public long getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime == null ? null : createTime.trim();
     }
 
-    public int getMemberCount() {
-        return memberCount;
+    public String getCreatorId() {
+        return creatorId;
     }
 
-    public void setMemberCount(int memberCount) {
-        this.memberCount = memberCount;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId == null ? null : creatorId.trim();
     }
 
-    public int getDeployCount() {
-        return deployCount;
+    public String getLastModifiedTime() {
+        return lastModifiedTime;
     }
 
-    public void setDeployCount(int deployCount) {
-        this.deployCount = deployCount;
+    public void setLastModifiedTime(String lastModifiedTime) {
+        this.lastModifiedTime = lastModifiedTime == null ? null : lastModifiedTime.trim();
     }
 
+    public String getLastModifierId() {
+        return lastModifierId;
+    }
 
-    public static class DeployCollectionInfoListComparator implements Comparator<AppInfo> {
-        @Override
-        public int compare(AppInfo t1, AppInfo t2) { 
-            if (t2.getCreateTime() - t1.getCreateTime() > 0) {
-                return 1;
-            } else if (t2.getCreateTime() - t1.getCreateTime() < 0) {
-                return -1;
-            } else {
-                return 0;
-            }
-        }
+    public void setLastModifierId(String lastModifierId) {
+        this.lastModifierId = lastModifierId == null ? null : lastModifierId.trim();
     }
 }

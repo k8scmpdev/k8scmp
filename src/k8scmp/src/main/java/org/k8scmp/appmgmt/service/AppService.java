@@ -11,7 +11,7 @@ public interface AppService {
 
     HttpResponseTemp<?> deleteApp(String id);
 
-    HttpResponseTemp<?> modifyApp(String id, AppInfo appInfo);
+    HttpResponseTemp<?> modifyApp(AppInfo appInfo);
 
-    HttpResponseTemp<?> listApps();
+    HttpResponseTemp<?> listApps(AppInfo appInfo);
 }
