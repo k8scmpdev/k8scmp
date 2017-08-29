@@ -27,8 +27,7 @@ public class LoginController {
     @Autowired
     UserService userService;
     
-    
-	@GetMapping("/domain/UserPassword")	
+    	
     @RequestMapping(value="/login", method=RequestMethod.GET)
     public String login(Model model) {
     	model.addAttribute("UserPassword", new UserPassword());
@@ -36,8 +35,6 @@ public class LoginController {
     }
     
 
-	@PostMapping("/domain/UserPassword")
-    @GetMapping("/domain/UserPassword")
     @RequestMapping(value="/login", method = RequestMethod.POST)
     public String normalLogin(Model model,@ModelAttribute UserPassword userPassword) {
     	userPassword.setLoginType(LoginType.USER);
@@ -56,10 +53,10 @@ public class LoginController {
     }
 
     @RequestMapping("/logout")
-    public ModelAndView logout() {
+    public String logout(Model model) {
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
-        return new ModelAndView("redirect:/login/loginform");
+        return login(model);
     }
    
 }
