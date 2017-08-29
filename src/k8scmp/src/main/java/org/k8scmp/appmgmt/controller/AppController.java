@@ -14,7 +14,7 @@ import java.io.IOException;
  * Created by KaiRen on 2016/9/23.
  */
 @Controller
-@RequestMapping("/api/app")
+@RequestMapping("/app/app-mgmt")
 public class AppController {
     @Autowired
     AppService appService;
@@ -33,15 +33,14 @@ public class AppController {
 
     @ResponseBody
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public HttpResponseTemp<?> modifyApp(@PathVariable String id,
-                                                   @RequestBody AppInfo appInfo) throws Exception {
-        return appService.modifyApp(id, appInfo);
+    public HttpResponseTemp<?> modifyApp(@RequestBody AppInfo appInfo) throws Exception {
+        return appService.modifyApp(appInfo);
     }
 
     @ResponseBody
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public HttpResponseTemp<?> listApp() throws Exception {
-        return appService.listApps();
+    public HttpResponseTemp<?> listApp(@RequestBody AppInfo appInfo) throws Exception {
+        return appService.listApps(appInfo);
     }
 
 }

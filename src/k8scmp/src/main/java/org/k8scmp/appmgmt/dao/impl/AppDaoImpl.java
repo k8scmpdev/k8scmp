@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by KaiRen on 2016/9/20.
  */
-@Service("deployCollectionBiz")
+@Service("appDao")
 public class AppDaoImpl implements AppDao {
 
     @Autowired
@@ -20,17 +20,17 @@ public class AppDaoImpl implements AppDao {
     @Override
     public long createApp(AppInfo appInfo) {
 
-        return mapper.createApp(appInfo, appInfo.toString());
+        return mapper.createApp(appInfo);
     }
 
     @Override
     public void updateApp(AppInfo appInfo) {
-        mapper.updateApp(appInfo, appInfo.toString());
+        mapper.updateApp(appInfo);
     }
 
 	@Override
 	public void deleteApp(String id) {
-		// TODO Auto-generated method stub
+		 mapper.deleteApp(id);
 		
 	}
 
@@ -41,10 +41,14 @@ public class AppDaoImpl implements AppDao {
 	}
 
 	@Override
-	public List<AppInfo> getAppByName(String name) {
+	public List<AppInfo> getAppByAppId(String AppId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
+	public List<AppInfo> getApps(AppInfo appInfo) {
+		return mapper.getApps(appInfo);
+	}
  
 }

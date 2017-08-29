@@ -1,22 +1,30 @@
 package org.k8scmp.mapper.appmgmt;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.*;
 import org.k8scmp.appmgmt.domain.AppInfo;
 
 /**
- * Created by KaiRen on 2016/9/20.
+ * Created by Yanhl on 2017/8/24.
  */
 @Mapper
 public interface AppMapper {
-    @Insert("INSERT INTO " +
-            " (name, description, state, createTime, removeTime, removed, data) values (" +
-            " #{item.name}, #{item.description}, #{item.state}, #{item.createTime}, #{item.removeTime}," +
-            " #{item.removed}, #{data})")
-    @Options(useGeneratedKeys = true, keyProperty = "item.id", keyColumn = "id")
-    int createApp(@Param("item") AppInfo item, @Param("data") String data);
+	String BASIC_COLUMN =  " id, appId, namespace, logicClusterId, clusterId, description, state, createTime, creatorId, lastModifiedTime, lastModifierId ";
+	@Select({"<script>","SELECT" + BASIC_COLUMN + "from application where 1=1 ","<when test='item.appId!=null and item.appId!=&quot;&quot;'>",
+			 "and appId like '%${item.appId}%' ", "</when>","order by createTime desc","</script>"})
+    List<AppInfo> getApps(@Param("item") AppInfo item);
+	
+    @Insert("INSERT INTO (BASIC_COLUMN) values (" +
+            " #{item.id}, #{item.appId}, #{item.namespace}, #{item.logicClusterId}, #{item.clusterId}," +
+            " #{item.description}, #{item.state},#{item.createTime},#{item.creatorId},#{item.lastModifiedTime},#{item.lastModifierId})")
+    int createApp(@Param("item") AppInfo item);
 
-    @Update("update " +
-            " set name=#{item.name}, description=#{item.description}, state=#{item.state}, " +
-            "data=#{data} where id = #{item.id}")
-    int updateApp(@Param("item") AppInfo item, @Param("data") String data);
+    @Update("update application" +
+            " set appId=#{item.appId}, description=#{item.description} " +
+            "where id = #{item.id}")
+    int updateApp(@Param("item") AppInfo item);
+    
+    @Delete("delete from application where id = #{item.id}")
+	int deleteApp(@Param("id") String id);
 }
