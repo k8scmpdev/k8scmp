@@ -24,22 +24,22 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class LoginController {
 
-	@GetMapping("/domain/UserPassword")
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+	@GetMapping("/domain/UserPassword")	
+    @RequestMapping(value="/login", method=RequestMethod.GET)
     public String login(Model model) {
     	model.addAttribute("UserPassword", new UserPassword());
-        return "login/login";
+        return "login/loginform";
     }
-    
-    @GetMapping("/domain/UserPassword")
-    @RequestMapping(value = "/lo", method = RequestMethod.GET)
+	
+	@GetMapping("/domain/UserPassword")
+    @RequestMapping(value="/lo", method=RequestMethod.GET)
     public String login2(Model model) {
     	model.addAttribute("UserPassword", new UserPassword());
-        return "demo/login";
+        return "demo/login2";
     }
     
     
-    @RequestMapping(value = "/index")
+    @RequestMapping(value="/index")
     public String index() {
         return "demo/index";
     }
@@ -47,19 +47,30 @@ public class LoginController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/domain/UserPassword")
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String normalLogin(@ModelAttribute UserPassword userPassword) {
+	@PostMapping("/domain/UserPassword")
+    @GetMapping("/domain/UserPassword")
+    @RequestMapping(value="/login", method = RequestMethod.POST)
+    public String normalLogin(Model model,@ModelAttribute UserPassword userPassword) {
     	userPassword.setLoginType(LoginType.USER);
     	HttpResponseTemp<?> resp = userService.normalLogin(userPassword);
-        return "overview/index";
+    	if(resp.getResultCode()==200){
+    		model.addAttribute("userPassword",userPassword);
+    		return "overview/index";
+    	}else{
+    		if(resp.getResultMsg().split(":").length>0){
+    			model.addAttribute("msg", resp.getResultMsg().split(":")[1]);
+    		}else{
+    			model.addAttribute("msg", resp.getResultMsg());
+    		}
+	    	return login(model);
+    	}
     }
 
     @RequestMapping("/logout")
     public ModelAndView logout() {
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
-        return new ModelAndView("redirect:/login/login.html");
+        return new ModelAndView("redirect:/login/loginform");
     }
    
 }
