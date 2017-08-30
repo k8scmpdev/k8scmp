@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Created by zhenfengchen on 15-11-16.
+ * Created by jason on 2017-8-29.
  */
 @Component("jdbcRealm")
 public class JdbcRealm extends AuthorizingRealm {
