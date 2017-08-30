@@ -4,9 +4,6 @@ import org.k8scmp.appmgmt.domain.AppInfo;
 
 import java.util.List;
 
-/**
- * Created by KaiRen on 2016/9/20.
- */
 public interface AppDao{
 
 

@@ -25,32 +25,29 @@ public class AppServiceImpl implements AppService {
 
 
 	@Override
-	public HttpResponseTemp<?> createApp(
+	public Long createApp(
 			AppInfo appInfo) {
 		Long result = appDao.createApp(appInfo);
-		return ResultStat.OK.wrap(result);
+		return result;
 	}
 
 
 	@Override
-	public HttpResponseTemp<?> deleteApp(
-			String id) {
+	public void deleteApp(String id) {
 		appDao.deleteApp(id);
-		return ResultStat.OK.wrap(null);
 	}
 
 
 	@Override
-	public HttpResponseTemp<?> modifyApp(AppInfo appInfo) {
+	public void modifyApp(AppInfo appInfo) {
 		appDao.updateApp(appInfo);
-		return ResultStat.OK.wrap(null);
 	}
 
 
 	@Override
-	public HttpResponseTemp<?> listApps(AppInfo appInfo) {
+	public List<AppInfo> listApps(AppInfo appInfo) {
 		List<AppInfo> apps = appDao.getApps(appInfo);
-		return ResultStat.OK.wrap(apps);
+		return apps;
 	}
 
 
