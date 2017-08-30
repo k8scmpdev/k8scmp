@@ -2,45 +2,43 @@ package org.k8scmp.appmgmt.controller;
 
 import org.k8scmp.appmgmt.domain.AppInfo;
 import org.k8scmp.appmgmt.service.AppService;
-import org.k8scmp.basemodel.HttpResponseTemp;
-import org.k8scmp.basemodel.ResultStat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
 
-/**
- * Created by KaiRen on 2016/9/23.
- */
 @Controller
-@RequestMapping("/app/app-mgmt")
+@RequestMapping("app")
 public class AppController {
     @Autowired
     AppService appService;
 
-    @ResponseBody
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public HttpResponseTemp<?> createApp(@RequestBody AppInfo appInfo) throws Exception {
-        return ResultStat.OK.wrap(appService.createApp(appInfo));
+    @RequestMapping(value = "/create")
+    public String createApp(@RequestBody AppInfo appInfo) throws Exception {
+    	appService.createApp(appInfo);
+        return "app/app-mgmt";
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public HttpResponseTemp<?> deleteApp(@PathVariable String id) throws IOException {
-        return appService.deleteApp(id);
+    @RequestMapping(value = "/delete")
+    public String deleteApp(@PathVariable String id) throws Exception {
+        appService.deleteApp(id);
+        return "app/app-mgmt";
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public HttpResponseTemp<?> modifyApp(@RequestBody AppInfo appInfo) throws Exception {
-        return appService.modifyApp(appInfo);
+    @RequestMapping(value = "/modify")
+    public String modifyApp(@RequestBody AppInfo appInfo) throws Exception {
+        appService.modifyApp(appInfo);
+        return "app/app-mgmt";
     }
 
-    @ResponseBody
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public HttpResponseTemp<?> listApp(@RequestBody AppInfo appInfo) throws Exception {
-        return appService.listApps(appInfo);
+    @RequestMapping(value = "")
+    public ModelAndView listApps() throws Exception {
+    	return searchApps(null);
     }
 
+    @RequestMapping(value = "/search")
+    public ModelAndView searchApps(AppInfo appInfo) throws Exception {
+        return new ModelAndView("app/app-mgmt","appList",appService.listApps(appInfo));
+    }
 }
