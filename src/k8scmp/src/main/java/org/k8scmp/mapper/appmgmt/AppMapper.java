@@ -11,8 +11,10 @@ import org.k8scmp.appmgmt.domain.AppInfo;
 @Mapper
 public interface AppMapper {
 	String BASIC_COLUMN =  " id, appId, namespace, logicClusterId, clusterId, description, state, createTime, creatorId, lastModifiedTime, lastModifierId ";
-	@Select({"<script>","SELECT" + BASIC_COLUMN + "from application where 1=1 ","<when test='item.appId!=null and item.appId!=&quot;&quot;'>",
-			 "and appId like '%${item.appId}%' ", "</when>","order by createTime desc","</script>"})
+	@Select({"<script>","SELECT" + BASIC_COLUMN + "from application where 1=1 ","<when test='item!=null'>",
+			"<when test='item.appId!=null and item.appId!=&quot;&quot;'>",
+			"and appId like '%${item.appId}%' ", "</when>",
+		"</when>","order by createTime desc","</script>"})
     List<AppInfo> getApps(@Param("item") AppInfo item);
 	
     @Insert("INSERT INTO (BASIC_COLUMN) values (" +

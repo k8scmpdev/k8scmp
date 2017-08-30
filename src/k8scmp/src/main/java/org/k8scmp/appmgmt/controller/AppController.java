@@ -38,9 +38,7 @@ public class AppController {
     @ResponseBody
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ModelAndView listApps() throws Exception {
-    	AppInfo app = new AppInfo();
-    	app.setAppId("app");
-    	return searchApps(app);
+    	return searchApps(null);
 //        return new ModelAndView("/appList","appList",appService.listApps(app));
     }
 
