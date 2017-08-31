@@ -14,37 +14,31 @@ public class AppController {
     @Autowired
     AppService appService;
 
-    @ResponseBody
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/create")
     public String createApp(@RequestBody AppInfo appInfo) throws Exception {
     	appService.createApp(appInfo);
-        return "/app-mgmt";
+        return "app/app-mgmt";
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete")
     public String deleteApp(@PathVariable String id) throws Exception {
         appService.deleteApp(id);
-        return "/app-mgmt";
+        return "app/app-mgmt";
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/modify")
     public String modifyApp(@RequestBody AppInfo appInfo) throws Exception {
         appService.modifyApp(appInfo);
-        return "/app-mgmt";
+        return "app/app-mgmt";
     }
 
-    @ResponseBody
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "")
     public ModelAndView listApps() throws Exception {
     	return searchApps(null);
-//        return new ModelAndView("/appList","appList",appService.listApps(app));
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/search")
     public ModelAndView searchApps(AppInfo appInfo) throws Exception {
-        return new ModelAndView("/app-mgmt","appList",appService.listApps(appInfo));
+        return new ModelAndView("app/app-mgmt","appList",appService.listApps(appInfo));
     }
 }
