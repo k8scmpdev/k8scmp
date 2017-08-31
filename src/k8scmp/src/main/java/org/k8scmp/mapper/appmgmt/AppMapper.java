@@ -23,7 +23,7 @@ public interface AppMapper {
     int createApp(@Param("item") AppInfo item);
 
     @Update("update application" +
-            " set appId=#{item.appId}, description=#{item.description} " +
+            " set appId=#{item.appId}, description=#{item.description} ,namespace=#{item.namespace}, logicClusterId=#{item.logicClusterId}, clusterId=#{item.clusterId},lastModifiedTime=#{item.lastModifiedTime},lastModifierId=#{item.lastModifierId})" +
             "where id = #{item.id}")
     int updateApp(@Param("item") AppInfo item);
     
