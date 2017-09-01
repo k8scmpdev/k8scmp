@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta charset="UTF-8" />
+<title></title>
+<link rel="stylesheet" type="text/css"
+	th:href="@{highcharts/css/BigDataShow.css}" />
+
+</head>
+<body style="background-color: #313131;; text-align: center">
+	<div id="datashow-main" class="datashow-main">
+		<div id="datashow-title">demo大数据平台</div>
+		<div id="datashow-top-nav">
+			<table border="0" align="center">
+				<tr>
+					<td><div id="datashow-nav-car" class="datashow-top-nav">
+							过车总量<br/> 123899000001
+						</div>
+					</td>
+					<td style="width: 50%" rowspan="2">
+						<div class="wrap" style="width: 450px;">
+							<div class="items" id="Item0">
+								<div class="itemCon">
+									<div id="Map"></div>
+								</div>
+							</div>
+						</div>
+					</td>
+					<td><div id="datashow-nav-people" class="datashow-top-nav">
+							人员总量<br/> 11万
+						</div></td>
+				</tr>
+				<tr>
+					<td><div id="datashow-nav-ytpeople" class="datashow-top-nav">
+							全烟常驻人口库<br/> 350万
+						</div></td>
+					<td><div id="datashow-nav-operation" class="datashow-top-nav">
+							运维总设备<br/> 9000
+						</div></td>
+				</tr>
+			</table>
+		</div>
+		<div class="datashow-charts">
+			<div class="datashow-chart" id="chart-nowcar"></div>
+			<div class="datashow-chart" id="chart-7daycar"></div>
+			<div class="datashow-chart" id="chart-yearpeople"></div>
+			<div class="datashow-chart" id="chart-agepeople"></div>
+		</div>
+		
+	</div>
+</body>
+<script th:src="@{highcharts/js/jquery-1.7.2.min.js}"></script>
+<script th:src="@{highcharts/js/highcharts.js}"></script>
+<script th:src="@{highcharts/js/chart-nowcar.js}"></script>
+<script th:src="@{highcharts/js/chart-7daycar.js}"></script>
+<script th:src="@{highcharts/js/chart-yearpeople.js}"></script>
+<script th:src="@{highcharts/js/chart-agepeople.js}"></script>
+
+<script type="text/javascript"
+	th:src="@{highcharts/js/lib/raphael-min.js}"></script>
+<script type="text/javascript" th:src="@{highcharts/js/map.js}"></script>
+<script type="text/javascript" th:src="@{highcharts/data/c3706.js}"></script>
+<script type="text/javascript">
+	$(function() {
+		// 默认
+		$('#Map').SVGMap({
+			mapName : 'c3706',
+			mapWidth : 400,
+			mapHeight : 300,
+			showName : true
+		});
+	});
+</script>
+</html>
