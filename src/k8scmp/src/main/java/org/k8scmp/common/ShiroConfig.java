@@ -80,7 +80,7 @@ public class ShiroConfig {
         DmoShiroFilterFactoryBean bean = new DmoShiroFilterFactoryBean();
         bean.setSecurityManager(securityManager());
         bean.setLoginUrl("/login");
-        bean.setSuccessUrl("/");
+        bean.setSuccessUrl("/overview/index");
 //        SsoFilter ssoFilter = new SsoFilter();
 //        ssoFilter.setSuccessUrl("/");
 //        ssoFilter.setFailureUrl("/login/login.html");
