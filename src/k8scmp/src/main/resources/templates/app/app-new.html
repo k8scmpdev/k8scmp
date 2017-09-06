@@ -9,6 +9,7 @@
 		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
 		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
 		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/k8scmp.css}" />
 		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>
 	<body>
@@ -89,48 +90,44 @@
 							</div>
 							
 							<div class="widget-content">
-								<div style="padding-left: 30%">
-									<span class="label label-info">应用名称</span>&nbsp;
-									<input type="text" placeholder="输入应用名称（字母数字）..." style="font-style: italic;font-size: 12px"/>
-								</div>
-								<div style="padding-left: 30%">
-									<span class="label label-info">应用描述</span>&nbsp;
-									<textarea rows="3" cols="5"></textarea>
-								</div>
-								<div style="padding-left: 30%">
-									<span class="label label-info">物理集群</span>&nbsp;
-									<div class="btn-group">
-									  <button class="btn">集群1</button>
-									  <button data-toggle="dropdown" class="btn dropdown-toggle"><span class="caret"></span></button>
-									  <ul class="dropdown-menu">
-										<li><a href="#">集群1</a></li>
-										<li><a href="#">集群2</a></li>
-										<li><a href="#">集群3</a></li>
-									  </ul>
+								<form action="#" method="get" class="form-horizontal">
+									<div class="control-group">
+	                                        <label class="control-label">应用名称</label>
+	                                        <div class="controls">
+	                                            <input class="normaltext" type="text" placeholder="输入应用名称（字母数字）..." style="font-style: italic;font-size: 12px"/>
+	                                        </div>
+		                            </div>
+		                            <div class="control-group">
+                                        <label class="control-label">应用描述</label>
+                                        <div class="controls">
+                                            <textarea rows="3" cols="5"></textarea>
+                                        </div>
+	                                </div>
+	                                <div class="control-group">
+                                        <label class="control-label">物理集群</label>
+                                        <div class="controls">
+                                            <select>
+												<option>集群1</option>
+												<option>集群2</option>
+												<option>集群3</option>
+											</select>
+                                        </div>
+	                                </div>
+	                                <div class="control-group">
+                                        <label class="control-label">逻辑集群</label>
+                                        <div class="controls">
+                                            <select>
+												<option>开发环境</option>
+												<option>测试环境</option>
+											</select>
+                                        </div>
+	                                </div>
+	                                
+	                                <div class="form-actions">
+										<button type="submit" class="btn btn-primary">保存</button>&nbsp;&nbsp;&nbsp;
+										<button class="btn btn-primary">取消</button>
 									</div>
-								</div>
-								<br/>
-								<div style="padding-left: 30%">
-									<span class="label label-info">逻辑集群</span>&nbsp;
-									<div class="btn-group">
-									  <button class="btn">开发环境</button>
-									  <button data-toggle="dropdown" class="btn dropdown-toggle"><span class="caret"></span></button>
-									  <ul class="dropdown-menu">
-										<li><a href="#">开发环境</a></li>
-										<li><a href="#">测试环境</a></li>
-									  </ul>
-									</div>
-								</div>
-								<br/>
-								<div style="padding-left: 40%">
-									<div>
-										<div class="buttons">
-											<a title="完成" class="btn" href="app-mgmt.html"><i class="icon-ok-sign"></i>完成</a>
-											<a title="取消" class="btn" href="app-mgmt.html"><i class="icon-remove-sign"></i>取消</a>
-										</div>
-									</div>
-										
-								</div>
+								</form>
 							</div>
 						</div>
 					</div>
