@@ -65,7 +65,7 @@
 			</div>
 			<div id="search" style="padding-top: 15%;padding-left: 50%">
 			<form action="/app/search" method="post">
-				<input name="appId" type="text" placeholder="输入应用名称查询..." style="font-size: 11px;font-style: italic;color: white"/>
+				<input name="appCode" type="text" placeholder="输入应用名称查询..." style="font-size: 11px;font-style: italic;color: white"/>
 				<button type="submit" class="tip-top" title="Search" ><i class="icon-search icon-white"></i></button>
 			</form>	
 			</div>
@@ -97,7 +97,7 @@
 									<tbody id="tBody">
 									    <tr th:each="app,itState:${appList}">
 									    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
-									        <td><a title='单击查看服务列表' th:href="@{/app/service-mgmt(appId=${app.appCode},logicClusterId=${app.logicClusterId},namespace=${app.namespace})}" th:text="${app.appId}" class="tip-top"></a></td>
+									        <td><a title='单击查看服务列表' th:href="@{/app/service-mgmt(appCode=${app.appCode},hostLabel=${app.hostLabel},namespace=${app.namespace})}" th:text="${app.appCode}" class="tip-top"></a></td>
 									        <td th:text="${app.state}"></td>
 									        <td th:text="${app.hostLabel}"></td>
 									        <td th:text="${app.clusterId}"></td>
