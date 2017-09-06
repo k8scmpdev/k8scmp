@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Unicorn Admin</title>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<script th:src="@{/js/jquery.min.js}"></script>
+        <script th:src="@{/js/jquery.ui.custom.js}"></script>
+        <script th:src="@{/js/bootstrap.min.js}"></script>
+        <script th:src="@{/js/jquery.uniform.js}"></script>
+        <script th:src="@{/js/select2.min.js}"></script>
+        <script th:src="@{/js/jquery.dataTables.min.js}"></script>
+        <script th:src="@{/js/unicorn.js}"></script>
+        <script th:src="@{/js/unicorn.tables.js}"></script>
+	</head>
+	<body>
+		
+		
+		<div id="header">
+			<h1><a href="./dashboard.html">PaaS云管理控制台</a></h1>		
+		</div>
+		<div id="user-nav" class="navbar navbar-inverse">
+            <ul class="nav btn-group">
+                <li class="btn btn-inverse"><a title="" href="#"><i class="icon icon-user"></i> <span class="text">Profile</span></a></li>
+                <li class="btn btn-inverse dropdown" id="menu-messages"><a href="#" data-toggle="dropdown" data-target="#menu-messages" class="dropdown-toggle"><i class="icon icon-envelope"></i> <span class="text">Messages</span> <span class="label label-important">5</span> <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a class="sAdd" title="" href="#">new message</a></li>
+                        <li><a class="sInbox" title="" href="#">inbox</a></li>
+                        <li><a class="sOutbox" title="" href="#">outbox</a></li>
+                        <li><a class="sTrash" title="" href="#">trash</a></li>
+                    </ul>
+                </li>
+                <li class="btn btn-inverse"><a title="" href="#"><i class="icon icon-cog"></i> <span class="text">Settings</span></a></li>
+                <li class="btn btn-inverse"><a title="" href="login.html"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
+            </ul>
+        </div>
+            
+		<div id="sidebar">
+			<a href="#" class="visible-phone"><i class="icon icon-th-title"></i>服务管理</a>
+			<ul>
+				<li><a href="index.html"><i class="icon icon-home"></i> <span>总览</span></a></li>
+				<li><a href="buttons.html"><i class="icon icon-tint"></i> <span>全局配置</span></a></li>
+				<li class="active"><a href="app-mgmt.html"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
+				
+				<li class="submenu">
+					<a href="#"><i class="icon icon-file"></i> <span>报警监控</span> <span class="label">3</span></a>
+					<ul>
+						<li><a href="invoice.html">用户操作日志</a></li>
+						<li><a href="chat.html">监控管理</a></li>
+						<li><a href="calendar.html">报警管理</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		
+		<div id="style-switcher">
+			<i class="icon-arrow-left icon-white"></i>
+			<span>Style:</span>
+			<a href="#grey" style="background-color: #555555;border-color: #aaaaaa;"></a>
+			<a href="#blue" style="background-color: #2D2F57;"></a>
+			<a href="#red" style="background-color: #673232;"></a>
+		</div>
+		
+		<div id="content">
+			<div id="content-header">
+				<h1>服务管理</h1>
+			</div>
+			<div id="breadcrumb">
+				<a href="/app" class="tip-bottom">应用管理</a>
+				<a href="#" class="current">服务管理</a>
+			</div>
+			<div id="search" style="padding-top: 15%;padding-left: 50%">
+				<input type="text" placeholder="输入服务名称查询..." style="font-size: 11px;font-style: italic;color: white"/><button type="submit" class="tip-top" title="Search"><i class="icon-search icon-white"></i></button>
+			</div>
+			<div class="buttons" style="padding-top: 2%;padding-left: 2%">
+				<a title="添加一个服务" class="btn tip-bottom" href="service-new.html"><i class="icon-plus"></i>添加服务</a>
+				<a title="启动服务" class="btn tip-bottom" href="serice-start.html"><i class="icon-play"></i>启动</a>
+				<a title="停止服务" class="btn tip-bottom" href="service-stop.html"><i class="icon-off"></i>停止</a>
+				<a title="升级/回滚" class="btn tip-bottom" href="service-upordowngrade.html"><i class="icon-repeat"></i>升级/回滚</a>
+				<a title="扩容/缩容" class="btn tip-bottom" href="service-capacity.html"><i class="icon-resize-small"></i>扩容/缩容</a>
+				<a title="删除" class="btn tip-bottom"><i class="icon-remove"></i>删除</a>
+			</div>	
+			<div class="container-fluid">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="widget-box">
+							<div class="widget-title">
+								<h5>所属集群：<span th:text="@{logicClusterId}"></span>&nbsp;&nbsp;
+									namespace：<span th:text="@{namespace}"></span> </h5>
+							</div>
+							<div class="widget-content nopadding">
+							<input type="hidden" id="apps"/>
+								<table class="table table-bordered data-table with-check">
+									<thead>
+										<tr>
+											<th><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></th>
+											<th>服务名称</th>
+											<th>启动顺序</th>
+											<th>状态</th>
+											<th>所属应用</th>
+											<th>创建人</th>
+											<th>创建时间</th>
+							
+										</tr>
+									</thead>
+									<tbody id="tBody">
+									    <tr th:each="service,itState:${serviceList}">
+									    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
+									        <td><a title='单击查看服务详情' th:href="@{app/service-detail(serviceId=${service.serviceId})}" th:text="${service.serviceId}" class="tip-top"></a></td>
+									        <td th:text="${service.turn}"></td>
+									        <td th:text="${service.state}"></td>
+									        <td th:text="${service.appId}"></td>
+									        <td th:text="${service.creator}"></td>
+									        <td th:text="${service.createTime}"></td>
+									    </tr>
+									</tbody>
+								</table>							
+							</div>
+						</div>				
+					</div>
+				</div>
+				
+				<div class="row-fluid">
+					<div id="footer" class="span12">
+						2012 &copy; Unicorn Admin. Brought to you by <a href="https://wrapbootstrap.com/user/diablo9983">diablo9983</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>

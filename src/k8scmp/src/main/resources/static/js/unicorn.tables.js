@@ -5,6 +5,7 @@
 $(document).ready(function(){
 	
 	$('.data-table').dataTable({
+		"bFilter":false,
 		"bJQueryUI": true,
 		"sPaginationType": "full_numbers",
 		"sDom": '<""l>t<"F"fp>'

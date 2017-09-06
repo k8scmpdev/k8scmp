@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Unicorn Admin</title>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
+		<script th:src="@{/js/jquery.min.js}"></script>
+        <script th:src="@{/js/jquery.ui.custom.js}"></script>
+        <script th:src="@{/js/bootstrap.min.js}"></script>
+        <script th:src="@{/js/jquery.uniform.js}"></script>
+        <script th:src="@{/js/select2.min.js}"></script>
+        <script th:src="@{/js/jquery.dataTables.min.js}"></script>
+        <script th:src="@{/js/unicorn.js}"></script>
+        <script th:src="@{/js/unicorn.tables.js}"></script>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	
+	<body>
+		<div id="header">
+			<h1><a href="./dashboard.html">PaaS云管理控制台</a></h1>		
+		</div>
+		<div id="user-nav" class="navbar navbar-inverse">
+            <ul class="nav btn-group">
+                <li class="btn btn-inverse"><a title="" href="login.html"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
+            </ul>
+        </div>
+		<div id="sidebar">
+			<a href="#" class="visible-phone"><i class="icon icon-th-title"></i>应用管理</a>
+			<ul>
+				<li><a href="index.html"><i class="icon icon-home"></i> <span>总览</span></a></li>
+				<li><a href="buttons.html"><i class="icon icon-tint"></i> <span>全局配置</span></a></li>
+				<li class="active"><a href="/app"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
+				
+				<li class="submenu">
+					<a href="#"><i class="icon icon-file"></i> <span>报警监控</span> <span class="label">3</span></a>
+					<ul>
+						<li><a href="invoice.html">用户操作日志</a></li>
+						<li><a href="chat.html">监控管理</a></li>
+						<li><a href="calendar.html">报警管理</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		
+		<div id="style-switcher">
+			<i class="icon-arrow-left icon-white"></i>
+			<span>Style:</span>
+			<a href="#grey" style="background-color: #555555;border-color: #aaaaaa;"></a>
+			<a href="#blue" style="background-color: #2D2F57;"></a>
+			<a href="#red" style="background-color: #673232;"></a>
+		</div>
+		
+		<div id="content">
+			<div id="content-header">
+				<h1>应用管理</h1>
+			</div>
+			<div id="breadcrumb">
+				<a href="#" class="current tip-bottom" title="应用管理">应用管理</a>
+			</div>
+			<div id="search" style="padding-top: 15%;padding-left: 50%">
+			<form action="/app/search" method="post">
+				<input name="appId" type="text" placeholder="输入应用名称查询..." style="font-size: 11px;font-style: italic;color: white"/>
+				<button type="submit" class="tip-top" title="Search" ><i class="icon-search icon-white"></i></button>
+			</form>	
+			</div>
+			<div class="buttons" style="padding-top: 2%;padding-left: 2%">
+				<a title="创建应用" class="btn tip-bottom" href="/app/app-new"><i class="icon-plus"></i>创建应用</a>
+				<a title="删除应用" class="btn tip-bottom" href="#"><i class="icon-remove"></i>删除</a>
+			</div>	
+			<div class="container-fluid">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="widget-box">
+							<div class="widget-title">
+								<h5>应用列表</h5>
+							</div>
+							<div class="widget-content nopadding">
+								<table class="table table-bordered data-table with-check">
+									<thead>
+										<tr>
+											<th><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></th>
+											<th>应用名称</th>
+											<th>状态</th>
+											<th>逻辑集群</th>
+											<th>物理集群</th>
+											<th>创建时间</th>
+											<th>应用描述</th>
+							
+										</tr>
+									</thead>
+									<tbody id="tBody">
+									    <tr th:each="app,itState:${appList}">
+									    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
+									        <td><a title='单击查看服务列表' th:href="@{/app/service-mgmt(appId=${app.appId},logicClusterId=${app.logicClusterId},namespace=${app.namespace})}" th:text="${app.appId}" class="tip-top"></a></td>
+									        <td th:text="${app.state}"></td>
+									        <td th:text="${app.logicClusterId}"></td>
+									        <td th:text="${app.clusterId}"></td>
+									       <!-- <td><i class="icon-list-alt tip-top" title="点击查看地址"></i></td> --> 
+									        <td th:text="${app.createTime}"></td>
+									        <td th:text="${app.description}"></td>
+									    </tr>
+									</tbody>
+								</table>							
+							</div>
+						</div>				
+					</div>
+				</div>
+				
+				<div class="row-fluid">
+					<div id="footer" class="span12">
+						2012 &copy; Unicorn Admin. Brought to you by <a href="https://wrapbootstrap.com/user/diablo9983">diablo9983</a>
+					</div>
+				</div>
+			</div>
+		</div>  
+	</body>
+</html>
