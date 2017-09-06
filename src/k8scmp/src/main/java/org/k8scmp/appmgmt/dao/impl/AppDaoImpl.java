@@ -40,11 +40,6 @@ public class AppDaoImpl implements AppDao {
 		return null;
 	}
 
-	@Override
-	public List<AppInfo> getAppByAppId(String AppId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public List<AppInfo> getApps(AppInfo appInfo) {

@@ -15,8 +15,6 @@ public interface AppDao{
 
     AppInfo getApp(String id);
 
-    List<AppInfo> getAppByAppId(String AppId);
-
 	List<AppInfo> getApps(AppInfo appInfo);
 
 }
