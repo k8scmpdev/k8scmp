@@ -3,11 +3,11 @@ package org.k8scmp.appmgmt.domain;
 public class AppInfo {
     private String id;
 
-    private String appId;
+    private String appCode;
 
     private String namespace;
 
-    private String logicClusterId;
+    private String hostLabel;
 
     private String clusterId;
 
@@ -31,12 +31,12 @@ public class AppInfo {
         this.id = id == null ? null : id.trim();
     }
 
-    public String getAppId() {
-        return appId;
+    public String getAppCode() {
+        return appCode;
     }
 
-    public void setAppId(String appId) {
-        this.appId = appId == null ? null : appId.trim();
+    public void setAppCode(String appCode) {
+        this.appCode = appCode == null ? null : appCode.trim();
     }
 
     public String getNamespace() {
@@ -47,12 +47,12 @@ public class AppInfo {
         this.namespace = namespace == null ? null : namespace.trim();
     }
 
-    public String getLogicClusterId() {
-        return logicClusterId;
+    public String getHostLabel() {
+        return hostLabel;
     }
 
-    public void setLogicClusterId(String logicClusterId) {
-        this.logicClusterId = logicClusterId == null ? null : logicClusterId.trim();
+    public void setHostLabel(String hostLabel) {
+        this.hostLabel = hostLabel == null ? null : hostLabel.trim();
     }
 
     public String getClusterId() {
