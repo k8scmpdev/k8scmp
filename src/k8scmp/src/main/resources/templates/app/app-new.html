@@ -11,7 +11,13 @@
 		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
 		<link rel="stylesheet" th:href="@{/css/k8scmp.css}" />
 		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	  
+        <script th:src="@{/js/jquery.min.js}"></script>
+        <script th:src="@{/js/jquery.ui.custom.js}"></script>
+        <script th:src="@{/js/bootstrap.min.js}"></script>
+        <script th:src="@{/js/unicorn.js}"></script>
+	</head>
 	<body>
 		
 		
@@ -90,7 +96,7 @@
 							</div>
 							
 							<div class="widget-content">
-								<form action="#" method="get" class="form-horizontal">
+								<form action="/app/new" method="get" class="form-horizontal">
 									<div class="control-group">
 	                                        <label class="control-label">应用名称</label>
 	                                        <div class="controls">
@@ -125,8 +131,9 @@
 	                                
 	                                <div class="form-actions">
 										<button type="submit" class="btn btn-primary">保存</button>&nbsp;&nbsp;&nbsp;
-										<button class="btn btn-primary">取消</button>
+										<button class="btn btn-primary" onclick="/app/app-mgmt">取消</button>
 									</div>
+									 
 								</form>
 							</div>
 						</div>
@@ -140,12 +147,5 @@
 				</div>
 			</div>
 		</div>
-		
-		
-            
-            <script src="js/jquery.min.js"></script>
-            <script src="js/jquery.ui.custom.js"></script>
-            <script src="js/bootstrap.min.js"></script>
-            <script src="js/unicorn.js"></script>
 	</body>
 </html>

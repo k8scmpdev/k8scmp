@@ -215,12 +215,25 @@ a:hover {
 	background-image: -o-linear-gradient(top, #FFFFFF 0%, #EEEEEE 100%);
 	background-image: linear-gradient(top, #FFFFFF 0%, #EEEEEE 100%);
     border-top-left-radius: 8px;
-    height: 80px;
+    /*height: 80px; changed on 20170907*/
+    height: 60px;
     position: abslute;
     width: 100%;
     margin-top: -38px;
     z-index: 20;
 }
+/* add on 20170907 for h2 dispaly some like h1*/
+
+#content-header h2 {
+    color: #555555;
+    font-size:22px;
+    font-weight: normal;
+    float: left;
+    text-shadow: 0 1px 0 #ffffff;
+    margin-left: 20px;
+    position: absolute;
+}
+
 
 #content-header h1 {
     color: #555555;
@@ -250,7 +263,8 @@ a:hover {
 }
 
 .container-fluid .row-fluid:first-child {
-	margin-top: 20px;
+	/*changed on 20170907 margin-top: 20px;*/
+	margin-top: 0px;
 }
 /* Breadcrumb */
 #breadcrumb {
@@ -296,7 +310,8 @@ a:hover {
 	background-color: #000000;
 	z-index: 40;
 	right: 0;
-	top: 123px;
+	/*top: 123px;*/
+	top: 21%;
 	border-radius: 5px 0 0 5px;
 	margin-right: -190px;
 }
@@ -619,7 +634,8 @@ a:hover {
     border-left: 1px solid #CDCDCD;
     border-right: 1px solid #CDCDCD;
     clear: both;
-    margin-top: 16px;
+    /*changed on 20170907 margin-top: 16px;*/
+    margin-top: 1%;
     margin-bottom: 16px;
     position: relative;
 }
@@ -648,6 +664,7 @@ a:hover {
     background-image: -linear-gradient(top, #fdfdfd 0%, #eaeaea 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fdfdfd', endColorstr='#eaeaea',GradientType=0 ); /* IE6-9 */
     border-bottom: 1px solid #CDCDCD;
+    /*height: 36px; changed on 20170907*/
     height: 36px;
 }
 .widget-title .nav-tabs {
