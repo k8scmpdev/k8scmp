@@ -9,7 +9,7 @@
 		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
 		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
 		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
-		<link rel="stylesheet" th:href="@{/css/k8scmp.css}" type="text/css"/>	
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<script th:src="@{/js/jquery.min.js}"></script>
         <script th:src="@{/js/jquery.ui.custom.js}"></script>
@@ -17,23 +17,12 @@
         <script th:src="@{/js/unicorn.js}"></script>
 	</head>
 	<body>
-		
-		
+
 		<div id="header">
 			<h1><a href="./dashboard.html">Unicorn Admin</a></h1>		
 		</div>
 		<div id="user-nav" class="navbar navbar-inverse">
             <ul class="nav btn-group">
-                <li class="btn btn-inverse"><a title="" href="#"><i class="icon icon-user"></i> <span class="text">Profile</span></a></li>
-                <li class="btn btn-inverse dropdown" id="menu-messages"><a href="#" data-toggle="dropdown" data-target="#menu-messages" class="dropdown-toggle"><i class="icon icon-envelope"></i> <span class="text">Messages</span> <span class="label label-important">5</span> <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a class="sAdd" title="" href="#">new message</a></li>
-                        <li><a class="sInbox" title="" href="#">inbox</a></li>
-                        <li><a class="sOutbox" title="" href="#">outbox</a></li>
-                        <li><a class="sTrash" title="" href="#">trash</a></li>
-                    </ul>
-                </li>
-                <li class="btn btn-inverse"><a title="" href="#"><i class="icon icon-cog"></i> <span class="text">Settings</span></a></li>
                 <li class="btn btn-inverse"><a title="" href="login.html"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
             </ul>
         </div>
@@ -55,18 +44,9 @@
 					</li>
 				</ul>
 			</div>
-		
-		<div id="style-switcher">
-			<i class="icon-arrow-left icon-white"></i>
-			<span>Style:</span>
-			<a href="#grey" style="background-color: #555555;border-color: #aaaaaa;"></a>
-			<a href="#blue" style="background-color: #2D2F57;"></a>
-			<a href="#red" style="background-color: #673232;"></a>
-		</div>
-		
 		<div id="content">
 			<div id="content-header">
-				<h1>添加服务</h1>
+				<h2>添加服务</h2>
 			</div>
 			<div id="breadcrumb">
 				<a href="/app" class="tip-bottom" title="应用管理">应用管理</a>
@@ -132,8 +112,8 @@
                                 		</div>
 	                                </div>
 	                            
-									<div class="form-actions">
-										<button class="btn btn-primary">取消</button>
+									<div class="form-actions" style="text-align: left;padding-left: 40%">
+										<button class="btn btn-primary">取消</button>&nbsp;&nbsp;&nbsp;
 										<button class="btn btn-primary" onclick="javascrtpt:window.location.href='/app/service1'">下一步</button>
 									</div>
 								</form>
