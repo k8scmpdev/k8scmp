@@ -46,4 +46,15 @@ public class ServiceDaoImpl implements ServiceDao {
 		return mapper.getServicesByAppId(appId);
 	}
 	
+	@Override
+	public String getServiceStatu(String id) {
+		return mapper.getServiceStatu(id);
+	}
+
+	@Override
+	public void updateServiceStatu(String state, String id) {
+		mapper.updateServiceStatu(state, id);
+	}
+	
+	
 }

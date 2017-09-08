@@ -19,4 +19,8 @@ public interface ServiceDao{
 
 	List<ServiceInfo> getServicesByAppId(String appId);
 
+	String getServiceStatu(String id);
+	
+	void updateServiceStatu(String state,String id);
+
 }

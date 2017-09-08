@@ -6,6 +6,10 @@ import java.util.List;
 import org.k8scmp.appmgmt.dao.AppDao;
 import org.k8scmp.appmgmt.domain.AppInfo;
 import org.k8scmp.appmgmt.service.AppService;
+import org.k8scmp.basemodel.ResourceType;
+import org.k8scmp.operation.OperationLog;
+import org.k8scmp.operation.OperationRecord;
+import org.k8scmp.operation.OperationType;
 import org.k8scmp.util.DateUtil;
 import org.k8scmp.util.UUIDUtil;
 import org.slf4j.Logger;
@@ -20,7 +24,10 @@ import org.springframework.stereotype.Service;
 public class AppServiceImpl implements AppService {
     @Autowired
     AppDao appDao;
-
+    
+    @Autowired
+    OperationLog operationLog;
+    
     private static Logger logger = LoggerFactory.getLogger(AppServiceImpl.class);
 
 	@Override
@@ -29,12 +36,33 @@ public class AppServiceImpl implements AppService {
 		appInfo.setCreatorId("");
 		appInfo.setCreateTime(DateUtil.dateFormatToMillis(new Date()));
 		Long result = appDao.createApp(appInfo);
+		operationLog.insertRecord(new OperationRecord(
+				appInfo.getId(), 
+				ResourceType.APPLICATION,
+				OperationType.SET, 
+				"", 
+				"", 
+				"OK", 
+				"", 
+				DateUtil.dateFormatToMillis(new Date())
+		));
+		
 		return result;
 	}
 
 	@Override
 	public void deleteApp(String id) {
 		appDao.deleteApp(id);
+		operationLog.insertRecord(new OperationRecord(
+				id, 
+				ResourceType.APPLICATION,
+				OperationType.DELETE, 
+				"", 
+				"", 
+				"OK", 
+				"", 
+				DateUtil.dateFormatToMillis(new Date())
+		));
 	}
 
 	@Override
@@ -42,6 +70,16 @@ public class AppServiceImpl implements AppService {
 		appInfo.setLastModifierId("");
 		appInfo.setLastModifiedTime(DateUtil.dateFormatToMillis(new Date()));
 		appDao.updateApp(appInfo);
+		operationLog.insertRecord(new OperationRecord(
+				appInfo.getId(), 
+				ResourceType.APPLICATION,
+				OperationType.MODIFY, 
+				"", 
+				"", 
+				"OK", 
+				"", 
+				DateUtil.dateFormatToMillis(new Date())
+		));
 	}
 
 	@Override

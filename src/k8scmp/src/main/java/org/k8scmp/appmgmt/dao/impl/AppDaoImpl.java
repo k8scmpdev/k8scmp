@@ -36,8 +36,7 @@ public class AppDaoImpl implements AppDao {
 
 	@Override
 	public AppInfo getApp(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		return mapper.getApp(id);
 	}
 
 
@@ -46,4 +45,8 @@ public class AppDaoImpl implements AppDao {
 		return mapper.getApps(appInfo);
 	}
  
+	@Override
+	public List<AppInfo> getAppsByserviceCode(String serviceCode) {
+		return mapper.getAppsByserviceCode(serviceCode);
+	}
 }

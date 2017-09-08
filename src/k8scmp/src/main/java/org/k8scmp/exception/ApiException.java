@@ -17,26 +17,26 @@ public class ApiException extends RuntimeException {
         this.stat = stat;
     }
 
-    protected ApiException(ResultStat stat) {
+    public ApiException(ResultStat stat) {
         this.stat = stat;
     }
 
-    protected ApiException(ResultStat stat, String message) {
+    public ApiException(ResultStat stat, String message) {
         super(message);
         this.stat = stat;
     }
 
-    private ApiException(ResultStat stat, Throwable cause) {
+    public ApiException(ResultStat stat, Throwable cause) {
         super(cause);
         this.stat = stat;
     }
 
-    private ApiException(ResultStat stat, String msg, Throwable cause) {
+    public ApiException(ResultStat stat, String msg, Throwable cause) {
         super(msg, cause);
         this.stat = stat;
     }
 
-    protected ApiException() {
+    public ApiException() {
     }
 
 //    private ApiException(Throwable cause) {

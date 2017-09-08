@@ -17,4 +17,6 @@ public interface AppDao{
 
 	List<AppInfo> getApps(AppInfo appInfo);
 
+	List<AppInfo> getAppsByserviceCode(String serviceCode);
+
 }

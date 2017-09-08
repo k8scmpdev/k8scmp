@@ -1,6 +1,6 @@
 package org.k8scmp.appmgmt.controller;
 
-import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
+import org.k8scmp.appmgmt.domain.ServiceDetail;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.appmgmt.service.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,8 @@ public class ServiceController {
     ServiceService serviceService;
 
     @RequestMapping(value = "/create")
-    public String createService(@RequestBody ServiceConfigInfo serviceConfigInfo) throws Exception {
-    	serviceService.createService(serviceConfigInfo);
+    public String createService(@RequestBody ServiceDetail serviceDetail) throws Exception {
+    	serviceService.createService(serviceDetail);
         return "app/service-mgmt";
     }
 

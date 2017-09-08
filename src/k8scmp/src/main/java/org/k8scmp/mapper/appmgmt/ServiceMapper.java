@@ -27,6 +27,8 @@ public interface ServiceMapper {
 			"and serviceCode like '%${item.serviceCode}%' ", "</when>",
 			"<when test='item.appId!=null and item.appId!=&quot;&quot;'>",
 			"and appId=#{item.appId} ", "</when>",
+			"<when test='item.state!=null and item.state!=&quot;&quot;'>",
+			"and state=#{item.state} ", "</when>",
 		"</when>","order by createTime desc","</script>"})
     List<ServiceInfo> getServices(@Param("item") ServiceInfo item);
 	
@@ -53,5 +55,13 @@ public interface ServiceMapper {
     
     @Update("update service set startSeq=#{startSeq} where id=#{id}")
     int updateServiceStartSeq(@Param("item") ServiceInfo item);
+    
+    @Select("SELECT state FROM service"
+			+" where id=#{id}")
+    String getServiceStatu(@Param("id") String id);
+    
+    @Update("update service set state=#{state} where id=#{id}")
+    int updateServiceStatu(@Param("state") String state,@Param("id") String id);
 
+    
 }

@@ -3,13 +3,13 @@ package org.k8scmp.appmgmt.service;
 import java.util.List;
 
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
+import org.k8scmp.appmgmt.domain.ServiceDetail;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
 
 /**
- * Created by KaiRen on 2016/9/22.
  */
 public interface ServiceService {
-    Long createService(ServiceConfigInfo serviceConfigInfo);
+    String createService(ServiceDetail serviceDetail);
 
     void deleteService(String id);
 
