@@ -51,7 +51,7 @@ public class AuthUtil {
         return authBiz.getUserName(loginName);
     }
     
-    public static String getUserNameById(int id) {
+    public static String getUserNameById (int id) {
         return authBiz.getUserNameById(id);
     }
 
