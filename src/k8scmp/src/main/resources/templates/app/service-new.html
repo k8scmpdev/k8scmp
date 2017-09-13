@@ -10,40 +10,12 @@
 		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
 		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
 		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/k8scmp.css}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<script th:src="@{/js/jquery.min.js}"></script>
-        <script th:src="@{/js/jquery.ui.custom.js}"></script>
-        <script th:src="@{/js/bootstrap.min.js}"></script>
-        <script th:src="@{/js/unicorn.js}"></script>
 	</head>
 	<body>
-
-		<div id="header">
-			<h1><a href="./dashboard.html">Unicorn Admin</a></h1>		
+		<div id="common-header">
 		</div>
-		<div id="user-nav" class="navbar navbar-inverse">
-            <ul class="nav btn-group">
-                <li class="btn btn-inverse"><a title="" href="login.html"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
-            </ul>
-        </div>
-            
-		<div id="sidebar">
-				<a href="#" class="visible-phone"><i class="icon icon-th-title"></i>服务管理</a>
-				<ul>
-					<li><a href="index.html"><i class="icon icon-home"></i> <span>总览</span></a></li>
-					<li><a href="buttons.html"><i class="icon icon-tint"></i> <span>全局配置</span></a></li>
-					<li class="active"><a href="app-mgmt.html"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
-					
-					<li class="submenu">
-						<a href="#"><i class="icon icon-file"></i> <span>报警监控</span> <span class="label">3</span></a>
-						<ul>
-							<li><a href="invoice.html">用户操作日志</a></li>
-							<li><a href="chat.html">监控管理</a></li>
-							<li><a href="calendar.html">报警管理</a></li>
-						</ul>
-					</li>
-				</ul>
-			</div>
 		<div id="content">
 			<div id="content-header">
 				<h2>添加服务</h2>
@@ -64,8 +36,8 @@
 								<h5>添加服务</h5>
 							</div>
 							
-							<div class="widget-content">
-								<form action="#" method="get" class="form-horizontal">
+							<form action="/app/app-new" method="get" class="form-horizontal">
+								<div class="widget-content" id="service-new1">
 									<div class="control-group">
                                         <label class="control-label">服务名称</label>
                                         <div class="controls">
@@ -112,22 +84,198 @@
                                 		</div>
 	                                </div>
 	                            
-									<div class="form-actions" style="text-align: left;padding-left: 40%">
-										<button class="btn btn-primary">取消</button>&nbsp;&nbsp;&nbsp;
-										<button class="btn btn-primary" onclick="javascrtpt:window.location.href='/app/service1'">下一步</button>
+									 <div class="form-actions" style="text-align: left;padding-left: 40%">
+										<button id="cancleService" class="btn btn-primary" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+										<button id="btnnew1next" class="btn btn-primary" type="button">下一步</button>
 									</div>
-								</form>
+								</div>
+								
+								<div class="widget-content" id="service-new2">
+									<div class="control-group">
+                                        <label class="control-label-left">选择镜像</label>
+                                        <div class="controls-left">
+                                            <input type="text" placeholder="输入服务名称（字母数字）..." style="font-style: italic;font-size: 13px;width: 87%"/>
+                                            <button class="btn btn-primary">添加</button>
+                                            <a title="点击添加按钮，在弹出的页面中，输入
+												镜像名称进行查询，被选中的镜像会显示在
+												镜像列表里，单击每个镜像进行配置。" class="tip-top">
+												<i class="icon-question-sign"></i>
+											</a>
+                                        </div>
+	                                </div>
+									<div class="control-group">
+                                        <label class="control-label-left">镜像仓库</label>
+                                        <div class="controls-left">
+                                        	 <span class="label">http://123.com</span>
+                                        </div>
+	                                </div>
+	                                <div class="control-group">
+	                                <div class="row-fluid">
+									<div class="span12">
+										<div class="widget-box">
+											<div class="widget-title">
+												<h5>镜像列表</h5>
+											</div>
+											<div class="widget-content nopadding">
+												<table class="table table-bordered data-table with-check">
+													<thead>
+														<tr>
+															<th><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></th>
+															<th>镜像名称</th>
+															<th>镜像仓库</th>
+															<th>版本</th>
+															<th>配置</th>
+														</tr>
+													</thead>
+													<tbody id="tBody">
+													    <tr th:each="app,itState:${imageList}">
+													    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
+													        <td><a title='单击查看服务列表' th:href="@{/app/service-mgmt(appId=${app.appId},logicClusterId=${app.logicClusterId},namespace=${app.namespace})}" th:text="${app.appId}" class="tip-top"></a></td>
+													        <td th:text="${app.state}"></td>
+													        <td th:text="${app.logicClusterId}"></td>
+													        <td th:text="${app.clusterId}"></td>
+													       <!-- <td><i class="icon-list-alt tip-top" title="点击查看地址"></i></td> --> 
+													        <td th:text="${app.createTime}"></td>
+													        <td th:text="${app.description}"></td>
+													    </tr>
+													</tbody>
+												</table>							
+											</div>
+										</div>				
+									</div>
+									</div>
+	                                </div>
+									<div class="form-actions" style="text-align: left;padding-left: 35%">
+										<button id="cancleService" class="btn btn-primary" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+										<button id="btnnew2pre" class="btn btn-primary" type="button">上一步</button>
+										<button id="btnnew2next" class="btn btn-primary" type="button">下一步</button>
+									</div>
+								</div>
+							
+								<div class="widget-content" id="service-new3">
+									<div class="control-group">
+	                                       <label class="control-label">挂载存储</label>
+	                                       <div class="controls">
+	                                           <a title="添加挂载存储" class="btn tip-bottom" href="javascript:void(0);" onclick="showStorage();"><i class="icon-plus"></i></a>
+	                                       		<br/>
+	                                       		<br/>
+	                                       		<div id="storages">
+	                                       			
+	                                       		</div>
+	                                       </div>
+	                                </div>
+	                                
+									<div class="control-group">
+	                                       <label class="control-label">服务描述</label>
+	                                       <div class="controls">
+	                                           <textarea rows="3" cols="5"></textarea>
+	                                       </div>
+	                                </div>
+									<div class="control-group">
+	                                       <label class="control-label">配置方式</label>
+	                                       <div class="controls">
+											<input type="radio" name="radios" />界面配置&nbsp;&nbsp;&nbsp;
+											<input type="radio" name="radios" />YAML
+										</div>
+	                                </div>
+	                                <div class="control-group">
+	                                	<label class="control-label">实例个数</label>
+	                                	<div class="controls">
+											<input type="text" class="normaltext"/>
+											<span class="help-block" style="font-size:13px">实例在集群中启动的副本数</span>
+										</div>
+	                                </div>
+	                                <div class="control-group">
+	                                	<label class="control-label">端口映射</label>
+	                                	<div class="controls">
+	                               			<input type="text" class="combine tip-top" title="端口"/>
+											<select class="combine">
+												<option>TCP</option>
+												<option>HTTP</option>
+												
+											</select>
+											<select class="combine">
+												<option>动态生成</option>
+												<option>指定端口</option>
+											</select>
+											<select class="combine">
+												<option >保存</option>
+												<option >取消</option>
+											</select>
+	                               		</div>
+	                                </div>
+								 <div class="form-actions" style="text-align: left;padding-left: 40%">
+									<button id="cancleService" class="btn btn-primary" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+									<button id="btnnew3pre" class="btn btn-primary" type="button">上一步</button>
+									<button id="btnnew3next" class="btn btn-primary" type="button">提交</button>
+								</div>
 							</div>
+							
+							<div class="widget-content" id="service-new4">
+									<div class="control-group">
+	                                       <label class="control-label">服务名称4</label>
+	                                       <div class="controls">
+	                                           <input class="normaltext" type="text" placeholder="输入服务名称（字母数字）..." style="font-style: italic;font-size: 13px"/>
+	                                       </div>
+	                                </div>
+									<div class="control-group">
+	                                       <label class="control-label">服务描述</label>
+	                                       <div class="controls">
+	                                           <textarea rows="3" cols="5"></textarea>
+	                                       </div>
+	                                </div>
+									<div class="control-group">
+	                                       <label class="control-label">配置方式</label>
+	                                       <div class="controls">
+											<input type="radio" name="radios" />界面配置&nbsp;&nbsp;&nbsp;
+											<input type="radio" name="radios" />YAML
+										</div>
+	                                </div>
+	                                <div class="control-group">
+	                                	<label class="control-label">实例个数</label>
+	                                	<div class="controls">
+											<input type="text" class="normaltext"/>
+											<span class="help-block" style="font-size:13px">实例在集群中启动的副本数</span>
+										</div>
+	                                </div>
+	                                <div class="control-group">
+	                                	<label class="control-label">端口映射</label>
+	                                	<div class="controls">
+	                               			<input type="text" class="combine tip-top" title="端口"/>
+											<select class="combine">
+												<option>TCP</option>
+												<option>HTTP</option>
+												
+											</select>
+											<select class="combine">
+												<option>动态生成</option>
+												<option>指定端口</option>
+											</select>
+											<select class="combine">
+												<option >保存</option>
+												<option >取消</option>
+											</select>
+	                               		</div>
+	                                </div>
+								 <div class="form-actions" style="text-align: left;padding-left: 40%">
+									<button id="cancleService" class="btn btn-primary" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+									<button id="btnnew4pre" class="btn btn-primary" type="button">上一步</button>
+									<button id="btnnew4next" class="btn btn-primary" type="button">下一步</button>
+								</div>
+							</div>
+						</form>
 						</div>
 					</div>
 				</div>
 
-				<div class="row-fluid">
-					<div id="footer" class="span12">
-						2012 &copy; Unicorn Admin. Brought to you by <a href="https://wrapbootstrap.com/user/diablo9983">diablo9983</a>
-					</div>
+				<div id="common-footer">
 				</div>
 			</div>
 		</div> 
 	</body>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/jquery.ui.custom.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/unicorn.js}"></script>
+    <script th:src="@{/js/commonDisplay.js}"></script>
 </html>
