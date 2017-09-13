@@ -4,12 +4,12 @@
 		<title>PaaS云管理平台</title>
 		<meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{css/fullcalendar.css}" />	
-		<link rel="stylesheet" th:href="@{css/unicorn.main.css}" />
-		<link rel="stylesheet" th:href="@{css/unicorn.grey.css}" class="skin-color" />
-		<link rel="stylesheet" type="text/css" th:href="@{css/timeline.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/fullcalendar.css}" />	
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
+		<link rel="stylesheet" type="text/css" th:href="@{/css/timeline.css}" />
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>
 	<body>
 		
@@ -23,7 +23,7 @@
 		</div>
 		<div id="user-nav" class="navbar navbar-inverse">
             <ul class="nav btn-group">
-                <li class="btn btn-inverse"><a title="" href="#"><i class="icon icon-user"></i> <span class="text" th:text="${userPassword.username}"></span></a></li>
+                <li class="btn btn-inverse"><a title="" href="#"><i class="icon icon-user"></i> <span class="text" th:text="${user.username}"></span></a></li>
                 <!--  <li class="btn btn-inverse dropdown" id="menu-messages"><a href="#" data-toggle="dropdown" data-target="#menu-messages" class="dropdown-toggle"><i class="icon icon-envelope"></i> <span class="text">Messages</span> <span class="label label-important">5</span> <b class="caret"></b></a>
                    <ul class="dropdown-menu">
                         <li><a class="sAdd" title="" href="#">new message</a></li>
@@ -40,8 +40,16 @@
 		<div id="sidebar">
 			<a href="#" class="visible-phone"><i class="icon icon-home"></i> Dashboard</a>
 			<ul>
-				<li class="active"><a href="index.html"><i class="icon icon-home"></i> <span>总览</span></a></li>
-				<li><a href="buttons.html"><i class="icon icon-tint"></i> <span>全局配置</span></a></li>
+				<li class="active"><a th:href="@{/overview}"><i class="icon icon-home"></i> <span>总览</span></a></li>
+				<li class="submenu">
+					<a href="#"><i class="icon icon-tint"></i> <span>全局配置</span><span class="label">4</span></a>
+					<ul>
+						<li><a href="/user/list">用户管理</a></li>
+						<li><a href="/cluster/edit">集群设置</a></li>
+						<li><a href="/registry/edit">镜像仓库设置</a></li>
+						<li><a href="/monitor/edit">监控报警设置</a></li>
+					</ul>
+				</li>
 				<li><a href="buttons.html"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
 				
 				<li class="submenu">
@@ -82,7 +90,7 @@
 				<div class="row-fluid" style="margin-bottom:0px">
 					<div class="span12">
 						<div class="alert alert-info">
-							欢迎  <strong> <span class="text" th:text="${userPassword.username}"></span> </strong>登录系统. 你可以通过总览界面了解系统总体运行情况
+							欢迎  <strong> <span class="text" th:text="${user.username}"></span> </strong>登录系统. 你可以通过总览界面了解系统总体运行情况
 							<a href="#" data-dismiss="alert" class="close">×</a>
 						</div>
 						
@@ -263,20 +271,20 @@
 		</div>
 		
 
-            <script th:src="@{js/excanvas.min.js}"></script>
-            <script th:src="@{js/jquery.min.js}"></script>
-            <script th:src="@{js/jquery.ui.custom.js}"></script>
-            <script th:src="@{js/bootstrap.min.js}"></script>
-            <script th:src="@{js/jquery.peity.min.js}"></script>
-            <script th:src="@{js/unicorn.js}"></script>
+            <script th:src="@{/js/excanvas.min.js}"></script>
+            <script th:src="@{/js/jquery.min.js}"></script>
+            <script th:src="@{/js/jquery.ui.custom.js}"></script>
+            <script th:src="@{/js/bootstrap.min.js}"></script>
+            <script th:src="@{/js/jquery.peity.min.js}"></script>
+            <script th:src="@{/js/unicorn.js}"></script>
             
-			<script th:src="@{highcharts/js/highcharts.js}"></script>
-            <script th:src="@{highcharts/js/chart-app.js}"></script>
-            <script th:src="@{highcharts/js/chart-pod.js}"></script>
-            <script th:src="@{highcharts/js/chart-service.js}"></script>
-            <script th:src="@{highcharts/js/chart-mem.js}"></script>
-            <script th:src="@{highcharts/js/chart-disk.js}"></script>
-            <script th:src="@{highcharts/js/chart-cpu.js}"></script>
-			<script th:src="@{highcharts/js/chart-host.js}"></script>
+			<script th:src="@{/highcharts/js/highcharts.js}"></script>
+            <script th:src="@{/highcharts/js/chart-app.js}"></script>
+            <script th:src="@{/highcharts/js/chart-pod.js}"></script>
+            <script th:src="@{/highcharts/js/chart-service.js}"></script>
+            <script th:src="@{/highcharts/js/chart-mem.js}"></script>
+            <script th:src="@{/highcharts/js/chart-disk.js}"></script>
+            <script th:src="@{/highcharts/js/chart-cpu.js}"></script>
+			<script th:src="@{/highcharts/js/chart-host.js}"></script>
 	</body>
 </html>

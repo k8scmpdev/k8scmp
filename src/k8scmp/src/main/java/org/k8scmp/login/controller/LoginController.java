@@ -31,7 +31,7 @@ public class LoginController {
     @RequestMapping(value="/login", method=RequestMethod.GET)
     public String login(Model model) {
     	model.addAttribute("UserPassword", new UserPassword());
-        return "login/loginform";
+        return "login/login";
     }
     
 
@@ -39,9 +39,10 @@ public class LoginController {
     public String normalLogin(Model model,@ModelAttribute UserPassword userPassword) {
     	userPassword.setLoginType(LoginType.USER);
     	HttpResponseTemp<?> resp = userService.normalLogin(userPassword);
+    	
     	if(resp.getResultCode()==200){
     		model.addAttribute("userPassword",userPassword);
-    		return "overview/index";
+    		return "redirect:/overview";
     	}else{
     		if(resp.getResultMsg().split(":").length>0){
     			model.addAttribute("msg", resp.getResultMsg().split(":")[1]);
@@ -53,10 +54,10 @@ public class LoginController {
     }
 
     @RequestMapping("/logout")
-    public String logout(Model model) {
+    public ModelAndView logout() {
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
-        return login(model);
+        return new ModelAndView("redirect:/login");
     }
    
 }

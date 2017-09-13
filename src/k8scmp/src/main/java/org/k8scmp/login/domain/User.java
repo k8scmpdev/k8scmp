@@ -6,10 +6,11 @@ import org.k8scmp.login.domain.related.UserState;
 import org.k8scmp.util.CryptoUtil;
 
 /**
- * Created by feiliu206363 on 2016/4/5.
+ * Created by jason on 2017/9/5.
  */
 public class User {
     private int id;
+    private String loginname;
     private String username;
     private String password;
     private String salt;
@@ -18,13 +19,13 @@ public class User {
     private LoginType loginType;
     private UserState state;
     private long createTime;
-    private long updateTime;
+    private long lastModifiedTime;
 
     public User() {
     }
 
-    public User(String username, String password) {
-        this.username = username;
+    public User(String loginname, String password) {
+    	this.loginname = loginname;
         this.password = password;
         this.salt = CryptoUtil.generateSalt();
         this.loginType = LoginType.USER;
@@ -44,26 +45,17 @@ public class User {
         return id == user.getId();
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", salt='" + salt + '\'' +
-                ", loginType='" + loginType + '\'' +
-                '}';
-    }
+    
 
     public String checkLegality() {
         String error = null;
-        if (StringUtils.isBlank(username)) {
+        if (StringUtils.isBlank(loginname)) {
+            error = "loginname is blank";
+        } else if (StringUtils.isBlank(username)) {
             error = "username is blank";
         } else if (StringUtils.isBlank(password)) {
             error = "password is blank";
-        } else if (StringUtils.isBlank(email)) {
-            error = "email is blank";
-        }
+        } 
         return error;
     }
 
@@ -140,10 +132,18 @@ public class User {
     }
 
     public long getUpdateTime() {
-        return updateTime;
+        return lastModifiedTime;
     }
 
     public void setUpdateTime(long updateTime) {
-        this.updateTime = updateTime;
+        this.lastModifiedTime = updateTime;
     }
+
+	public String getLoginname() {
+		return loginname;
+	}
+
+	public void setLoginname(String loginname) {
+		this.loginname = loginname;
+	}
 }

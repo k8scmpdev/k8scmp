@@ -79,13 +79,13 @@ public class ShiroConfig {
     public DmoShiroFilterFactoryBean shiroFilter() {
         DmoShiroFilterFactoryBean bean = new DmoShiroFilterFactoryBean();
         bean.setSecurityManager(securityManager());
-        bean.setLoginUrl("/login");
+        bean.setLoginUrl("/login/login.html");
         bean.setSuccessUrl("/overview/index");
 //        SsoFilter ssoFilter = new SsoFilter();
 //        ssoFilter.setSuccessUrl("/");
 //        ssoFilter.setFailureUrl("/login/login.html");
         DmoLogoutFilter dmoLogoutFilter = new DmoLogoutFilter();
-        dmoLogoutFilter.setRedirectUrl("/login");
+        dmoLogoutFilter.setRedirectUrl("/login/login.html");
 
         Map<String, Filter> filters = Maps.newLinkedHashMap();
         filters.put("front", new FrontFilter());
@@ -101,37 +101,15 @@ public class ShiroConfig {
         Map<String, String> chains = Maps.newLinkedHashMap();
         chains.put("/api/user/logout", "logout");
         chains.put("/health", "anon,backend");
-        chains.put("/api/ci/build/autobuild", "anon,backend");
-        chains.put("/api/ci/build/builddockerfile/**", "anon,backend");
-        chains.put("/api/ci/build/compilefile/**", "anon,backend");
-        chains.put("/api/ci/build/compilescript/**", "anon,backend");
-        chains.put("/api/ci/build/status", "anon,backend");
-        chains.put("/api/ci/build/upload/**", "anon,backend");
-        chains.put("/api/ci/build/download/**", "anon,backend");
-        chains.put("/api/image/public/item/**", "anon,backend");
-        chains.put("/api/agent/pod/**", "anon,backend");
-        chains.put("/api/user/login", "anon,backend");
-        chains.put("/api/global/registry/private/certification", "anon,backend");
-        chains.put("/api/alarm/action/wrap/**", "anon,backend");
-        chains.put("/api/alarm/group/users/**", "anon,backend");
-        chains.put("/api/alarm/link/**", "anon,backend");
-        chains.put("/api/alarm/send/**", "anon,backend");
-        chains.put("/service/token/**", "anon,backend");
-        chains.put("/api/deploy/updatejob", "anon,backend");
-        chains.put("/api/k8sevent/report", "anon,backend");
-        chains.put("/api/global/loginoption", "anon,backend");
 //        chains.put(GlobalConstant.SSO_API, "sso");
 
-        chains.put("/common/**", "anon,front");
         chains.put("/lib/**", "anon,front");
-        chains.put("/index/**", "anon,front");
         chains.put("/login/**", "anon,front");
-        chains.put("/index/**", "anon,front");
-        chains.put("/maps/**", "anon,front");
-        chains.put("/monitor/**", "anon,front");
-        chains.put("/favicon.ico", "anon,front");
+        chains.put("/static/**", "anon,front");
         chains.put("/api/**", "redirect,user,backend");
         chains.put("/", "redirect,user,backend");
+        chains.put("/*", "redirect,user,backend");
+        chains.put("/user/**", "redirect,user,backend");
         chains.put("/console/**", "redirect,user,backend");
         bean.setFilterChainDefinitionMap(chains);
         return bean;

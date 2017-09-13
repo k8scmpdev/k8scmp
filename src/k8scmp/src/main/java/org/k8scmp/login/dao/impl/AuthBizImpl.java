@@ -17,7 +17,9 @@ import java.util.List;
  */
 @Service("authBiz")
 public class AuthBizImpl implements AuthBiz {
-    @Autowired
+	@Autowired
+    AuthBiz authBiz;
+	@Autowired
     AdminRolesMapper adminRolesMapper;
     @Autowired
     UserMapper userMapper;
@@ -39,24 +41,68 @@ public class AuthBizImpl implements AuthBiz {
     }
     
     @Override
-    public User getUser(String userName) {
-        return userMapper.getUserByName(userName);
+    public User getUser(String loginname) {
+        return userMapper.getUserByName(loginname);
     }
     
     @Override
-    public User getUserByName(String username) {
-        return userMapper.getUserByName(username);
+    public List<User> listUsersByKW(String keyword) {
+    	 List<User> users = userMapper.listUsersByKW(keyword);
+        return users;
+    }
+    
+    
+    @Override
+    public User getUserByName(String loginname) {
+        return userMapper.getUserByName(loginname);
+    }
+
+
+    @Override
+    public User getUserById(int userId) {
+        return userMapper.getUserById(userId);
     }
 
 
 	@Override
-	public int getUserId(String userName) {
+	public String getUserNameById(int id) {
 		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 
 
-	
+	@Override
+    public int getUserId(String userName) {
+        User user = userMapper.getUserByName(userName);
+        if (user == null) {
+            return -1;
+        }
+        return user.getId();
+    }
 
+	@Override
+    public List<User> listAllUser() {
+        return userMapper.listAllUserInfo();
+    }
+	
+	@Override
+    public void addUser(User user) {
+        userMapper.addUser(user);
+    }
+	
+	@Override
+    public void deleteUser(User user) {
+        userMapper.deleteUser(user);
+    }
+	
+	@Override
+    public void changePassword(User user) {
+        userMapper.changePassword(user);
+    }
+	
+	@Override
+    public void modifyUser(User existUser) {
+        userMapper.modifyUser(existUser);
+    }
 
 }

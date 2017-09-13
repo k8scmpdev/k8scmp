@@ -17,4 +17,20 @@ public interface AuthBiz {
     User getUserByName(String username);
 
     List<String> getRole(String username);
+
+	String getUserNameById(int id);
+
+	User getUserById(int userId);
+
+	List<User> listAllUser();
+	
+	void addUser(User user);
+	
+	void deleteUser(User user);
+	
+	void changePassword(User user);
+
+	List<User> listUsersByKW(String keyword);
+
+	void modifyUser(User existUser);
 }

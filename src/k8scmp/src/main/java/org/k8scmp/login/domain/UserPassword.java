@@ -7,7 +7,7 @@ import org.k8scmp.login.domain.LoginType;
  * User use this info to login or change a user's password by admin
  */
 public class UserPassword {
-    private String username;
+    private String loginname;
     private String password;
     /**
      * to distiguish different type of login, such as LDAP or USER
@@ -18,23 +18,23 @@ public class UserPassword {
 
     }
 
-    public UserPassword(String username, String password) {
-        this.username = username;
+    public UserPassword(String loginname, String password) {
+        this.loginname = loginname;
         this.password = password;
     }
 
-    public UserPassword(String username, String password, LoginType loginType) {
-        this.username = username;
+    public UserPassword(String loginname, String password, LoginType loginType) {
+        this.loginname = loginname;
         this.password = password;
         this.loginType = loginType;
     }
 
-    public String getUsername() {
-        return username;
+    public String getLoginname() {
+        return loginname;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLoginname(String loginname) {
+        this.loginname = loginname;
     }
 
     public String getPassword() {
@@ -56,7 +56,7 @@ public class UserPassword {
     @Override
     public String toString() {
         return "UserPassword{" +
-                "username='" + username + '\'' +
+                "loginname='" + loginname + '\'' +
                 ", loginType='" + loginType + '\'' +
                 '}';
     }

@@ -22,7 +22,7 @@ import org.k8scmp.common.ClientConfigure;
 //import org.k8scmp.common.dao.GlobalBiz;
 import org.k8scmp.engine.model.CustomObjectMapper;
 import org.k8scmp.exception.ApiException;
-import org.k8scmp.globalmgmt.GlobalBiz;
+import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
 import org.k8scmp.monitormgmt.dao.monitor.MonitorDao;

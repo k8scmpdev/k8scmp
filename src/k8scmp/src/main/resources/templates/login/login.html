@@ -4,9 +4,9 @@
         <title>k8scmp</title>
 		<meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{css/bootstrap-responsive.min.css}" />
-        <link rel="stylesheet" th:href="@{css/unicorn.login.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+        <link rel="stylesheet" th:href="@{/css/unicorn.login.css}" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>
     <body>
         <div id="logo">
@@ -19,7 +19,7 @@
                 <div class="control-group">
                     <div class="controls">
                         <div class="input-prepend">
-                            <span class="add-on"><i class="icon-user"></i></span><input type="text" placeholder="Username" th:field="*{username}" />
+                            <span class="add-on"><i class="icon-user"></i></span><input type="text" placeholder="Loginname" th:field="*{loginname}" />
                         </div>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
             
         </div>
         
-        <script th:src="@{js/jquery.min.js}"></script>  
-        <script th:src="@{js/unicorn.login.js}"></script> 
+        <script th:src="@{/js/jquery.min.js}"></script>  
+        <script th:src="@{/js/unicorn.login.js}"></script> 
     </body>
 </html>

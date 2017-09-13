@@ -1,6 +1,7 @@
 package org.k8scmp.login.service;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
+import org.k8scmp.login.domain.ChangeUserPassword;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.login.domain.UserPassword;
 
@@ -22,4 +23,31 @@ public interface UserService {
     User getUser(String username);
     
     boolean loginWithoutType(String userName, String pass);
+    
+    HttpResponseTemp<?> createUser(User user, boolean flag);
+
+    HttpResponseTemp<?> createUser(User user);
+
+    HttpResponseTemp<?> deleteUser(int id);
+
+    HttpResponseTemp<?> modifyUser(User user);
+
+    HttpResponseTemp<?> changePassword(ChangeUserPassword changeUserPassword);
+
+    HttpResponseTemp<?> changePasswordByAdmin(UserPassword userPassword);
+
+    HttpResponseTemp<List<User>> listAllUserInfo();
+
+    HttpResponseTemp<?> getUserInfo(String username);
+
+    Set<String> findRoles(String username);
+
+    Set<String> findPermissions(String username);
+
+    int getUserId(String username);
+
+    boolean createUserForLDAP(User user);
+
+	HttpResponseTemp<List<User>> listUsersByKW(String keyword);
+
 }

@@ -10,6 +10,7 @@ public enum GlobalType {
     GITLAB,
     GITHUB,
     BUILD_IMAGE,
+    REGISTRY_NAME,
     REGISTRY_URL,
     REGISTRY_DESCRIPTION,
     REGISTRY_STATUS,
@@ -34,6 +35,7 @@ public enum GlobalType {
     PUBLIC_REGISTRY_URL,
     CI_CLUSTER_ID,
     CI_CLUSTER_NAME,
+    CI_CLUSTER_DESC,
     REGISTRY_AUTH,
 
     //add

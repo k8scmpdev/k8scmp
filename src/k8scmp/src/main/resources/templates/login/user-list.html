@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>PaaS云管理平台</title>
+		<meta charset="UTF-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/fullcalendar.css}" />	
+		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
+		
+		<script>
+		function delUser(id){
+			$('#frm').attr("action", "/user/delete/"+id).submit();
+		}
+		function changePwd(loginname){
+			$('#add-event').click();
+			$('#c_loginname').attr("value", loginname);  
+		}
+		function getUser(){
+			var keyword = $('#keyword').val();
+			$('#getform').attr("action", "/user/get?keyword="+keyword).submit();
+		}
+		</script>
+	</head>
+	<body>
+		
+		
+		<div id="header">
+			<h1><a >PaaS云管理控制台</a></h1>		
+		</div>
+		
+		<div id="search">
+			<input type="text" placeholder="Search here..." /><button type="submit" class="tip-right" title="Search"><i class="icon-search icon-white"></i></button>
+		</div>
+		<div id="user-nav" class="navbar navbar-inverse">
+            <ul class="nav btn-group">
+                <li class="btn btn-inverse"><a title="" href="#"><i class="icon icon-user"></i> <span class="text" th:text="${user.username}"></span></a></li>
+                <!--  <li class="btn btn-inverse dropdown" id="menu-messages"><a href="#" data-toggle="dropdown" data-target="#menu-messages" class="dropdown-toggle"><i class="icon icon-envelope"></i> <span class="text">Messages</span> <span class="label label-important">5</span> <b class="caret"></b></a>
+                   <ul class="dropdown-menu">
+                        <li><a class="sAdd" title="" href="#">new message</a></li>
+                        <li><a class="sInbox" title="" href="#">inbox</a></li>
+                        <li><a class="sOutbox" title="" href="#">outbox</a></li>
+                        <li><a class="sTrash" title="" href="#">trash</a></li>
+                    </ul>
+                </li> 
+                <li class="btn btn-inverse"><a title="" href="#"><i class="icon icon-cog"></i> <span class="text">Settings</span></a></li>-->
+                <li class="btn btn-inverse"><a title="" th:href="@{/logout}"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
+            </ul>
+        </div>
+            
+		<div id="sidebar">
+			<a href="#" class="visible-phone"><i class="icon icon-home"></i> Dashboard</a>
+			<ul>
+				<li ><a th:href="@{/overview}"><i class="icon icon-home"></i> <span>总览</span></a></li>
+				<li class="submenu open">
+					<a href="#"><i class="icon icon-tint"></i> <span>全局配置</span><span class="label">4</span></a>
+					<ul>
+						<li class="active"><a href="/user/list">用户管理</a></li>
+						<li><a href="/cluster/edit">集群设置</a></li>
+						<li><a href="/registry/edit">镜像仓库设置</a></li>
+						<li><a href="/monitor/edit">监控报警设置</a></li>
+					</ul>
+				</li>
+				<li><a href="buttons.html"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
+				
+				<li class="submenu">
+					<a href="#"><i class="icon icon-file"></i> <span>报警监控</span> <span class="label">3</span></a>
+					<ul>
+						<li><a href="invoice.html">用户操作日志</a></li>
+						<li><a href="chat.html">监控管理</a></li>
+						<li><a href="calendar.html">
+</a></li>
+					</ul>
+				</li>
+				
+			</ul>
+		
+		</div>
+		
+		<div id="style-switcher">
+			<i class="icon-arrow-left icon-white"></i>
+			<span>Style:</span>
+			<a href="#grey" style="background-color: #555555;border-color: #aaaaaa;"></a>
+			<a href="#blue" style="background-color: #2D2F57;"></a>
+			<a href="#red" style="background-color: #673232;"></a>
+		</div>
+		
+		<div id="content">
+			<div id="content-header">
+				<h1>用户管理</h1>
+				<div class="btn-group">
+					<a class="btn btn-large tip-bottom" title="Manage Users"><i class="icon-user"></i></a>
+					<a class="btn btn-large tip-bottom" title="Manage Comments"><i class="icon-comment"></i><span class="label label-important">5</span></a>
+				</div>
+			</div>
+			<div id="breadcrumb">
+				<a href="#" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a>
+				<a href="#" class="tip-bottom">全局配置</a>
+				<a href="#" class="current">用户管理</a>
+			</div>
+			<div class="container-fluid">
+				
+				<div class="row-fluid" >
+					
+					<div class="span12">
+						<a title="新增用户" class="btn tip-bottom" href="/user/create"><i class="icon-plus"></i>新增</a>
+						<font color="red"><span th:text="${info}"></span></font>
+						<div  style="float:right">
+						<form action="/user/get" method="post" id="getform">
+							<input name="keyword" id="keyword" type="text" placeholder="输入关键字查询..." style="font-size: 11px;font-style: italic" th:value="${keyword}"/>
+							<button type="button" onclick="getUser()"  title="Search" style="margin-top:-10px"><i class="icon-search icon-black"></i></button>
+						</form>	
+						</div>
+						
+					</div>
+				</div>
+				
+				<div class="row-fluid" >
+					<div class="span12">
+						<div class="widget-box">
+							<div class="widget-title">
+								<h5>用户列表</h5>
+							</div>
+							<div class="widget-content nopadding">
+								<table class="table table-bordered data-table">
+									<thead>
+										<tr>
+											<th>*登录名</th>
+											<th>*姓名</th>
+											<th>邮箱</th>
+											<th style="width:10%">操作</th>
+										</tr>
+									</thead>
+									<tbody th:each="user : ${users}">
+										<tr class="gradeX" th:object="${user}">
+											<td><a th:href="'/user/get/'+*{loginname}"><span th:text="*{loginname}"></span></a></td>
+											<td><span th:text="*{username}"></span></td>
+											<td><span th:text="*{email}"></span></td>
+											<td style="text-align:center">
+												<button title="修改密码" class="btn btn-primary" th:onclick="'changePwd(\''+*{loginname}+'\')'"><i class="icon-pencil icon-white"></i></button>
+												<button th:if="*{loginname}!='admin'" title="删除" class="btn btn-danger" th:onclick="'delUser('+*{id}+')'"><i class="icon-remove icon-white"></i></button>
+												<form id="frm" name="frm" action="#"  method="get"></form>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>	
+					</div>
+				</div>
+				
+				<a title="修改密码" id="add-event" data-toggle="modal" href="#modal-add-event" class="btn btn-primary btn" style="display:none"></a>
+				<div class="modal hide" id="modal-add-event" style="text-align:center">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">×</button>
+						<h3>修改密码</h3>
+					</div>
+					<form action="#" th:action="@{/user/adminChangePassword}" th:object="${UserPassword}" method="post" class="form-horizontal" id="create_user_validate">
+						<div class="modal-body">
+							<div class="control-group">
+								<p>*登录名：<input id="c_loginname" type="text" name="loginname" th:field="*{loginname}" readonly="readonly"/></p>
+							</div>
+							<div class="control-group">
+								<p>*新密码： &nbsp;&nbsp;<input id="pwd" type="password" name="pwd" th:field="*{password}"/></p>
+							</div>
+							<div class="control-group">
+								<p>*确认密码： &nbsp;&nbsp;<input id="pwd2" name="pwd2" type="password" /></p>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<a href="#" class="btn" data-dismiss="modal">取消</a>
+							<input type="submit" id="add-event-submit" class="btn btn-primary" value="确认修改" />
+						</div>
+					</form>
+				</div>
+				
+				<div class="row-fluid">
+					<div id="footer" class="span12">
+						2017 &copy; k8scmp. 
+					</div>
+				</div>
+			</div>
+		</div>
+		
+
+            <script th:src="@{/js/jquery.min.js}"></script>
+            <script th:src="@{/js/jquery.ui.custom.js}"></script>
+            <script th:src="@{/js/bootstrap.min.js}"></script>
+            
+            <script th:src="@{/js/jquery.uniform.js}"></script>
+            <script th:src="@{/js/select2.min.js}"></script>
+            <script th:src="@{/js/jquery.dataTables.min.js}"></script>
+            <script th:src="@{/js/unicorn.js}"></script>
+            <script th:src="@{/js/unicorn.tables.js}"></script>
+            <script th:src="@{/js/jquery.validate.js}"></script>
+            <script th:src="@{/js/unicorn.form_validation.js}"></script>
+	</body>
+</html>

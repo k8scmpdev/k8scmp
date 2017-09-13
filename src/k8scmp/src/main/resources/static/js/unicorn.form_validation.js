@@ -9,6 +9,40 @@ $(document).ready(function(){
 	$('select').select2();
 	
 	// Form Validation
+	$("#create_user_validate").validate({
+		rules:{
+			loginname:{
+				required:true
+			},
+			username:{
+				required:true
+			},
+			email:{
+				email: true
+			},
+			pwd:{
+				required: true,
+				minlength:3,
+				maxlength:20
+			},
+			pwd2:{
+				required:true,
+				minlength:3,
+				maxlength:20,
+				equalTo:"#pwd"
+			}
+		},
+		errorClass: "help-inline",
+		errorElement: "span",
+		highlight:function(element, errorClass, validClass) {
+			$(element).parents('.control-group').addClass('error');
+		},
+		unhighlight: function(element, errorClass, validClass) {
+			$(element).parents('.control-group').removeClass('error');
+			$(element).parents('.control-group').addClass('success');
+		}
+	});
+	
     $("#basic_validate").validate({
 		rules:{
 			required:{

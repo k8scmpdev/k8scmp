@@ -46,7 +46,7 @@ public class JdbcRealm extends AuthorizingRealm {
         }
 
         return new SimpleAuthenticationInfo(
-                user.getUsername(),
+                user.getLoginname(),
                 user.getPassword(),
                 ByteSource.Util.bytes(user.getSalt()),
                 getName()

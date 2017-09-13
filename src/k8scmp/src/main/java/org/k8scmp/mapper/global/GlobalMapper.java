@@ -37,6 +37,7 @@ public interface GlobalMapper {
     @Update("UPDATE globalconfig SET value=#{value}, lastUpdate=#{lastUpdate}, description=#{description} WHERE type=#{type} AND id=#{id}")
     int updateGlobalInfoById(GlobalInfo globalInfo);
 
-    @Update("UPDATE globalconfig SET value=#{value}, lastUpdate=#{lastUpdate} WHERE type=#{type}")
+    @Update("UPDATE globalconfig SET value=#{value}, lastModifierId=#{lastUpdate} WHERE type=#{type}")
     int updateGlobalInfoByType(GlobalInfo globalInfo);
+    
 }
