@@ -1,0 +1,52 @@
+<div id="app-header">
+<div id="header">
+	<h1><a href="./dashboard.html">PaaS云管理控制台</a></h1>		
+</div>
+<div id="user-nav" class="navbar navbar-inverse">
+     <ul class="nav btn-group">
+         <li class="btn btn-inverse"><a title="" href="login.html"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
+     </ul>
+</div>
+<div id="sidebar">
+	<a href="#" class="visible-phone"><i class="icon icon-th-title"></i>交行Paas</a>
+	<ul id="allMenu">
+		<li><a href="index.html"><i class="icon icon-home"></i> <span>总览</span></a></li>
+		<li><a href="buttons.html"><i class="icon icon-tint"></i> <span>全局配置</span></a></li>
+		<li class="active"><a href="/app"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
+		
+		<li class="submenu">
+			<a href="#"><i class="icon icon-file"></i> <span>报警监控</span> <span class="label">3</span></a>
+			<ul>
+				<li><a href="invoice.html">用户操作日志</a></li>
+				<li><a href="chat.html">监控管理</a></li>
+				<li><a href="calendar.html">报警管理</a></li>
+			</ul>
+		</li>
+	</ul>
+</div>
+</div>
+<div id="app-footer">
+<div class="row-fluid">
+<div id="footer" class="span12">
+	2012 &copy; Unicorn Admin. Brought to you by <a href="https://wrapbootstrap.com/user/diablo9983">diablo9983</a>
+</div>
+</div>
+</div>
+
+<div id="storageTemplate">
+	<select style="width: 18%">
+		<option>主机目录</option>
+		<option>实例内目录</option>
+		
+	</select>
+	<select style="width: 12%">
+		<option>只读</option>
+		<option>读写</option>
+	</select>
+	<input type="text" class="tip-top" title="挂载的目录名称" style="width: 14%"/>
+	<input type="text" class="tip-top" title="容器路径" style="width: 14%"/>
+	<input type="text" class="tip-top" title="主机路径" style="width: 14%"/>
+	<a title="添加挂载存储" class="tip-bottom" href="javascript:void(0);" onclick="showStorage();"><i class="icon-trash"></i></a>
+</div>
+
+

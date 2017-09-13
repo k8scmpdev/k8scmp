@@ -145,7 +145,7 @@ a:hover {
 	position: relative;
 }
 
-#sidebar > ul > li.active {
+#sidebar > ul > li.active !important {
 	box-shadow: 0 2px 4px rgba(0,0,0,0.2) inset;
 }
 
@@ -1307,16 +1307,15 @@ form {
 	width: 180px;
 }
 .form-horizontal .control-label-left{
-	text-align: left;
 	padding-top: 15px;
-	width: 180px;
-}
-.form-horizontal .control-label-left.controls{
-	margin-left: 0px;
-	padding: 10px 0;
+	width: 60px;
 }
 .form-horizontal .controls {
 	margin-left: 200px;
+	padding: 10px 0;
+}
+.form-horizontal .controls-left {
+	margin-left: 10%;
 	padding: 10px 0;
 }
 .form-horizontal input[class="normaltext"], .form-horizontal input[type=password], .form-horizontal textarea {
@@ -1417,9 +1416,13 @@ form {
         padding-left: 30px;
     }
      .form-horizontal .control-label-left {
-        padding-left: 0px;
+        padding-left: 30px;
     }
     .form-horizontal .controls {
+        margin-left: 0;
+        padding: 10px 30px;
+    }
+    .form-horizontal .controls-left {
         margin-left: 0;
         padding: 10px 30px;
     }

@@ -9,43 +9,12 @@
 		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
 		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
 		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
-		<script th:src="@{/js/jquery.min.js}"></script>
-        <script th:src="@{/js/jquery.ui.custom.js}"></script>
-        <script th:src="@{/js/bootstrap.min.js}"></script>
-        <script th:src="@{/js/jquery.uniform.js}"></script>
-        <script th:src="@{/js/select2.min.js}"></script>
-        <script th:src="@{/js/jquery.dataTables.min.js}"></script>
-        <script th:src="@{/js/unicorn.js}"></script>
-        <script th:src="@{/js/unicorn.tables.js}"></script>
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	</head>
-	
 	<body>
-		<div id="header">
-			<h1><a href="./dashboard.html">PaaS云管理控制台</a></h1>		
-		</div>
-		<div id="user-nav" class="navbar navbar-inverse">
-            <ul class="nav btn-group">
-                <li class="btn btn-inverse"><a title="" href="login.html"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
-            </ul>
-        </div>
-		<div id="sidebar">
-			<a href="#" class="visible-phone"><i class="icon icon-th-title"></i>应用管理</a>
-			<ul>
-				<li><a href="index.html"><i class="icon icon-home"></i> <span>总览</span></a></li>
-				<li><a href="buttons.html"><i class="icon icon-tint"></i> <span>全局配置</span></a></li>
-				<li class="active"><a href="/app"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
-				
-				<li class="submenu">
-					<a href="#"><i class="icon icon-file"></i> <span>报警监控</span> <span class="label">3</span></a>
-					<ul>
-						<li><a href="invoice.html">用户操作日志</a></li>
-						<li><a href="chat.html">监控管理</a></li>
-						<li><a href="calendar.html">报警管理</a></li>
-					</ul>
-				</li>
-			</ul>
+		<div id="common-header">
+			
 		</div>
 		<div id="content">
 			<div id="content-header">
@@ -102,13 +71,19 @@
 						</div>				
 					</div>
 				</div>
-				
-				<div class="row-fluid">
-					<div id="footer" class="span12">
-						2012 &copy; Unicorn Admin. Brought to you by <a href="https://wrapbootstrap.com/user/diablo9983">diablo9983</a>
-					</div>
+				<div class="common-footer">
 				</div>
 			</div>
-		</div>  
+		</div>
+		
+		<script th:src="@{/js/jquery.min.js}"></script>
+        <script th:src="@{/js/jquery.ui.custom.js}"></script>
+        <script th:src="@{/js/bootstrap.min.js}"></script>
+        <script th:src="@{/js/jquery.uniform.js}"></script>
+        <script th:src="@{/js/select2.min.js}"></script>
+        <script th:src="@{/js/jquery.dataTables.min.js}"></script>
+        <script th:src="@{/js/unicorn.js}"></script>
+        <script th:src="@{/js/unicorn.tables.js}"></script>
+		<script th:src="@{/js/commonDisplay.js}"></script>
 	</body>
 </html>
