@@ -27,7 +27,7 @@ public class AuthUtil {
         return authBiz.isAdmin(userId);
     }
 
-    public static String getCurrentUserName() {
+    public static String getCurrentLoginName() {
         return (String) SecurityUtils.getSubject().getPrincipal();
     }
 
@@ -37,15 +37,20 @@ public class AuthUtil {
      * @return userId or -1 if not aquired
      */
     public static int getUserId() {
-        String userName = getCurrentUserName();
-        return authBiz.getUserId(userName);
+        String loginName = getCurrentLoginName();
+        return authBiz.getUserId(loginName);
     }
 
     public static User getUser() {
-        String userName = getCurrentUserName();
-        return authBiz.getUser(userName);
+        String loginName = getCurrentLoginName();
+        return authBiz.getUser(loginName);
     }
-
+    
+    public static String getUserName() {
+    	String loginName = getCurrentLoginName();
+        return authBiz.getUserName(loginName);
+    }
+    
     public static String getUserNameById(int id) {
         return authBiz.getUserNameById(id);
     }

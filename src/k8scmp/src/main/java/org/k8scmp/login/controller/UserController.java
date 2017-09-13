@@ -48,8 +48,8 @@ public class UserController {
         
         HttpResponseTemp<?> resp = userService.listAllUserInfo();
         List<User> users = (List<User>) resp.getResult();
-        String currentUser = (String) SecurityUtils.getSubject().getPrincipal();
-    	User user = userService.getUser(currentUser);
+        //获取当前登录用户
+        User user = AuthUtil.getUser();
     	model.addAttribute("user", user);
     	if(!model.containsAttribute("info")) model.addAttribute("info","");
         model.addAttribute("users",users);
@@ -61,8 +61,8 @@ public class UserController {
 
     @RequestMapping(value="/create", method = RequestMethod.GET)
     public String create(Model model) {
-        String currentUser = (String) SecurityUtils.getSubject().getPrincipal();
-        User user = userService.getUser(currentUser);
+    	//获取当前登录用户
+        User user = AuthUtil.getUser();
     	model.addAttribute("user", user);
     	model.addAttribute("User", new User());
         return "login/user-new";
@@ -125,8 +125,8 @@ public class UserController {
     public String getUser(Model model,@RequestParam(defaultValue="") String keyword) {
     	HttpResponseTemp<?> resp =  userService.listUsersByKW("%"+keyword+"%");
     	List<User> users = (List<User>) resp.getResult();
-    	String currentUser = (String) SecurityUtils.getSubject().getPrincipal();
-    	User user = userService.getUser(currentUser);
+    	//获取当前登录用户
+        User user = AuthUtil.getUser();
      	model.addAttribute("user", user);
      	if(!model.containsAttribute("info")) model.addAttribute("info","");
         model.addAttribute("users",users);
@@ -138,9 +138,8 @@ public class UserController {
 
     @RequestMapping(value = "/get/{loginname}", method = RequestMethod.GET)
     public String getCurrentLoginUser(Model model,@PathVariable String loginname) {
-        String currentUser = AuthUtil.getCurrentUserName();
-        User user = new User();
-    	user.setUsername(currentUser);
+    	//获取当前登录用户
+        User user = AuthUtil.getUser();
     	model.addAttribute("user", user);
     	
         HttpResponseTemp<?> resp = userService.getUserInfo(loginname);

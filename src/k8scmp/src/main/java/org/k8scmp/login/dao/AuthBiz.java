@@ -33,4 +33,6 @@ public interface AuthBiz {
 	List<User> listUsersByKW(String keyword);
 
 	void modifyUser(User existUser);
+
+	String getUserName(String loginname);
 }
