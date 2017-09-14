@@ -9,10 +9,18 @@
 </div>
 <div id="sidebar">
 	<a href="#" class="visible-phone"><i class="icon icon-th-title"></i>交行Paas</a>
-	<ul id="allMenu">
-		<li><a href="index.html"><i class="icon icon-home"></i> <span>总览</span></a></li>
-		<li><a href="buttons.html"><i class="icon icon-tint"></i> <span>全局配置</span></a></li>
-		<li class="active"><a href="/app"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
+	<ul >
+		<li class="active"><a href="/overview"><i class="icon icon-home"></i> <span>总览</span></a></li>
+		<li class="submenu">
+			<a href="#"><i class="icon icon-tint"></i> <span>全局配置</span><span class="label">4</span></a>
+			<ul>
+				<li><a href="/user/list">用户管理</a></li>
+				<li><a href="/cluster/edit">集群设置</a></li>
+				<li><a href="/registry/edit">镜像仓库设置</a></li>
+				<li><a href="/monitor/edit">监控报警设置</a></li>
+			</ul>
+		</li>
+		<li><a href="/app"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
 		
 		<li class="submenu">
 			<a href="#"><i class="icon icon-file"></i> <span>报警监控</span> <span class="label">3</span></a>
