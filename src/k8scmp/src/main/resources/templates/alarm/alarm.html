@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Unicorn Admin</title>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	
+	<body>
+			<div id="common-header"></div>
+			
+			<div id="content">
+				<div id="content-header">
+					<h2>报警</h2>
+				</div>
+				<div id="breadcrumb">
+					<a href="#" class="current tip-bottom" title="报警">报警</a>
+				</div>
+				
+				<ul id="myTab" class="nav nav-tabs">
+					<li class="active">
+						<a href="#alarmTemplate" data-toggle="tab" >报警规则</a>
+					</li>
+					<li>
+						<a href="#hostTemplate" data-toggle="tab" >主机组</a>
+					</li>
+					<li>
+						<!-- <a href="#userTemplate" data-toggle="tab" >用户</a> -->
+					</li>
+				</ul>
+		
+				<div id="myTabContent" class="tab-content">
+					<!-- 第一个标签页 -->
+					<div class="tab-pane fade in active" id="alarmTemplate">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<div class="span12">
+								<div class="buttons">
+									<a title="创建规则" class="btn tip-bottom" href="#"><i class="icon-plus"></i>创建规则</a>
+								</div>
+									<div id="search" style="padding-top: 144px;padding-left: 68%;">
+										<form action="#" method="post">
+											<div>
+												<input name="hostName" type="text" placeholder="输入主机名称查询..." style="font-size: 11px;font-style: italic;color: white"/>
+												<button type="submit" class="tip-top" title="Search" ><i class="icon-search"></i></button>
+											</div>
+										</form> 
+									</div>
+								<br/>
+									<div class="widget-box">
+										<div class="widget-title">
+											<h5>报警规则</h5>
+										</div>
+										<div class="widget-content nopadding" id="alarmTemplate">
+			
+											<table class="table table-bordered data-table with-check" style="table-layout: fixed;">
+												<thead>
+													<tr>
+														<th></th>
+														<th data-field="hostName">规则名称</th>
+														<th data-field="phyCluster">创建者</th>
+														<th data-field="logicCluster">报警类型</th>
+														<th data-field="state">创建时间</th>
+													</tr>
+												</thead>
+												<tbody id="hostTbody">
+													<tr>
+														<td>1</td>
+														<td>test</td>
+														<td>Dr.Z</td>
+														<td>host</td>
+														<td>2017-09-14</td>
+													</tr>
+												</tbody>
+											</table>  
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="common-footer"></div>
+						</div>
+					</div>
+				
+				<!-- 第二个标签页 -->
+				<div class="tab-pane fade" id="hostTemplate">
+						<div class="container-fluid">
+							<div class="row-fluid">
+								<div class="span12">
+								<div class="buttons" style="padding-top: 0%;padding-left: 0%">
+									<a title="添加主机组" class="btn tip-bottom" href="#"><i class="icon-plus"></i>添加主机组</a>
+								</div>
+									<div id="search" style="padding-top: 144px;padding-left: 68%;">
+										<form action="#" method="post">
+											<div>
+												<input name="hostName" type="text" placeholder="输入主机名称查询..." style="font-size: 11px;font-style: italic;color: white"/>
+												<button type="submit" class="tip-top" title="Search" ><i class="icon-search"></i></button>
+											</div>
+										</form> 
+									</div>
+								<br/>
+									<div class="widget-box">
+										<div class="widget-title">
+											<h5>主机组</h5>
+										</div>
+										<div class="widget-content nopadding" id="hostTemplate">
+			
+											<table class="table table-bordered data-table with-check" style="table-layout: fixed;">
+												<thead>
+													<tr>
+														<th></th>
+														<th data-field="hostName">规则名称</th>
+														<th data-field="phyCluster">创建者</th>
+														<th data-field="logicCluster">报警类型</th>
+														<th data-field="state">创建时间</th>
+													</tr>
+												</thead>
+												<tbody id="hostTbody">
+													<tr>
+														<td>1</td>
+														<td>test</td>
+														<td>Dr.Z</td>
+														<td>host</td>
+														<td>2017-09-14</td>
+													</tr>
+												</tbody>
+											</table>  
+										</div>
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+					
+				<!-- 第三个标签页 -->
+			</div>
+			<div id="common-footer"></div>
+		</div>	
+
+
+		<script th:src="@{/js/jquery.min.js}"></script>
+		<script th:src="@{/js/jquery.ui.custom.js}"></script>
+		<script th:src="@{/js/bootstrap.min.js}"></script>
+		
+		<script th:src="@{/js/jquery.uniform.js}"></script>
+		<script th:src="@{/js/select2.min.js}"></script>
+		<script th:src="@{/js/jquery.dataTables.min.js}"></script>
+		<script th:src="@{/js/unicorn.js}"></script>
+		<script th:src="@{/js/unicorn.tables.js}"></script>
+		<script th:src="@{/js/commonDisplay.js}"></script>
+		
+		<script type="text/javascript">
+			 
+	
+		</script>
+	</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Unicorn Admin</title>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/k8scmp.css}" />
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<div id="common-header">
+		
+		</div>
+		<div id="content">
+			<div id="content-header">
+				<h2>服务管理</h2>
+			</div>
+			<div id="breadcrumb">
+				<a href="/app" class="tip-bottom">应用管理</a>
+				<a href="#" class="current">服务管理</a>
+			</div>
+			<div id="search" style="padding-top: 96px;padding-left: 53%;">
+				<form action="/app/search" method="post">
+					<input type="text" placeholder="输入服务名称查询..." style="font-size: 11px;font-style: italic;color: white"/>
+					<button type="submit" class="tip-top" title="Search"><i class="icon-search icon-white"></i></button>
+				</form>
+			</div>
+			<div class="buttons" style="padding-top: 1%;padding-left: 2%">
+				<a title="添加一个服务" class="btn tip-bottom" href="service-new.html"><i class="icon-plus"></i>添加服务</a>
+				<a title="启动服务" class="btn tip-bottom" href="serice-start.html"><i class="icon-play"></i>启动</a>
+				<a title="停止服务" class="btn tip-bottom" href="service-stop.html"><i class="icon-off"></i>停止</a>
+				<a title="升级/回滚" class="btn tip-bottom" href="service-upordowngrade.html"><i class="icon-repeat"></i>升级/回滚</a>
+				<a title="扩容/缩容" class="btn tip-bottom" href="service-capacity.html"><i class="icon-resize-small"></i>扩容/缩容</a>
+				<a title="删除" class="btn tip-bottom"><i class="icon-remove"></i>删除</a>
+			</div>	
+			<div class="container-fluid">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="widget-box">
+						<ul id="myTab" class="nav nav-tabs">
+							<li class="active">
+						        <a href="#sInfo" data-toggle="tab">服务详情</a>  
+						    </li>
+							<li><a href="#sExample" data-toggle="tab">服务实例</a></li>
+							<li><a href="#sUpgrade" data-toggle="tab">升级配置</a></li>
+						</ul> 
+						  
+						<div id="myTabContent" class="tab-content">  
+							<div class="filletDiv">
+								<ul style="list-style:none;">
+									<li class="filletLi">
+										<span class="filletSpan">实例个数</span>
+										<span class="filletSpan">当前版本</span>
+										<span class="filletSpan">状态</span>
+										<div class="filletButton">
+											<a title="升级/回滚" class="btn-mini tip-bottom" href="service-upordowngrade.html"><i class="icon-repeat"></i>升级/回滚</a>
+											<a title="扩容/缩容" class="btn-mini tip-bottom" href="service-capacity.html"><i class="icon-resize-small"></i>扩容/缩容</a>
+											<a title="停止" class="btn-mini tip-bottom"><i class="icon-remove"></i>删除</a>
+										</div>
+									</li>
+									<li>
+										<span class="lineSpan">3个</span>&nbsp;&nbsp;
+										<span class="lineSpan">1</span>&nbsp;&nbsp;&nbsp;
+										<span class="lineSpan">运行中</span>
+									</li>
+								</ul>
+							</div>
+							<hr style="padding-top: 1% solid #ddd;"/>  
+						    <div class="tab-pane fade in active" id="sInfo">  
+						    	<div>
+						    		<span class=>部署版本</span>
+						    		<span>
+						    			<select>
+											<option>1</option>
+											<option>5.0-beta</option>	
+										</select>
+						    		</span>
+						    		
+						    	</div>
+						        
+						    </div>  
+						    <div class="tab-pane fade" id="sExample">  
+						        <p>我这里是B选项卡显现的</p>  
+						    </div>  
+						    <div class="tab-pane fade" id="sUpgrade">  
+						        <p>我这里是B选项卡显现的</p>  
+						    </div>  
+						</div>
+						</div>				
+					</div>
+				</div>
+				
+				<div id="common-footer">
+					
+				</div>
+			</div>
+		</div>
+	</body>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/jquery.ui.custom.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/jquery.uniform.js}"></script>
+    <script th:src="@{/js/select2.min.js}"></script>
+    <script th:src="@{/js/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/js/unicorn.js}"></script>
+    <script th:src="@{/js/unicorn.tables.js}"></script>
+    <script th:src="@{/js/commonDisplay.js}"></script>
+</html>

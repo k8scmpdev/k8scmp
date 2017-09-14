@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>PaaS云管理平台</title>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+        <link rel="stylesheet" th:href="@{/css/datepicker.css}" />
+		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />	
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
+        <link rel="stylesheet" th:href="@{/css/colorpicker.css}" />
+		<link rel="stylesheet" th:href="@{/css/select2.css}" />	
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+	
+		<div id="common-header"></div>
+		
+		<div id="content">
+			<div id="content-header">
+				<h2>主机监控</h2>
+			</div>
+			<div id="breadcrumb">
+					<a href="#" class="current tip-bottom" title="主机监控">主机监控</a>
+			</div>
+			<div class="container-fluid">
+				<div class="row-fluid">
+					<div class="span12">
+					<br/>
+						<div class="control-group">
+						  <div style="float:left;border:1px">
+							    集群：<strong><span class="text" th:text="cent-os-01"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							    主机：<strong><span class="text" th:text="node-dex003"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							    采样方式&nbsp;&nbsp;<select id="dataSpec" name="dataSpec" class="selectpicker show-tick form-control" data-live-search="false" onclick="javascript(0);">
+									<option value="max">最大值</option>
+							        <option value="average" selected="selected">平均值</option>
+							        <option value="min">最小值</option>
+							    </select>
+						    </div>
+						    <div class="col-lg-5  pull-right" style="float:right;border:1px">
+                               		<form action="#" method="post"> 
+                                     	自定义&nbsp;&nbsp;<input id="date_begin" type="text" class="datepicker"/>
+                                     	-&nbsp;<input id="date_end" type="text" class="datepicker"/>
+                                     	<button type="submit" class="tip-top" title="Search" ><i class="icon-search"></i></button>
+                                   	</form>
+						    </div>
+					    </div>
+					</div>
+				</div>
+
+				<div class="row-fluid" >
+					<div class="span6" style="width:100%">
+						<div class="widget-box" >
+							<div class="widget-content">
+								<div class="row-fluid" style="margin-top:0px">
+									<div class="span4" style="width:48%">
+										
+										<ul class="site-stats" >
+											<li style="height:300px;width: 550px">
+												<div class="datashow-chart" id="hostCPU" style="min-width:200px;height:300px"></div>
+											</li>
+											
+											<li style="height:300px;width: 550px">
+												<div class="datashow-chart" id="hostMemory" style="min-width:200px;height:300px"></div>
+											</li>
+										</ul>
+									 </div>
+									<div class="span4" style="width:48%">
+										<ul class="site-stats" >
+											<li style="height:300px;width: 550px">
+												<div class="datashow-chart" id="hostDisk" style="min-width:200px;height:300px"></div>
+											</li>
+										</ul>
+									</div>
+								</div>							
+							</div>
+						</div>	
+					</div>
+				</div>
+
+				<div id="common-footer"></div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			
+		
+		
+		
+		</script>
+
+
+		<script th:src="@{/js/excanvas.min.js}"></script>
+ 		<script th:src="@{/highcharts/js/jquery-1.7.2.min.js}"></script>
+		<script th:src="@{/highcharts/js/highcharts.js}"></script>
+        <script th:src="@{/highcharts/js/chart-hostCPU.js}"></script>
+        <script th:src="@{/highcharts/js/chart-hostDisk.js}"></script>
+        <script th:src="@{/highcharts/js/chart-hostMemory.js}"></script>
+        <script th:src="@{/js/jquery.min.js}"></script>
+        <script th:src="@{/js/bootstrap.min.js}"></script>
+        <script th:src="@{/js/bootstrap-colorpicker.js}"></script>
+        <script th:src="@{/js/bootstrap-datepicker.js}"></script>
+        <script th:src="@{/js/jquery.uniform.js}"></script>
+        <script th:src="@{/js/select2.min.js}"></script>
+        <script th:src="@{/js/unicorn.js}"></script>
+        <script th:src="@{/js/unicorn.form_common.js}"></script>
+ 		<script th:src="@{/js/commonDisplay.js}"></script>
+ 		
+	</body>
+</html>
