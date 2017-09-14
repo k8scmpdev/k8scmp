@@ -3,7 +3,6 @@
  * Diablo9983 -> diablo9983@gmail.com
 **/
 $(document).ready(function(){
-	
 	$('.data-table').dataTable({
 		"bProcessing" : true,
 		"bFilter":false,
