@@ -48,6 +48,11 @@ public interface ServiceMapper {
     @Update("update service" +
             " set description=#{item.description},lastModifiedTime=#{item.lastModifiedTime},lastModifierId=#{item.lastModifierId}" +
             "where id = #{item.id}")
+    int updateDescription(@Param("item") ServiceInfo item);
+    
+    @Update("update service" +
+            " set description=#{item.description},state=#{item.state},data=#{item.data},lastModifiedTime=#{item.lastModifiedTime},lastModifierId=#{item.lastModifierId}" +
+            "where id = #{item.id}")
     int updateService(@Param("item") ServiceInfo item);
     
     @Delete("delete from service where id in(${id})")
@@ -63,5 +68,8 @@ public interface ServiceMapper {
     @Update("update service set state=#{state} where id=#{id}")
     int updateServiceStatu(@Param("state") String state,@Param("id") String id);
 
+    @Select("SELECT BASIC_COLUMN FROM service"
+			+" where appId=#{appId} and startSeq<#{startSeq} and state!='RUNNING'")
+    List<ServiceInfo> getNoRunningServicesByStartSeq(@Param("appId") String appId,@Param("startSeq") int startSeq);
     
 }

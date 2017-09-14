@@ -21,7 +21,7 @@ public class ServiceController {
         return "app/service-mgmt";
     }
 
-    @RequestMapping(value = "/delete")
+    @RequestMapping(value = "/delete/{id}")
     public String deleteService(@PathVariable String id) throws Exception {
         serviceService.deleteService(id);
         return "app/service-mgmt";
@@ -39,12 +39,21 @@ public class ServiceController {
     }
 
     @RequestMapping(value = "/search")
-    public ModelAndView searchServices(ServiceInfo serviceInfo) throws Exception {
+    public ModelAndView searchServices(@RequestBody ServiceInfo serviceInfo) throws Exception {
         return new ModelAndView("app/service-mgmt","serviceList",serviceService.listServices(serviceInfo));
     }
     
     @RequestMapping(value = "/{appId}")
     public ModelAndView getServicesByAppId(@PathVariable String appId) throws Exception {
         return new ModelAndView("app/service-mgmt","serviceList",serviceService.getServicesByAppId(appId));
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/start", method = RequestMethod.POST)
+    public String startService(@RequestParam(value = "serviceId", required = true) String serviceId,
+    						   @RequestParam(value = "version", required = true) int version,
+    						   @RequestParam(value = "replicas", required = true) int replicas) throws Exception {
+    	String msg = serviceService.startService(serviceId,version,replicas);
+    	return msg;
     }
 }

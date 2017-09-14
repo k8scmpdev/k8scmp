@@ -18,4 +18,7 @@ public interface ServiceService {
     List<ServiceConfigInfo> listServices(ServiceInfo serviceInfo);
 
 	List<ServiceConfigInfo> getServicesByAppId(String appId);
+
+	String startService(String serviceId, int version, int replicas)
+			throws Exception;
 }

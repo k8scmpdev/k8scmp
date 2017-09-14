@@ -25,6 +25,11 @@ public class ServiceDaoImpl implements ServiceDao {
     public void updateService(ServiceInfo serviceInfo) {
         mapper.updateService(serviceInfo);
     }
+    
+    @Override
+    public void updateDescription(ServiceInfo serviceInfo) {
+    	mapper.updateDescription(serviceInfo);
+    }
 
 	@Override
 	public void deleteService(String id) {
@@ -56,5 +61,8 @@ public class ServiceDaoImpl implements ServiceDao {
 		mapper.updateServiceStatu(state, id);
 	}
 	
-	
+	@Override
+	public List<ServiceInfo> getNoRunningServicesByStartSeq(String appId,int startSeq){
+		return mapper.getNoRunningServicesByStartSeq(appId,startSeq);
+	}
 }

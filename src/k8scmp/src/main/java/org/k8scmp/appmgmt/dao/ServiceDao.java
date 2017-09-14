@@ -10,6 +10,8 @@ public interface ServiceDao{
     long createService(ServiceConfigInfo service);
 
     void updateService(ServiceInfo serviceInfo);
+    
+    void updateDescription(ServiceInfo serviceInfo);
 
     void deleteService(String id);
 
@@ -22,5 +24,8 @@ public interface ServiceDao{
 	String getServiceStatu(String id);
 	
 	void updateServiceStatu(String state,String id);
+
+	List<ServiceInfo> getNoRunningServicesByStartSeq(String appId, int startSeq);
+
 
 }

@@ -16,7 +16,9 @@ import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
 import org.k8scmp.appmgmt.domain.ServiceDetail;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.appmgmt.domain.Version;
+import org.k8scmp.appmgmt.domain.VersionBase;
 import org.k8scmp.appmgmt.service.ServiceService;
+import org.k8scmp.appmgmt.service.ServiceStatusManager;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ClientConfigure;
@@ -47,13 +49,16 @@ public class ServiceServiceImpl implements ServiceService {
     @Autowired
     OperationLog operationLog;
     
+    @Autowired
+    ServiceStatusManager serviceStatusManager;
+    
     private static Logger logger = LoggerFactory.getLogger(ServiceServiceImpl.class);
 
 	@Override
 	public String createService(
 			ServiceDetail serviceDetail) {
 		if(serviceDetail==null){
-			 throw ApiException.wrapMessage(ResultStat.DEPLOYMENT_NOT_LEGAL, "service is null");
+			 throw ApiException.wrapMessage(ResultStat.SERVICE_NOT_LEGAL, "service is null");
 		}
 		ServiceConfigInfo service = serviceDetail.getServiceConfigInfo();
 		String serviceCode = service.getServiceCode();
@@ -61,20 +66,20 @@ public class ServiceServiceImpl implements ServiceService {
 		
 		AppInfo currentApp = appDao.getApp(appId);
 		if(currentApp == null){
-			throw ApiException.wrapMessage(ResultStat.DEPLOYMENT_NOT_LEGAL, "application is not exsited");
+			throw ApiException.wrapMessage(ResultStat.SERVICE_NOT_LEGAL, "application is not exsited");
 		}
 		List<AppInfo> apps = appDao.getAppsByserviceCode(serviceCode);
 		if (apps != null && apps.size() != 0) {
             for (AppInfo one : apps) {
                 if (one.getClusterId() == currentApp.getClusterId() &&
                         one.getNamespace().equals(currentApp.getNamespace())) {
-                    throw ApiException.wrapResultStat(ResultStat.DEPLOYMENT_EXIST);
+                    throw ApiException.wrapResultStat(ResultStat.SERVICE_EXIST);
                 }
             }
         }
 		String serviceId = UUIDUtil.generateUUID();
 		service.setCreateTime(DateUtil.dateFormatToMillis(new Date()));
-		service.setCreateTime("");
+		service.setCreatorId("");
 		service.setId(serviceId);
 		service.setState(ServiceStatus.STOP.name());
 		
@@ -83,13 +88,13 @@ public class ServiceServiceImpl implements ServiceService {
 		List<Version> versions = serviceDetail.getVersions();
 		
 		if(versions == null || versions.size()!=1){
-			throw ApiException.wrapMessage(ResultStat.DEPLOYMENT_NOT_LEGAL, "service config information cannot be None or more than one");
+			throw ApiException.wrapMessage(ResultStat.SERVICE_NOT_LEGAL, "service config information cannot be None or more than one");
 		}
 		
 		Version version = versions.get(0);
 		String errInfo = version.checkLegality();
         if (!StringUtils.isBlank(errInfo)) {
-            throw new ApiException(ResultStat.DEPLOYMENT_NOT_LEGAL,errInfo);
+            throw new ApiException(ResultStat.SERVICE_NOT_LEGAL,errInfo);
         }
         version.setCreateTime(DateUtil.dateFormatToMillis(new Date()));
 		version.setCreateTime("");
@@ -124,7 +129,7 @@ public class ServiceServiceImpl implements ServiceService {
 	public void deleteService(String id) {
 		String statu = serviceDao.getServiceStatu(id);
 		if(ServiceStatus.STOP.name().equals(statu)){
-			throw ApiException.wrapMessage(ResultStat.CANNOT_DELETE_DEPLOYMENT, "service statu is "+statu+" now");
+			throw ApiException.wrapMessage(ResultStat.CANNOT_DELETE_SERVICE, "service statu is "+statu+" now");
 		}
 		serviceDao.deleteService(id);
 		versionDao.deleteAllVersion(id);
@@ -146,7 +151,7 @@ public class ServiceServiceImpl implements ServiceService {
 	public void modifyService(ServiceInfo serviceInfo) {
 		serviceInfo.setLastModifierId("");
 		serviceInfo.setLastModifiedTime(DateUtil.dateFormatToMillis(new Date()));
-		serviceDao.updateService(serviceInfo);
+		serviceDao.updateDescription(serviceInfo);
 		operationLog.insertRecord(new OperationRecord(
 				serviceInfo.getId(), 
 				ResourceType.SERVICE,
@@ -224,5 +229,57 @@ public class ServiceServiceImpl implements ServiceService {
             return serviceConfig;
         }
     }
+
+	@Override
+	public String startService(String serviceId, int version,int replicas) throws Exception{
+		ServiceInfo serviceInfo = serviceDao.getService(serviceId);
+		if(serviceInfo == null){
+			throw ApiException.wrapMessage(ResultStat.PARAM_ERROR, "no such service:" + serviceId);
+		}
+		checkStartSeq(serviceInfo.getAppId(),serviceInfo.getStartSeq());
+		
+		VersionBase verBase = versionDao.getVersion(serviceId, version);
+		if(verBase == null){
+			throw ApiException.wrapMessage(ResultStat.PARAM_ERROR, "no such service version:" + serviceId);
+		}
+		
+		Version ver = verBase.toModel(Version.class);
+		if (ver.isDeprecate()) {
+            throw ApiException.wrapMessage(ResultStat.SERVICE_START_FAILED, "can't start deprecated version");
+        }
+		
+		serviceStatusManager.checkStateAvailable(ServiceStatus.valueOf(serviceInfo.getState()), ServiceStatus.DEPLOYING);
+		
+		serviceInfo.setState(ServiceStatus.DEPLOYING.name());
+		serviceInfo.setLastModifierId("");
+		serviceInfo.setLastModifiedTime(DateUtil.dateFormatToMillis(new Date()));
+		
+		ServiceConfigInfo service = serviceInfo.toModel(ServiceConfigInfo.class);
+		if(replicas>0){
+			service.setDefaultReplicas(replicas);
+		}
+		serviceInfo.setData(service.toString());
+		serviceDao.updateService(serviceInfo);
+		
+		return null;
+	}
 	
+	/**
+	 * 检查启动服务的依赖服务是否是运行态
+	 * @param appId
+	 * @param startSeq
+	 */
+	public void checkStartSeq(String appId,int startSeq){
+		if(startSeq<1){
+			return;
+		}
+		List<ServiceInfo> services = serviceDao.getNoRunningServicesByStartSeq(appId,startSeq);
+		if(services!=null && services.size()>0){
+			String msg="";
+			for(ServiceInfo service:services){
+				msg += service.getId()+"  ";
+			}
+			 throw ApiException.wrapMessage(ResultStat.SERVICE_START_FAILED, "hasn't start depend services:"+msg);
+		}
+	}
 }

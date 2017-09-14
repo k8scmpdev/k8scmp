@@ -20,7 +20,7 @@ public class AppController {
         return "app/app-mgmt";
     }
 
-    @RequestMapping(value = "/delete")
+    @RequestMapping(value = "/delete/{id}")
     public String deleteApp(@PathVariable String id) throws Exception {
         appService.deleteApp(id);
         return "app/app-mgmt";
@@ -38,7 +38,7 @@ public class AppController {
     }
 
     @RequestMapping(value = "/search")
-    public ModelAndView searchApps(AppInfo appInfo) throws Exception {
+    public ModelAndView searchApps(@RequestBody AppInfo appInfo) throws Exception {
         return new ModelAndView("app/app-mgmt","appList",appService.listApps(appInfo));
     }
 }
