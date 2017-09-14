@@ -25,7 +25,7 @@ public interface RuntimeDriver {
 
     // Operation
     void startDeploy(ServiceConfigInfo serviceConfigInfo, Version version, User user, List<Env> allExtraEnvs)
-            throws DriverException,  IOException;
+            throws DriverException,IOException;
 
     void stopDeploy(ServiceConfigInfo serviceConfigInfo, User user) throws  IOException;
 
