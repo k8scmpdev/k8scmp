@@ -29,7 +29,12 @@ public class TemplateController extends ApiController {
     public HttpResponseTemp<?> listTemplateInfo() {
         return templateService.listTemplateInfo();
     }
-
+    
+    @RequestMapping(value = "/templatenew")
+    public String createTemplate() throws Exception {
+        return "alarm/template-new";
+    }
+    
     @ResponseBody
     @RequestMapping(value = "/template", method = RequestMethod.POST)
     public HttpResponseTemp<?> createTemplate(@RequestBody TemplateInfo templateInfo) {

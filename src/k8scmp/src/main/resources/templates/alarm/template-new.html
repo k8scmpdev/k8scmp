@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Unicorn Admin</title>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	
+	<body>
+		<div id="common-header"></div>
+		
+		<div id="content">
+			<div id="content-header">
+				<h2>新建规则</h2>
+			</div>
+			<div id="breadcrumb">
+				<a href="#" class="current tip-bottom" title="新建规则">新建规则</a>
+			</div>
+			<div class="container-fluid">
+				<div class="row-fluid" >
+					<div class="span12">
+						<div class="widget-box">
+							<div class="widget-title">
+								<span class="icon">
+									<i class="icon-align-justify"></i>									
+								</span>
+								<!-- <h5>请输入用户信息</h5> -->
+							</div>
+							<div class="widget-content nopadding"><!-- th:object="${TemplateInfo}" -->
+								<form class="form-horizontal" action="#"  method="post" name="create_template" id="create_template" novalidate="novalidate">
+                                    <div class="control-group">
+                                        <label class="control-label">报警规则名称</label>
+                                        <div class="controls">
+                                            <input id="templateName" name="templateName" type="text" />
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label">选择报警类型</label>
+                                        <div class="controls">
+                                            <select id="templateType">
+                                            	<option>主机</option>
+                                            	<option>容器</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="control-group">
+											<label class="control-label">选择报警主机组</label>
+											<div class="controls">
+												<input id="hostGroup" name="hostGroup" type="text" />
+											</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label">添加报警逻辑</label>
+										<div class="controls">
+                                           <a title="添加报警逻辑" class="btn btn-primary" href="javascript:void(0);" onclick="showTemplate();">添加</a>
+                                       		<br/>
+                                       		<br/>
+                                       		<div id="template"></div>
+										</div>
+									</div>
+									
+									<div class="control-group">
+                                        <label class="control-label">指定报警用户</label>
+                                        <div class="controls">
+                                            <input id="user" type="text" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                    	<a  class="btn tip-bottom" href="/user/list">返回</a>
+                                        <input type="submit" value="提交" class="btn btn-primary" />
+                                    </div>
+                                </form>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row-fluid">
+					<div id="footer" class="span12">
+						2017 &copy; k8scmp. 
+					</div>
+				</div>
+			</div>
+		</div>	
+
+
+		<script th:src="@{/js/jquery.min.js}"></script>
+		<script th:src="@{/js/jquery.ui.custom.js}"></script>
+		<script th:src="@{/js/bootstrap.min.js}"></script>
+		
+		<script th:src="@{/js/jquery.uniform.js}"></script>
+		<script th:src="@{/js/select2.min.js}"></script>
+		<script th:src="@{/js/jquery.dataTables.min.js}"></script>
+		<script th:src="@{/js/unicorn.js}"></script>
+		<script th:src="@{/js/unicorn.tables.js}"></script>
+		<script th:src="@{/js/commonDisplay.js}"></script>
+		
+		<script type="text/javascript">
+			  
+			function showTemplate(){
+			    var childdiv=$('<div></div>');  
+				childdiv.attr("id","id" + new Date().getTime());
+				$("#template").append(childdiv);
+				childdiv.load("/js/common.html #rulerTemplate");
+			}
+			
+			function deleteTemplate(){
+				
+			}
+		
+		</script>
+	</body>
+</html>

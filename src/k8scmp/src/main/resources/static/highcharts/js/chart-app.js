@@ -35,24 +35,42 @@ $(function(){
         series:  []
     }
     chart = new Highcharts.Chart('chart-app',options)
-//    request({
-//        method: 'POST',
-//        url: '/overview/opelog',
-//        data: data,
-//        onload: function (resp) {
-//          var data = JSON.parse(resp.responseText);
-//          if (data.resultCode === 200) loginSuccess();
-//          else password_wrong.style.display = 'block';
+//    $.ajax({
+//    	type: 'GET',
+//        url: '/overview/appinfo',
+//        data: '',
+//        dataType: 'json',
+//        success: function (data) {
+//        	
+//        	chart.addSeries({
+//                type:data.type,
+//                name:data.name,
+//                data:data.data
+//            });
+//          $.each(data.data,function(i, field){     //遍历json数组
+//        	  alert(field)
+//        	  alert(i)
+//              chart.addSeries({
+//                  type:data.type,
+//                  name:i,
+//                  data:field
+//              });
+//          })
 //        },
 //    });
-    $.getJSON("highcharts/jsonData/chart-app.json",function(data){//获取Json文件,并创建Json对象
-        $.each(data,function(i, field){     //遍历json数组
-            chart.addSeries({
-                type:field.type,
-                name:field.name,
-                data:field.data
-            });
-        })
+    $.getJSON("highcharts/jsonData/chart-cpu.json",function(data){//获取Json文件,并创建Json对象
+    	chart.addSeries({
+	        type:data.type,
+	        name:data.name,
+	        data:data.data
+	    });
+//    	$.each(data,function(i, field){     //遍历json数组
+//            chart.addSeries({
+//            	type:field.type,
+//                name:field.name,
+//                data:field.data
+//            });
+//        })
     })
 })
 

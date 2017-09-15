@@ -3,9 +3,14 @@ package org.k8scmp.overview.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,25 +55,29 @@ public class OverviewController {
         return "overview/index";
     }
     
+    @ResponseBody
     @RequestMapping(value="/overview/appinfo", method=RequestMethod.GET)
-    public JSONObject showAppInfo() {
+    public String showAppInfo() {
      	
-     	JSONObject appinfo = new JSONObject();
-     	try {
-//     		String json = "{'type':'pie','name':'应用'}";
-     		appinfo.put("type", "pie");
-     		appinfo.put("name", "应用");
-     		Map <String, Integer> data = new HashMap <String, Integer>();
-     		data.put("运行中: 3",   3);
-     		data.put("已停止: 2",   2);
-     		data.put("操作中: 1",   1);
-			appinfo.put("data", data);
-		} catch (JSONException e) {
+    	ObjectMapper obj = new ObjectMapper();
+
+    	Map<String, Object> appinfo = new HashMap<>();
+     	appinfo.put("type", "pie");
+     	appinfo.put("name", "应用");
+     	Map <String, Integer> data = new HashMap <String, Integer>();
+     	data.put("运行中: 3",   3);
+     	data.put("已停止: 2",   2);
+     	data.put("操作中: 1",   1);
+		appinfo.put("data", data);
+
+        try {
+			return obj.writeValueAsString(appinfo);
+		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return "";
 		}
-        return appinfo;
+
     }
-   
    
 }
