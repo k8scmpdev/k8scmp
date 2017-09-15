@@ -36,4 +36,9 @@ public class OperationLogImpl implements OperationLog {
     public List<OperationRecord> listOperationRecordByUserNameTime(Integer userId, long operateTime) {
         return mapper.listOperationRecordByUserNameTime(userId, operateTime);
     }
+    
+    @Override
+    public List<OperationRecord> listOperationRecord4Overview() {
+        return mapper.listOperationRecord4Overview();
+    }
 }

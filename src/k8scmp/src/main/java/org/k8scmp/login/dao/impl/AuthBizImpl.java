@@ -62,6 +62,12 @@ public class AuthBizImpl implements AuthBiz {
     public User getUserById(int userId) {
         return userMapper.getUserById(userId);
     }
+    
+    @Override
+    public User getUserByLoginname(String loginname) {
+        return userMapper.getUserByName(loginname);
+    }
+    
 
     @Override
 	public String getUserName(String loginname) {
