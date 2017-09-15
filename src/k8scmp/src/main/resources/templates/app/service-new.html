@@ -22,7 +22,7 @@
 			</div>
 			<div id="breadcrumb">
 				<a href="/app" class="tip-bottom" title="应用管理">应用管理</a>
-				<a href="/app/service/service-mgmt" class="tip-bottom" title="应用管理">服务管理</a>
+				<a href="/app/service-mgmt" class="tip-bottom" title="应用管理">服务管理</a>
 				<a href="#" class="current" title="新建应用">添加服务</a>
 			</div>
 			<div class="container-fluid">
@@ -37,7 +37,7 @@
 							</div>
 							
 							<form action="/app/app-new" method="get" class="form-horizontal">
-								<div class="widget-content" id="service-new1" style="display: block">
+								<div class="widget-content" id="service-new1">
 									<div class="control-group">
                                         <label class="control-label">服务名称</label>
                                         <div class="controls">
@@ -90,12 +90,12 @@
 									</div>
 								</div>
 								
-								<div class="widget-content" id="service-new2" style="display: none;">
+								<div class="widget-content" id="service-new2">
 									<div class="control-group">
                                         <label class="control-label-left">选择镜像</label>
                                         <div class="controls-left">
                                             <input type="text" placeholder="输入服务名称（字母数字）..." style="font-style: italic;font-size: 13px;width: 87%"/>
-                                            <a href="#myModal" data-toggle="modal" class="btn btn-primary">添加</a>
+                                            <button class="btn btn-primary">添加</button>
                                             <a title="点击添加按钮，在弹出的页面中，输入
 												镜像名称进行查询，被选中的镜像会显示在
 												镜像列表里，单击每个镜像进行配置。" class="tip-top">
@@ -130,7 +130,7 @@
 													<tbody id="tBody">
 													    <tr th:each="app,itState:${imageList}">
 													    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
-													        <td><a title='单击查看服务列表' th:href="@{/app/service/service-mgmt(appId=${app.appId},logicClusterId=${app.logicClusterId},namespace=${app.namespace})}" th:text="${app.appId}" class="tip-top"></a></td>
+													        <td><a title='单击查看服务列表' th:href="@{/app/service-mgmt(appId=${app.appId},logicClusterId=${app.logicClusterId},namespace=${app.namespace})}" th:text="${app.appId}" class="tip-top"></a></td>
 													        <td th:text="${app.state}"></td>
 													        <td th:text="${app.logicClusterId}"></td>
 													        <td th:text="${app.clusterId}"></td>
@@ -147,12 +147,12 @@
 	                                </div>
 									<div class="form-actions" style="text-align: left;padding-left: 35%">
 										<button id="cancleService" class="btn btn-primary" type="button">取消</button>&nbsp;&nbsp;&nbsp;
-										<button id="btnnew2pre" class="btn btn-primary" type="button">上一步</button>&nbsp;&nbsp;&nbsp;
+										<button id="btnnew2pre" class="btn btn-primary" type="button">上一步</button>
 										<button id="btnnew2next" class="btn btn-primary" type="button">下一步</button>
 									</div>
 								</div>
 							
-								<div class="widget-content" id="service-new3" style="display: none">
+								<div class="widget-content" id="service-new3">
 									<div class="control-group">
 	                                       <label class="control-label">挂载存储</label>
 	                                       <div class="controls">
@@ -166,22 +166,23 @@
 	                                </div>
 	                                
 									<div class="control-group">
-	                                       <label class="control-label">启动命令</label>
+	                                       <label class="control-label">服务描述</label>
 	                                       <div class="controls">
-	                                           <input type="text" class="normaltext"/>
+	                                           <textarea rows="3" cols="5"></textarea>
 	                                       </div>
 	                                </div>
 									<div class="control-group">
-	                                    <label class="control-label">环境变量</label>
-	                                    <div class="controls">
-											<input type="text" class="normaltext" placeholder="环境变量以键值对key=value形式保存，以逗号,分割" style="font-style: italic;font-size: 13px"/>
+	                                       <label class="control-label">配置方式</label>
+	                                       <div class="controls">
+											<input type="radio" name="radios" />界面配置&nbsp;&nbsp;&nbsp;
+											<input type="radio" name="radios" />YAML
 										</div>
 	                                </div>
 	                                <div class="control-group">
-	                                	<label class="control-label">容器大小</label>
+	                                	<label class="control-label">实例个数</label>
 	                                	<div class="controls">
-	                                	 	<span>CPU(个)</span><input type="text" class="combine tip-top"/>&nbsp;&nbsp;&nbsp;
-											<span>内存(MB)</span><input type="text" class="combine tip-top"/>
+											<input type="text" class="normaltext"/>
+											<span class="help-block" style="font-size:13px">实例在集群中启动的副本数</span>
 										</div>
 	                                </div>
 	                                <div class="control-group">
@@ -205,96 +206,64 @@
 	                                </div>
 								 <div class="form-actions" style="text-align: left;padding-left: 40%">
 									<button id="cancleService" class="btn btn-primary" type="button">取消</button>&nbsp;&nbsp;&nbsp;
-									<button id="btnnew3pre" class="btn btn-primary" type="button">上一步</button>&nbsp;&nbsp;&nbsp;
-									<button id="btnnew3next" class="btn btn-primary" type="button">下一步</button>
+									<button id="btnnew3pre" class="btn btn-primary" type="button">上一步</button>
+									<button id="btnnew3next" class="btn btn-primary" type="button">提交</button>
 								</div>
 							</div>
 							
-							<div class="widget-content" id="service-new4" style="display: none">
+							<div class="widget-content" id="service-new4">
 									<div class="control-group">
-                                    	<label class="control-label-YAML">YAML配置示例</label>
+	                                       <label class="control-label">服务名称4</label>
+	                                       <div class="controls">
+	                                           <input class="normaltext" type="text" placeholder="输入服务名称（字母数字）..." style="font-style: italic;font-size: 13px"/>
+	                                       </div>
 	                                </div>
 									<div class="control-group">
-	                                    <div>
-	                                    	<ul style="list-style:none;">
-	                                    		<li>containers:</li>
-	                                    		<li>- image: "pub.test/registry:2.3</li>
-	                                    		<li> name: "test-container"</li>
-	                                    		<li> volumeMounts:</li>
-	                                    		<li> - mountPath: "/test-hostpath"</li>
-	                                    		<li>  name: "test-volume"</li>
-	                                    		<li>volumes:</li>
-	                                    		<li>- hostPath:</li>
-	                                    		<li> path: "/opt/scs"</li>
-	                                    		<li> name: "test-volume"</li>
-	                                    	</ul>
-	                                    </div>
+	                                       <label class="control-label">服务描述</label>
+	                                       <div class="controls">
+	                                           <textarea rows="3" cols="5"></textarea>
+	                                       </div>
 	                                </div>
-									<div class="textarea-left">
-										<textarea class="wholewidth" rows="5"></textarea>
+									<div class="control-group">
+	                                       <label class="control-label">配置方式</label>
+	                                       <div class="controls">
+											<input type="radio" name="radios" />界面配置&nbsp;&nbsp;&nbsp;
+											<input type="radio" name="radios" />YAML
+										</div>
+	                                </div>
+	                                <div class="control-group">
+	                                	<label class="control-label">实例个数</label>
+	                                	<div class="controls">
+											<input type="text" class="normaltext"/>
+											<span class="help-block" style="font-size:13px">实例在集群中启动的副本数</span>
+										</div>
+	                                </div>
+	                                <div class="control-group">
+	                                	<label class="control-label">端口映射</label>
+	                                	<div class="controls">
+	                               			<input type="text" class="combine tip-top" title="端口"/>
+											<select class="combine">
+												<option>TCP</option>
+												<option>HTTP</option>
+												
+											</select>
+											<select class="combine">
+												<option>动态生成</option>
+												<option>指定端口</option>
+											</select>
+											<select class="combine">
+												<option >保存</option>
+												<option >取消</option>
+											</select>
+	                               		</div>
 	                                </div>
 								 <div class="form-actions" style="text-align: left;padding-left: 40%">
 									<button id="cancleService" class="btn btn-primary" type="button">取消</button>&nbsp;&nbsp;&nbsp;
-									<button id="btnnew4pre" class="btn btn-primary" type="button">上一步</button>&nbsp;&nbsp;&nbsp;
-									<button id="btnnew4pre" class="btn btn-primary" type="button">提交</button>
+									<button id="btnnew4pre" class="btn btn-primary" type="button">上一步</button>
+									<button id="btnnew4next" class="btn btn-primary" type="button">下一步</button>
 								</div>
 							</div>
 						</form>
-						
-						<div id="myModal" class="modal hide">
-							<div class="modal-header">
-								<button data-dismiss="modal" class="close" type="button">×</button>
-								<h3>选择镜像</h3>
-							</div>
-							<div class="modal-body">
-	                            <div class="form-horizontal">
-	                            <div class="control-group">
-	                                 <label class="control-label-left">镜像仓库</label>
-	                                 <div class="controls">
-	                                 	 <span style="padding-bottom: 1%;padding-left: 5%">http://123.com</span>
-	                                 </div>
-	                            </div> 
-	                            <div class="control-group">
-	                                <div class="row-fluid">
-									<div class="span12">
-										<div class="widget-box">
-											<div class="widget-title">
-												<h5>镜像列表</h5>
-											</div>
-											<div class="widget-content nopadding">
-												<table class="table table-bordered data-table with-check">
-													<thead>
-														<tr>
-															<th><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></th>
-															<th>选择</th>
-															<th>镜像名称</th>
-															<th>版本</th>
-														</tr>
-													</thead>
-													<tbody id="tBody">
-													    <tr th:each="app,itState:${imageList}">
-													    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
-													        <td><a title='单击查看服务列表' th:href="@{/app/service/service-mgmt(appId=${app.appId},logicClusterId=${app.logicClusterId},namespace=${app.namespace})}" th:text="${app.appId}" class="tip-top"></a></td>
-													        <td th:text="${app.createTime}"></td>
-													        <td th:text="${app.description}"></td>
-													    </tr>
-													</tbody>
-												</table>							
-											</div>
-										</div>				
-									</div>
-									</div>
-	                                </div>
-	                            
-	                            </div>
-                                
-	                                <div class="form-actions" style="text-align: left;padding-left: 35%">
-										<button id="cancleService" class="btn btn-primary" type="button">取消</button>&nbsp;&nbsp;&nbsp;
-										<button id="btnnew2pre" class="btn btn-primary" type="button">确定</button>&nbsp;&nbsp;&nbsp;
-									</div>
-                                
-							</div>
-						</div>
 						</div>
 					</div>
 				</div>
@@ -309,5 +278,4 @@
     <script th:src="@{/js/bootstrap.min.js}"></script>
     <script th:src="@{/js/unicorn.js}"></script>
     <script th:src="@{/js/commonDisplay.js}"></script>
-    <script th:src="@{/js/service-new.js}"></script>
 </html>

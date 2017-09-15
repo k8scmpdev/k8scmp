@@ -14,22 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class ServiceController {
     @Autowired
     ServiceService serviceService;
-    
-    @RequestMapping(value = "/service-new")
-    public String showCreateService() throws Exception {
-        return "app/service-new";
-    }
-    
-    @RequestMapping(value = "/service-mgmt")
-    public String showService() throws Exception {
-        return "app/service-mgmt";
-    }
 
-    @RequestMapping(value = "/service-info")
-    public String showServiceInfo() throws Exception {
-        return "app/service-info";
-    }
-    
     @RequestMapping(value = "/create")
     public String createService(@RequestBody ServiceDetail serviceDetail) throws Exception {
     	serviceService.createService(serviceDetail);

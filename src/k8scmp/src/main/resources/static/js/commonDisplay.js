@@ -1,39 +1,72 @@
 $("#common-header").load("/js/common.html #app-header",function(){
-	var menuId = $("#commonScript").attr("menu");
-	$("a[id="+menuId+"]").parent().addClass("active");
 	$('#allMenu li').click(function(){
 		$(this).parent().find('li.active').removeClass('active'); 
 		$(this).addClass("active");
-		
-		if($(this).children("ul")){
-			var submenu = $(this).children("a").siblings('ul');
-			var li = $(this);
-			var submenus = $('#sidebar li.submenu ul');
-			//var submenus_parents = $('#sidebar li.submenu');
-			var submenus_parents = submenu.parent();
-			if(li.hasClass('open'))
-			{
-				if(($(window).width() > 768) || ($(window).width() < 479)) {
-					submenu.slideUp();
-				} else {
-					submenu.fadeOut(500);
-				}
-				li.removeClass('open');
-			} else 
-			{
-				if(($(window).width() > 768) || ($(window).width() < 479)) {
-					submenus.slideUp();			
-					submenu.slideDown();
-				} else {
-					submenus.fadeOut(500);			
-					submenu.fadeIn(500);
-				}
-				submenus_parents.removeClass('open');		
-				li.addClass('open');	
-			}	
-		}
 	});
 });
 $("#common-footer").load("/js/common.html #app-footer");
 
+//service-new2 service-new3 service-new4 hide onload
+$(document).ready(function(){
+	$("#service-new1").css("display","block");
+	$("#service-new2").css("display","none");
+	$("#service-new3").css("display","none");
+	$("#service-new4").css("display","none");
+	$("#defaultDiv").css("display","none");
+});
+
+//bind dynamic hide and display
+//next
+$("#btnnew1next").bind("click", function(event) {
+	$("#service-new1").css("display","none");
+	$("#service-new2").css("display","block");
+	$("#service-new3").css("display","none");
+	$("#service-new4").css("display","none"); 
+});
+$("#btnnew2next").bind("click", function(event) {
+	$("#service-new1").css("display","none"); 
+	$("#service-new2").css("display","none");
+	$("#service-new3").css("display","block");
+	$("#service-new4").css("display","none"); 
+});
+$("#btnnew3next").bind("click", function(event) {
+	$("#service-new1").css("display","none"); 
+	$("#service-new2").css("display","none");
+	$("#service-new3").css("display","none"); 
+	$("#service-new4").css("display","block"); 
+});
+//pre
+$("#btnnew2pre").bind("click", function(event) {
+	$("#service-new1").css("display","block"); 
+	$("#service-new2").css("display","none"); 
+	$("#service-new3").css("display","none");
+	$("#service-new4").css("display","none"); 
+});
+$("#btnnew3pre").bind("click", function(event) {
+	$("#service-new1").css("display","none"); 
+	$("#service-new2").css("display","block"); 
+	$("#service-new3").css("display","none");
+	$("#service-new4").css("display","none"); 
+});
+$("#btnnew4pre").bind("click", function(event) {
+	$("#service-new1").css("display","none"); 
+	$("#service-new2").css("display","none");
+	$("#service-new3").css("display","block");
+	$("#service-new4").css("display","none"); 
+});
+$("#cancleService").bind("click", function(event) {
+	$("#service-new1").css("display","none"); 
+	$("#service-new2").css("display","none");
+	$("#service-new3").css("display","none"); 
+	$("#service-new4").css("display","none"); 
+	window.location.href="/app/service-mgmt";
+});
+
+function showStorage(){
+    var childdiv=$('<div></div>');  
+	childdiv.attr("id","");
+	$("#storages").append(childdiv);
+	childdiv.load("/js/common.html #storageTemplate");
+	 
+}
 

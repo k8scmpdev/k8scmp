@@ -13,13 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class AppController {
     @Autowired
     AppService appService;
-    
-    
-    @RequestMapping(value = "/app-new")
-    public String showCreateApp() throws Exception {
-        return "app/app-new";
-    }
-    
+
     @RequestMapping(value = "/create")
     public String createApp(@RequestBody AppInfo appInfo) throws Exception {
     	appService.createApp(appInfo);
@@ -47,5 +41,4 @@ public class AppController {
     public ModelAndView searchApps(@RequestBody AppInfo appInfo) throws Exception {
         return new ModelAndView("app/app-mgmt","appList",appService.listApps(appInfo));
     }
-    
 }
