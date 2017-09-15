@@ -32,15 +32,15 @@ public interface ServiceMapper {
 		"</when>","order by createTime desc","</script>"})
     List<ServiceInfo> getServices(@Param("item") ServiceInfo item);
 	
-	@Select("SELECT BASIC_COLUMN FROM service"
+	@Select("SELECT" +BASIC_COLUMN + " FROM service"
 			+" where appId=#{appId}")
     List<ServiceInfo> getServicesByAppId(@Param("appId") String appId);
 	
-	@Select("SELECT BASIC_COLUMN FROM service"
+	@Select("SELECT" + BASIC_COLUMN +" FROM service"
 			+" where id=#{id}")
 	ServiceInfo getService(@Param("id") String id);
 	
-    @Insert("INSERT INTO service(BASIC_COLUMN) values (" +
+    @Insert("INSERT INTO service(" + BASIC_COLUMN + " ) values (" +
             " #{item.id}, #{item.serviceCode}, #{item.appId}, #{item.startSeq}, #{item.description}, #{item.state}, #{item.data}," +
             " #{item.createTime},#{item.creatorId},#{item.lastModifiedTime},#{item.lastModifierId})")
     int createService(@Param("item") ServiceConfigInfo item,@Param("data") String data);
@@ -68,7 +68,7 @@ public interface ServiceMapper {
     @Update("update service set state=#{state} where id=#{id}")
     int updateServiceStatu(@Param("state") String state,@Param("id") String id);
 
-    @Select("SELECT BASIC_COLUMN FROM service"
+    @Select("SELECT" + BASIC_COLUMN + " FROM service"
 			+" where appId=#{appId} and startSeq<#{startSeq} and state!='RUNNING'")
     List<ServiceInfo> getNoRunningServicesByStartSeq(@Param("appId") String appId,@Param("startSeq") int startSeq);
     
