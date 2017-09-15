@@ -70,9 +70,8 @@ public class GlobalController {
     	
     	model.addAttribute("clusterinfo", clinfo);
     	
-    	String currentUser = (String) SecurityUtils.getSubject().getPrincipal();
-    	User user = new User();
-    	user.setUsername(currentUser);
+    	//获取当前登录用户
+        User user = AuthUtil.getUser();
     	model.addAttribute("user", user);
     	
     	return "/global/cluster-edit";
@@ -82,11 +81,26 @@ public class GlobalController {
     @RequestMapping(value="/cluster/edit", method = RequestMethod.POST)
     public String editCluster(Model model,@ModelAttribute ClusterInfo clusterInfo) {
     	HttpResponseTemp<?> resp = globalService.editClusterInfo(clusterInfo);
+    	String info = "集群配置信息修改成功";
+    	String state = "ok";
     	if(resp.getResultCode()==200){
-    		model.addAttribute("info","修改成功");
+    		model.addAttribute("info",info);
+    		
     	}else{
-    		model.addAttribute("info","修改失败");
+    		info ="集群仓库配置信息修改失败";
+    		state="fail";
+    		model.addAttribute("info",info);
     	}
+    	operationLog.insertRecord(new OperationRecord(
+    			clusterInfo.getName(), 
+				ResourceType.CONFIGURATION,
+				OperationType.MODIFY, 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
+				state, 
+				info, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
     	return showCluster(model);
     }
 
@@ -108,9 +122,8 @@ public class GlobalController {
     	
     	model.addAttribute("reginfo", rinfo);
     	
-    	String currentUser = (String) SecurityUtils.getSubject().getPrincipal();
-    	User user = new User();
-    	user.setUsername(currentUser);
+    	//获取当前登录用户
+        User user = AuthUtil.getUser();
     	model.addAttribute("user", user);
     	
     	return "/global/registry-edit";
@@ -119,11 +132,26 @@ public class GlobalController {
     @RequestMapping(value="/registry/edit", method = RequestMethod.POST)
     public String editRegistry(Model model,@ModelAttribute RegisterInfo registryinfo) {
     	HttpResponseTemp<?> resp = globalService.editRegistryInfo(registryinfo);
+    	String info = "镜像仓库配置信息修改成功";
+    	String state = "ok";
     	if(resp.getResultCode()==200){
-    		model.addAttribute("info","修改成功");
+    		model.addAttribute("info",info);
+    		
     	}else{
-    		model.addAttribute("info","修改失败");
+    		info ="镜像仓库配置信息修改失败";
+    		state="fail";
+    		model.addAttribute("info",info);
     	}
+    	operationLog.insertRecord(new OperationRecord(
+    			registryinfo.getName(), 
+				ResourceType.CONFIGURATION,
+				OperationType.MODIFY, 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
+				state, 
+				info, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
     	return showRegistry(model);
     }
     
@@ -160,9 +188,8 @@ public class GlobalController {
     	
     	model.addAttribute("moninfo", minfo);
     	
-    	String currentUser = (String) SecurityUtils.getSubject().getPrincipal();
-    	User user = new User();
-    	user.setUsername(currentUser);
+    	//获取当前登录用户
+        User user = AuthUtil.getUser();
     	model.addAttribute("user", user);
     	
     	return "/global/monitor-edit";
@@ -171,22 +198,24 @@ public class GlobalController {
     @RequestMapping(value="/monitor/edit", method = RequestMethod.POST)
     public String editMonitor(Model model,@ModelAttribute MonitorInfo monitorinfo) {
     	HttpResponseTemp<?> resp = globalService.editMonitorInfo(monitorinfo);
+    	String info = "监控配置信息修改成功";
     	String state = "ok";
     	if(resp.getResultCode()==200){
-    		model.addAttribute("info","修改成功");
+    		model.addAttribute("info",info);
     		
     	}else{
-    		model.addAttribute("info","修改失败");
-    		state = "fail";
+    		info ="监控配置信息修改失败";
+    		state="fail";
+    		model.addAttribute("info",info);
     	}
     	operationLog.insertRecord(new OperationRecord(
 				monitorinfo.getTransfer(), 
 				ResourceType.CONFIGURATION,
 				OperationType.MODIFY, 
-				"", 
-				"", 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
 				state, 
-				"", 
+				info, 
 				DateUtil.dateFormatToMillis(new Date())
 		));
     	return showMonitor(model);

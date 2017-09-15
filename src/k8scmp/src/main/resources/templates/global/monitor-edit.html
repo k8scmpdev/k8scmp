@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>PaaS云管理平台</title>
+		<meta charset="UTF-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/fullcalendar.css}" />	
+		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
+		
+	</head>
+	<body>
+		
+		
+		<div id="common-header"></div>
+		
+		<div id="content">
+			<div id="content-header">
+				<h2>用户管理</h2>
+				<div class="btn-group">
+					<a class="btn btn-large tip-bottom" title="Manage Users"><i class="icon-user"></i></a>
+					<a class="btn btn-large tip-bottom" title="Manage Comments"><i class="icon-comment"></i><span class="label label-important">5</span></a>
+				</div>
+			</div>
+			<div id="breadcrumb">
+				<a href="#" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a>
+				<a href="#" class="tip-bottom">全局配置</a>
+				<a href="#" class="current">监控报警设置</a>
+			</div>
+			<div class="container-fluid">
+				
+				
+				<div class="row-fluid" >
+					<div class="span12">
+						<div class="widget-box">
+							<div class="widget-title">
+								<span class="icon">
+									<i class="icon-align-justify"></i>									
+								</span>
+								<h5>监控报警设置</h5>
+							</div>
+							<div class="widget-content nopadding">
+								<form class="form-horizontal" action="#" th:action="@{/monitor/edit}" th:object="${moninfo}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
+                                    <div class="control-group">
+                                        <label class="control-label">*transfer</label>
+                                        <div class="controls">
+                                            <input id="transfer" name="transfer" type="text"  th:field="*{transfer}" />
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label">*graphy</label>
+                                        <div class="controls">
+                                            <input id="graphy" name="graphy" type="text"  th:field="*{graphy}" />
+                                        </div>
+                                    </div>
+                                    
+									
+									<div class="control-group">
+                                        <label class="control-label">query</label>
+                                        <div class="controls">
+                                            <input id="query" type="text" th:field="*{query}"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="control-group">
+                                        <label class="control-label">hbs</label>
+                                        <div class="controls">
+                                            <input id="hbs" type="text" th:field="*{hbs}"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="control-group">
+                                        <label class="control-label">judge</label>
+                                        <div class="controls">
+                                            <input id="judge" type="text" th:field="*{judge}"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="control-group">
+                                        <label class="control-label">alarm</label>
+                                        <div class="controls">
+                                            <input id="alarm" type="text" th:field="*{alarm}"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="control-group">
+                                        <label class="control-label">sender</label>
+                                        <div class="controls">
+                                            <input id="sender" type="text" th:field="*{sender}"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="control-group">
+                                        <label class="control-label">redis</label>
+                                        <div class="controls">
+                                            <input id="redis" type="text" th:field="*{redis}"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <input type="submit" value="修改" class="btn btn-primary" />
+                                    </div>
+                                </form>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="common-footer">
+				</div>
+			</div>
+		</div>
+		
+
+            <script th:src="@{/js/jquery.min.js}"></script>
+            <script th:src="@{/js/jquery.ui.custom.js}"></script>
+            <script th:src="@{/js/bootstrap.min.js}"></script>
+            
+            <script th:src="@{/js/jquery.uniform.js}"></script>
+            <script th:src="@{/js/select2.min.js}"></script>
+            <script th:src="@{/js/jquery.validate.js}"></script>
+            <script th:src="@{/js/unicorn.js}"></script>
+            <script th:src="@{/js/unicorn.form_validation.js}"></script>
+            <script th:src="@{/js/commonDisplay.js}"></script>
+	</body>
+</html>

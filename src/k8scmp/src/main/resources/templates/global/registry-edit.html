@@ -28,9 +28,9 @@
 				</div>
 			</div>
 			<div id="breadcrumb">
-				<a href="#" class="tip-bottom"><i class="icon-home"></i>全局配置</a>
-				<a href="/user/list" class="tip-bottom">用户管理</a>
-				<a href="#" class="current">新增用户</a>
+				<a href="#" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a>
+				<a href="#" class="tip-bottom">全局配置</a>
+				<a href="#" class="current">集群设置</a>
 			</div>
 			<div class="container-fluid">
 				
@@ -42,46 +42,33 @@
 								<span class="icon">
 									<i class="icon-align-justify"></i>									
 								</span>
-								<h5>请输入用户信息</h5>
+								<h5>镜像仓库设置</h5>
 							</div>
 							<div class="widget-content nopadding">
-								<form class="form-horizontal" action="#" th:action="@{/user/create}" th:object="${User}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
+								<form class="form-horizontal" action="#" th:action="@{/registry/edit}" th:object="${reginfo}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
                                     <div class="control-group">
-                                        <label class="control-label">*登录名</label>
+                                        <label class="control-label">*镜像仓库名称</label>
                                         <div class="controls">
-                                            <input id="loginname" name="loginname" type="text"  th:field="*{loginname}"/>
+                                            <input id="loginname" name="clustername" type="text"  th:field="*{name}" />
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label">*用户名</label>
+                                        <label class="control-label">*镜像仓库地址</label>
                                         <div class="controls">
-                                            <input id="username" name="username" type="text"  th:field="*{username}" />
+                                            <input id="username" name="username" type="text"  th:field="*{url}" />
                                         </div>
                                     </div>
                                     
-                                    <div class="control-group">
-											<label class="control-label">*密码</label>
-											<div class="controls">
-												<input id="pwd" name="pwd" type="password" th:field="*{password}"/>
-											</div>
-									</div>
-									<div class="control-group">
-											<label class="control-label">*确认密码</label>
-											<div class="controls">
-												<input id="pwd2" name="pwd2" type="password" />
-											</div>
-									</div>
 									
 									<div class="control-group">
-                                        <label class="control-label">邮箱</label>
+                                        <label class="control-label">描述</label>
                                         <div class="controls">
-                                            <input id="email" type="text" th:field="*{email}"/>
+                                            <input id="email" type="text" th:field="*{description}"/>
                                         </div>
                                     </div>
                                     
                                     <div class="form-actions">
-                                    	<a  class="btn tip-bottom" href="/user/list">返回</a>
-                                        <input type="submit" value="确认添加" class="btn btn-primary" />
+                                        <input type="submit" value="修改" class="btn btn-primary" />
                                     </div>
                                 </form>
 							</div>
@@ -89,7 +76,8 @@
 					</div>
 				</div>
 
-				<div class="common-footer"></div>
+				<div class="common-footer">
+				</div>
 			</div>
 		</div>
 		
@@ -104,6 +92,5 @@
             <script th:src="@{/js/unicorn.js}"></script>
             <script th:src="@{/js/unicorn.form_validation.js}"></script>
             <script th:src="@{/js/commonDisplay.js}"></script>
-	
 	</body>
 </html>

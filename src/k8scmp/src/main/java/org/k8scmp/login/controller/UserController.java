@@ -1,17 +1,23 @@
 package org.k8scmp.login.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.k8scmp.basemodel.HttpResponseTemp;
+import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.login.domain.ChangeUserPassword;
 import org.k8scmp.login.domain.LoginType;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.login.domain.UserPassword;
 import org.k8scmp.login.service.UserService;
+import org.k8scmp.operation.OperationLog;
+import org.k8scmp.operation.OperationRecord;
+import org.k8scmp.operation.OperationType;
 import org.k8scmp.util.AuthUtil;
+import org.k8scmp.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +43,8 @@ public class UserController {
     protected static Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
     UserService userService;
+    @Autowired
+    OperationLog operationLog;
 
     
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -75,22 +83,52 @@ public class UserController {
         user.setEmail(addUserInfo.getEmail());
         user.setPhone(addUserInfo.getPhone());
         HttpResponseTemp<?> resp = userService.createUser(user);
-        if(resp.getResultCode()==200){
-    		model.addAttribute("info","新增成功");
+        String info = "用户新增成功";
+    	String state = "ok";
+    	if(resp.getResultCode()==200){
+    		model.addAttribute("info",info);
+    		
     	}else{
-    		model.addAttribute("info","新增失败");
+    		info ="用户新增失败";
+    		state="fail";
+    		model.addAttribute("info",info);
     	}
-        return "redirect:/user/list?info=新增成功";
+    	operationLog.insertRecord(new OperationRecord(
+    			addUserInfo.getLoginname(), 
+				ResourceType.CONFIGURATION,
+				OperationType.DELETEUSER, 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
+				state, 
+				info, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
+        return "redirect:/user/list?info="+info;
     }
 
-    @RequestMapping(value="/delete/{id}", method = RequestMethod.GET)
-    public String deleteUser(Model model,@PathVariable int id) {
-    	HttpResponseTemp<?> resp =  userService.deleteUser(id);
+    @RequestMapping(value="/delete/{loginname}", method = RequestMethod.GET)
+    public String deleteUser(Model model,@PathVariable String loginname) {
+    	HttpResponseTemp<?> resp =  userService.deleteUser(loginname);
+    	String info = "用户删除成功";
+    	String state = "ok";
     	if(resp.getResultCode()==200){
-    		model.addAttribute("info","删除成功");
+    		model.addAttribute("info",info);
+    		
     	}else{
-    		model.addAttribute("info","删除失败");
+    		info ="用户删除失败";
+    		state="fail";
+    		model.addAttribute("info",info);
     	}
+    	operationLog.insertRecord(new OperationRecord(
+    			loginname, 
+				ResourceType.CONFIGURATION,
+				OperationType.DELETEUSER, 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
+				state, 
+				info, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
     	return "redirect:/user/list";
     }
 
@@ -102,22 +140,52 @@ public class UserController {
     @RequestMapping(value = "/adminChangePassword", method = RequestMethod.POST)
     public String modifyPassword(Model model,@ModelAttribute UserPassword userPassword) {
         HttpResponseTemp<?> resp =  userService.changePasswordByAdmin(userPassword);
+        String info = "用户密码修改成功";
+    	String state = "ok";
     	if(resp.getResultCode()==200){
-    		model.addAttribute("info","密码修改成功");
+    		model.addAttribute("info",info);
+    		
     	}else{
-    		model.addAttribute("info","密码修改失败");
+    		info ="用户密码修改失败";
+    		state="fail";
+    		model.addAttribute("info",info);
     	}
+    	operationLog.insertRecord(new OperationRecord(
+    			userPassword.getLoginname(), 
+				ResourceType.CONFIGURATION,
+				OperationType.MODIFYUSER, 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
+				state, 
+				info, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
     	return "redirect:/user/list";
     }
 
     @RequestMapping(value = "/modify", method = RequestMethod.POST)
     public String modifyUser(Model model,@ModelAttribute User user) {
     	HttpResponseTemp<?> resp =   userService.modifyUser(user);
+    	String info = "用户信息修改成功";
+    	String state = "ok";
     	if(resp.getResultCode()==200){
-    		model.addAttribute("info","修改成功");
+    		model.addAttribute("info",info);
+    		
     	}else{
-    		model.addAttribute("info","修改失败");
+    		info ="用户信息修改失败";
+    		state="fail";
+    		model.addAttribute("info",info);
     	}
+    	operationLog.insertRecord(new OperationRecord(
+    			user.getLoginname(), 
+				ResourceType.CONFIGURATION,
+				OperationType.MODIFYUSER, 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
+				state, 
+				info, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
     	return "redirect:/user/list";
     }
 

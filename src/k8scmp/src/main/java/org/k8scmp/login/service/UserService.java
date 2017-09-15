@@ -28,7 +28,7 @@ public interface UserService {
 
     HttpResponseTemp<?> createUser(User user);
 
-    HttpResponseTemp<?> deleteUser(int id);
+    HttpResponseTemp<?> deleteUser(String loginname);
 
     HttpResponseTemp<?> modifyUser(User user);
 

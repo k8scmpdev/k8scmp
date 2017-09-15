@@ -35,4 +35,6 @@ public interface AuthBiz {
 	void modifyUser(User existUser);
 
 	String getUserName(String loginname);
+
+	User getUserByLoginname(String loginname);
 }

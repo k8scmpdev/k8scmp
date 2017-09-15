@@ -147,12 +147,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public HttpResponseTemp<?> deleteUser(int id) {
+	public HttpResponseTemp<?> deleteUser(String loginname) {
 		int userId = CurrentThreadInfo.getUserId();
 //        if (!AuthUtil.isAdmin(userId)) {
 //            throw ApiException.wrapMessage(ResultStat.USER_NOT_LEGAL, "must be admin");
 //        }
-        User user = authBiz.getUserById(id);
+        User user = authBiz.getUserByLoginname(loginname);
         if (user == null) {
             throw ApiException.wrapResultStat(ResultStat.USER_NOT_EXIST);
         }

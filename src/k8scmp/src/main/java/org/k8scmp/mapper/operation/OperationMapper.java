@@ -27,4 +27,7 @@ public interface OperationMapper {
             + ",'CONFIGURATION','CONFIGURATION_COLLECTION'"
             + ",'CLUSTER','LOADBALANCER','LOADBALANCER_COLLECTION')")
     List<OperationRecord> listOperationRecordByUserNameTime(@Param("userId") Integer userId, @Param("operateTime") long operateTime);
+    
+    @Select("SELECT "+BASIC_COLUMN+" FROM operationLog order by operateTime desc limit 6")
+    List<OperationRecord> listOperationRecord4Overview();
 }

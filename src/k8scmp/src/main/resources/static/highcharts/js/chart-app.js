@@ -35,6 +35,16 @@ $(function(){
         series:  []
     }
     chart = new Highcharts.Chart('chart-app',options)
+//    request({
+//        method: 'POST',
+//        url: '/overview/opelog',
+//        data: data,
+//        onload: function (resp) {
+//          var data = JSON.parse(resp.responseText);
+//          if (data.resultCode === 200) loginSuccess();
+//          else password_wrong.style.display = 'block';
+//        },
+//    });
     $.getJSON("highcharts/jsonData/chart-app.json",function(data){//获取Json文件,并创建Json对象
         $.each(data,function(i, field){     //遍历json数组
             chart.addSeries({

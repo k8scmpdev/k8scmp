@@ -25,7 +25,7 @@
 			</div>
 			<div class="container-fluid">
 				
-				<div class="row-fluid" style="margin-bottom:0px">
+				<div class="row-fluid" style="margin-top:10px;margin-bottom:-10px">
 					<div class="span12">
 						<div class="alert alert-info">
 							欢迎  <strong> <span class="text" th:text="${user.username}"></span> </strong>登录系统. 你可以通过总览界面了解系统总体运行情况
@@ -79,51 +79,19 @@
 							<div class="widget-title"><span class="icon"><i class="icon-file"></i></span><h5>审计日志</h5><div class="buttons"><a href="#" class="btn btn-mini"><i class="icon-search"></i> 查看全部</a></div></div>
 							<div class="widget-content nopadding" style="height:385px">
 								<div class="content" style="width:160%">
-								<article>
-									<section>
+								<article >
+									<section th:each="operecord : ${operecords}">
 										<span class="point-time point-green"></span>
-										<time datetime="2017-08-30">
-											<span>2017/08/30</span>
-											<span>15:05</span>
+										<time datetime="">
+											<span th:text="${operecord.operateTime.substring(0,10)}"></span>
+											<span th:text="*{operecord.operateTime.substring(10,19)}"></span>
 										</time>
 										<aside>
-											<p class="things">创建服务‘Test-service’成功</p>
-											<p class="brief"><span class="text-yellow">admin</span> </p>
+											<p class="things" th:text="*{operecord.resourceId+' '+operecord.message}"></p>
+											<p class="brief"><span class="text-yellow" th:text="*{operecord.userName}"></span> </p>
 										</aside>
 									</section>
-									<section>
-										<span class="point-time point-green"></span>
-										<time datetime="2017-08-10">
-											<span>2017/08/10</span>
-											<span>15:00</span>
-										</time>
-										<aside>
-											<p class="things">创建应用‘Test-App’成功</p>
-											<p class="brief"><span class="text-yellow">Jason</span> </p>
-										</aside>
-									</section>
-									<section>
-										<span class="point-time point-red"></span>
-										<time datetime="2017-08-10">
-											<span>2017/08/07</span>
-											<span>09:00</span>
-										</time>
-										<aside>
-											<p class="things">创建应用‘Test-App’失败</p>
-											<p class="brief"><span class="text-yellow">Jason</span> </p>
-										</aside>
-									</section>
-									<section>
-										<span class="point-time point-yellow"></span>
-										<time datetime="2017-08-10">
-											<span>2017/07/29</span>
-											<span>15:00</span>
-										</time>
-										<aside>
-											<p class="things">删除应用‘demo’成功</p>
-											<p class="brief"><span class="text-yellow">admin</span> </p>
-										</aside>
-									</section>
+									
 								</article>
 								</div>
 							</div>
@@ -222,6 +190,30 @@
             <script th:src="@{/highcharts/js/chart-disk.js}"></script>
             <script th:src="@{/highcharts/js/chart-cpu.js}"></script>
 			<script th:src="@{/highcharts/js/chart-host.js}"></script>
+			
+			<script type="text/javascript">
+			var actLogin = function () {
+				/*
+			      var inputs = form.querySelectorAll([
+			        'input[type="text"]',
+			        'input[type="password"]',
+			        'input[type="radio"]:checked'
+			      ].join(','));
+			      var data = {};
+			      [].slice.call(inputs).forEach(function (input) { data[input.name] = input.value; });
+			    */
+			      request({
+			        method: 'POST',
+			        url: '/overview/opelog',
+			        data: data,
+			        onload: function (resp) {
+			          var data = JSON.parse(resp.responseText);
+			          if (data.resultCode === 200) loginSuccess();
+			          else password_wrong.style.display = 'block';
+			        },
+			      });
+			};
+			</script>
 			
 	</body>
 </html>
