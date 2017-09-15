@@ -17,7 +17,7 @@ public interface AppMapper {
 		"</when>","order by createTime desc","</script>"})
     List<AppInfo> getApps(@Param("item") AppInfo item);
 	
-    @Insert("INSERT INTO application(BASIC_COLUMN) values (" +
+    @Insert("INSERT INTO application(" + BASIC_COLUMN + " ) values (" +
             " #{item.id}, #{item.appCode}, #{item.namespace}, #{item.hostLabel}, #{item.clusterId}," +
             " #{item.description}, #{item.state},#{item.createTime},#{item.creatorId},#{item.lastModifiedTime},#{item.lastModifierId})")
     int createApp(@Param("item") AppInfo item);
