@@ -1,12 +1,4 @@
 //service-new2 service-new3 service-new4 hide onload
-$(document).ready(function(){
-	$("#service-new1").css("display","block");
-	$("#service-new2").css("display","none");
-	$("#service-new3").css("display","none");
-	$("#service-new4").css("display","none");
-	$("#defaultDiv").css("display","none");
-	
-});
 
 //bind dynamic hide and display
 //next
@@ -52,7 +44,7 @@ $("#cancleService").bind("click", function(event) {
 	$("#service-new2").css("display","none");
 	$("#service-new3").css("display","none"); 
 	$("#service-new4").css("display","none"); 
-	window.location.href="/app/service-mgmt";
+	window.location.href="/app/service/service-mgmt";
 });
 
 function showStorage(){
