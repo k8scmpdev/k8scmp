@@ -57,7 +57,7 @@
 									<tbody id="tBody">
 									    <tr th:each="app,itState:${appList}">
 									    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
-									        <td><a title='单击查看服务列表' th:href="@{/app/service-mgmt(appCode=${app.appCode},hostLabel=${app.hostLabel},namespace=${app.namespace})}" th:text="${app.appCode}" class="tip-top"></a></td>
+									        <td><a title='单击查看服务列表' th:href="@{/app/service/service-mgmt(appCode=${app.appCode},hostLabel=${app.hostLabel},namespace=${app.namespace})}" th:text="${app.appCode}" class="tip-top"></a></td>
 									        <td th:text="${app.state}"></td>
 									        <td th:text="${app.hostLabel}"></td>
 									        <td th:text="${app.clusterId}"></td>
@@ -82,8 +82,8 @@
         <script th:src="@{/js/jquery.uniform.js}"></script>
         <script th:src="@{/js/select2.min.js}"></script>
         <script th:src="@{/js/jquery.dataTables.min.js}"></script>
+        <script th:src="@{/js/commonDisplay.js}" id="commonScript" menu="3"></script>
         <script th:src="@{/js/unicorn.js}"></script>
         <script th:src="@{/js/unicorn.tables.js}"></script>
-		<script th:src="@{/js/commonDisplay.js}"></script>
 	</body>
 </html>
