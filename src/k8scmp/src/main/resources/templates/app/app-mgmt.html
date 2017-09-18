@@ -23,19 +23,17 @@
 			<div id="breadcrumb">
 				<a href="#" class="current tip-bottom" title="应用管理">应用管理</a>
 			</div>
-			<div id="search" style="padding-top: 96px;padding-left: 53%;">
-			<form action="/app/search" method="post">
-				<input name="appCode" type="text" placeholder="输入应用名称查询..." style="font-size: 11px;font-style: italic;color: white"/>
-				<button type="submit" class="tip-top" title="Search" ><i class="icon-search icon-white"></i></button>
-			</form>	
-			</div>
-			<div class="buttons" style="padding-top: 1%;padding-left: 2%">
-				<a title="创建应用" class="btn tip-bottom" href="/app/app-new"><i class="icon-plus"></i>创建应用</a>
-				<a title="删除应用" class="btn tip-bottom" href="#"><i class="icon-remove"></i>删除</a>
-			</div>	
 			<div class="container-fluid">
 				<div class="row-fluid">
 					<div class="span12">
+						<div class="buttons">
+							<a title="创建应用" class="btn tip-bottom" href="/app/app-new"><i class="icon-plus"></i>创建应用</a>
+							<a title="删除应用" class="btn tip-bottom" href="#"><i class="icon-remove"></i>删除</a>
+							
+							<div class="input-append" style="float:right">
+			                	<input type="text" placeholder="请输入查询内容"/><button class="btn prepend"><i class="icon-search"></i> </button>
+			            	</div>
+						</div>	
 						<div class="widget-box">
 							<div class="widget-title">
 								<h5>应用列表</h5>

@@ -264,7 +264,7 @@ a:hover {
 
 .container-fluid .row-fluid:first-child {
 	/*changed on 20170907 margin-top: 20px;*/
-	margin-top: 0px;
+	margin-top:10px;
 }
 /* Breadcrumb */
 #breadcrumb {
