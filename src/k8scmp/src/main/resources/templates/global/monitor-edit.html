@@ -49,13 +49,13 @@
                                     <div class="control-group">
                                         <label class="control-label">*transfer</label>
                                         <div class="controls">
-                                            <input id="transfer" name="transfer" type="text"  th:field="*{transfer}" />
+                                            <input id="transfer" name="transfer" type="text"  th:field="*{transfer}" placeholder="监控数据转发组件，rpc端口。请输入ip:port"/>
                                         </div>
                                     </div>
                                     <div class="control-group">
                                         <label class="control-label">*graphy</label>
                                         <div class="controls">
-                                            <input id="graphy" name="graphy" type="text"  th:field="*{graphy}" />
+                                            <input id="graphy" name="graphy" type="text"  th:field="*{graphy}" placeholder="监控数据存储组件，rpc端口。请输入ip:port"/>
                                         </div>
                                     </div>
                                     
@@ -63,47 +63,47 @@
 									<div class="control-group">
                                         <label class="control-label">query</label>
                                         <div class="controls">
-                                            <input id="query" type="text" th:field="*{query}"/>
+                                            <input id="query" type="text" th:field="*{query}" placeholder="监控数据查询组件，http端口。请输入ip:port"/>
                                         </div>
                                     </div>
                                     
                                     <div class="control-group">
                                         <label class="control-label">hbs</label>
                                         <div class="controls">
-                                            <input id="hbs" type="text" th:field="*{hbs}"/>
+                                            <input id="hbs" type="text" th:field="*{hbs}" placeholder="监控心跳服务器组件，rpc端口。请输入ip:port"/>
                                         </div>
                                     </div>
                                     
                                     <div class="control-group">
                                         <label class="control-label">judge</label>
                                         <div class="controls">
-                                            <input id="judge" type="text" th:field="*{judge}"/>
+                                            <input id="judge" type="text" th:field="*{judge}" placeholder="报警判断组件，rpc端口。请输入ip:port"/>
                                         </div>
                                     </div>
                                     
                                     <div class="control-group">
                                         <label class="control-label">alarm</label>
                                         <div class="controls">
-                                            <input id="alarm" type="text" th:field="*{alarm}"/>
+                                            <input id="alarm" type="text" th:field="*{alarm}" placeholder="报警事件处理组件，http端口。请输入ip:port"/>
                                         </div>
                                     </div>
                                     
                                     <div class="control-group">
                                         <label class="control-label">sender</label>
                                         <div class="controls">
-                                            <input id="sender" type="text" th:field="*{sender}"/>
+                                            <input id="sender" type="text" th:field="*{sender}" placeholder="报警发送组件，http端口。请输入ip:port"/>
                                         </div>
                                     </div>
                                     
                                     <div class="control-group">
                                         <label class="control-label">redis</label>
                                         <div class="controls">
-                                            <input id="redis" type="text" th:field="*{redis}"/>
+                                            <input id="redis" type="text" th:field="*{redis}" placeholder="报警redis组件。请输入ip:port"/>
                                         </div>
                                     </div>
                                     
                                     <div class="form-actions">
-                                        <input type="submit" value="修改" class="btn btn-primary" />
+                                        <input type="submit" value="修改" class="btn btn-primary" placeholder="监控数据转发组件，rpc端口。请输入ip:port"/>
                                     </div>
                                 </form>
 							</div>

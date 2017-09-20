@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,8 @@ import org.json.JSONObject;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.operation.OperationLog;
 import org.k8scmp.operation.OperationRecord;
+import org.k8scmp.overview.domain.OverviewCountInfo;
+import org.k8scmp.overview.service.OverviewService;
 import org.k8scmp.util.AuthUtil;
 
 /**
@@ -34,6 +37,8 @@ import org.k8scmp.util.AuthUtil;
 public class OverviewController {
 	@Autowired
     OperationLog operationLog;
+	@Autowired
+    OverviewService overviewService;
     	
     @RequestMapping(value="/overview", method=RequestMethod.GET)
     public String overview(Model model) {
@@ -64,11 +69,31 @@ public class OverviewController {
     	Map<String, Object> appinfo = new HashMap<>();
      	appinfo.put("type", "pie");
      	appinfo.put("name", "应用");
-     	Map <String, Integer> data = new HashMap <String, Integer>();
-     	data.put("运行中: 3",   3);
-     	data.put("已停止: 2",   2);
-     	data.put("操作中: 1",   1);
-		appinfo.put("data", data);
+
+     	//获取app数据
+     	Map<String, Integer> appinfolist = overviewService.getAppInfo();
+		appinfo.put("datalist", appinfolist);
+
+        try {
+			return obj.writeValueAsString(appinfo);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
+
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/overview/serviceinfo", method=RequestMethod.GET)
+    public String showServiceInfo() {
+     	
+    	ObjectMapper obj = new ObjectMapper();
+
+    	Map<String, Object> appinfo = new HashMap<>();
+     	appinfo.put("type", "pie");
+     	appinfo.put("name", "服务");
+		appinfo.put("datalist", overviewService.getServiceInfo());
 
         try {
 			return obj.writeValueAsString(appinfo);

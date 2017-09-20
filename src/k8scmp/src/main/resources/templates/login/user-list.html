@@ -64,13 +64,13 @@
 								<h5>用户列表</h5>
 							</div>
 							<div class="widget-content nopadding">
-								<table class="table table-bordered data-table">
+								<table class="table table-bordered data-table" style="table-layout: fixed;">
 									<thead>
 										<tr>
 											<th>*登录名</th>
 											<th>*姓名</th>
 											<th>邮箱</th>
-											<th style="width:10%">操作</th>
+											<th >操作</th>
 										</tr>
 									</thead>
 									<tbody th:each="user : ${users}">
@@ -136,6 +136,6 @@
             <script th:src="@{/js/unicorn.tables.js}"></script>
             <script th:src="@{/js/jquery.validate.js}"></script>
             <script th:src="@{/js/unicorn.form_validation.js}"></script>
-            <script th:src="@{/js/commonDisplay.js}"></script>
+            <script th:src="@{/js/commonDisplay.js}" id="commonScript" menu="21"></script>
 	</body>
 </html>

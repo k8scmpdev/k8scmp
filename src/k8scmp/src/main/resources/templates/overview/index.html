@@ -191,29 +191,6 @@
             <script th:src="@{/highcharts/js/chart-cpu.js}"></script>
 			<script th:src="@{/highcharts/js/chart-host.js}"></script>
 			
-			<script type="text/javascript">
-			var actLogin = function () {
-				/*
-			      var inputs = form.querySelectorAll([
-			        'input[type="text"]',
-			        'input[type="password"]',
-			        'input[type="radio"]:checked'
-			      ].join(','));
-			      var data = {};
-			      [].slice.call(inputs).forEach(function (input) { data[input.name] = input.value; });
-			    */
-			      request({
-			        method: 'POST',
-			        url: '/overview/opelog',
-			        data: data,
-			        onload: function (resp) {
-			          var data = JSON.parse(resp.responseText);
-			          if (data.resultCode === 200) loginSuccess();
-			          else password_wrong.style.display = 'block';
-			        },
-			      });
-			};
-			</script>
 			
 	</body>
 </html>
