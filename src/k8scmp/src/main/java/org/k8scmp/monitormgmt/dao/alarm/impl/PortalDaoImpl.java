@@ -28,7 +28,6 @@ import org.k8scmp.monitormgmt.domain.alarm.falcon.GroupTemplate;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Mockcfg;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Strategy;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Template;
-import org.k8scmp.monitormgmt.service.alarm.AlarmEventService;
 import org.k8scmp.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,8 +47,8 @@ public class PortalDaoImpl implements PortalDao {
 	PortalActionMapper portalActionMapper;
 	@Autowired
     AlarmEventInfoMapper alarmEventInfoMapper;
-	@Autowired
-    AlarmEventService alarmEventService;
+//	@Autowired
+//    AlarmEventService alarmEventService;
 	@Autowired
 	PortalGroupHostMapper portalGroupHostMapper;
 	@Autowired
@@ -250,10 +249,10 @@ public class PortalDaoImpl implements PortalDao {
 	                alarmString = alarmString + alarmEventId + ",,";
 	            }
 	        }
-	        if (!StringUtils.isBlank(alarmString)) {
-	            alarmString = alarmString.substring(0, alarmString.length() - 2);
-	            alarmEventService.ignoreAlarmsInside(alarmString);
-	        }
+//	        if (!StringUtils.isBlank(alarmString)) {
+//	            alarmString = alarmString.substring(0, alarmString.length() - 2);
+//	            alarmEventService.ignoreAlarmsInside(alarmString);
+//	        }
 	        portalStrategyMapper.deleteStrategyByTemplateId(template.getId());
 	        if (templateType.equals(TemplateType.deploy.name())) {
 	            portalGroupHostMapper.deleteByTemplate(template.getId());
