@@ -3,12 +3,15 @@ package org.k8scmp.monitormgmt.dao.alarm.impl;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.mapper.monitor.AlarmEventInfoMapper;
 import org.k8scmp.mapper.monitor.portal.PortalActionMapper;
 import org.k8scmp.mapper.monitor.portal.PortalGroupHostMapper;
 import org.k8scmp.mapper.monitor.portal.PortalGroupMapper;
 import org.k8scmp.mapper.monitor.portal.PortalGroupTemplateMapper;
+import org.k8scmp.mapper.monitor.portal.PortalHostMapper;
+import org.k8scmp.mapper.monitor.portal.PortalMockcfgMapper;
 import org.k8scmp.mapper.monitor.portal.PortalStrategyMapper;
 import org.k8scmp.mapper.monitor.portal.PortalTemplateMapper;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
@@ -19,7 +22,10 @@ import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateType;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Action;
+import org.k8scmp.monitormgmt.domain.alarm.falcon.Group;
+import org.k8scmp.monitormgmt.domain.alarm.falcon.GroupHost;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.GroupTemplate;
+import org.k8scmp.monitormgmt.domain.alarm.falcon.Mockcfg;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Strategy;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Template;
 import org.k8scmp.monitormgmt.service.alarm.AlarmEventService;
@@ -48,6 +54,10 @@ public class PortalDaoImpl implements PortalDao {
 	PortalGroupHostMapper portalGroupHostMapper;
 	@Autowired
 	PortalGroupMapper portalGroupMapper;
+	@Autowired
+	PortalMockcfgMapper portalMockcfgMapper;
+	@Autowired
+	PortalHostMapper portalHostMapper;
 	
 	@Override
 	public void insertTemplateByTemplateInfo(TemplateInfo templateInfo) {
@@ -259,7 +269,86 @@ public class PortalDaoImpl implements PortalDao {
 
         portalTemplateMapper.deleteTemplateById(templateId);
 	}
-	 
+
+	@Override
+	public void insertHostGroupByHostGroupBasicInfo(HostGroupInfoBasic hostGroupInfoBasic) {
+		Group group = new Group();
+        group.setId(hostGroupInfoBasic.getId());
+        group.setGrp_name(hostGroupInfoBasic.getHostGroupName());
+        group.setCreate_user(hostGroupInfoBasic.getCreatorName());
+        group.setCreate_at(new Timestamp(hostGroupInfoBasic.getCreateTime()));
+        group.setCome_from(1);
+        portalGroupMapper.insertHostGroupById(group);
+
+        // update nodata config
+        updateNodataObj(getHostGroupList());
+	}
+
+	private void updateNodataObj(String groups) {
+
+        Mockcfg mockcfg = portalMockcfgMapper.getMockcfgByName(GlobalConstant.NODATA_CONFIG_NAME);
+        if (mockcfg == null) {
+            mockcfg = new Mockcfg();
+            mockcfg.setName(GlobalConstant.NODATA_CONFIG_NAME);
+            mockcfg.setObj(groups);
+            mockcfg.setObj_type("group");
+            mockcfg.setMetric("agent.alive");
+            mockcfg.setTags("");
+            mockcfg.setDstype("GAUGE");
+            mockcfg.setStep(10);
+            mockcfg.setMock(-1);
+            mockcfg.setCreator("admin");
+            mockcfg.setT_create(new Timestamp(System.currentTimeMillis()));
+            mockcfg.setT_modify(mockcfg.getT_create());
+            portalMockcfgMapper.insertMockcfg(mockcfg);
+            return;
+        }
+        portalMockcfgMapper.updateObjByName(GlobalConstant.NODATA_CONFIG_NAME, groups);
+    
+	}
+	
+	public String getHostGroupList() {
+        List<HostGroupInfoBasic> hostGroups = alarmDao.listHostGroupInfoBasic();
+        if (hostGroups == null || hostGroups.size() == 0) {
+            return "";
+        }
+        StringBuilder retBuilder = new StringBuilder();
+        for (HostGroupInfoBasic hostGroupInfoBasic : hostGroups) {
+            retBuilder.append(hostGroupInfoBasic.getHostGroupName()).append("\n");
+        }
+        String ret = retBuilder.toString();
+        return retBuilder.toString().substring(0, ret.length() - 1);
+    }
+
+	@Override
+	public void updateHostGroupByHostGroupBasicInfo(HostGroupInfoBasic hostGroupInfoBasic) {
+		long id = hostGroupInfoBasic.getId();
+        String grp_name = hostGroupInfoBasic.getHostGroupName();
+        portalGroupMapper.updateHostGroup(id, grp_name);
+
+        // update nodata config
+        updateNodataObj(getHostGroupList());
+	}
+
+	@Override
+	public Integer getHostIdByHostname(String hostname) {
+		return portalHostMapper.getHostIdByHostname(hostname);
+	}
+
+	@Override
+	public void insertGroupHostBind(long grp_id, long host_id) {
+
+        GroupHost groupHost = new GroupHost(grp_id, host_id);
+        if (portalGroupHostMapper.checkGroupHostBind(groupHost) != null) {
+            return;
+        }
+        portalGroupHostMapper.insertGroupHostBind(groupHost);
+    }
+
+	@Override
+	public void deleteGroupHostBind(long grp_id, long host_id) {
+		 portalGroupHostMapper.deleteGroupHostBind(grp_id, host_id);
+	} 
 	 
 	 
  }

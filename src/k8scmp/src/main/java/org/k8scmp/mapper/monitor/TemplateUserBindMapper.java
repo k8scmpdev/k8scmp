@@ -16,7 +16,7 @@ public interface TemplateUserBindMapper {
     int addTemplateUserGroupBind(@Param("userGroupId") long userGroupId, @Param("templateId") long templateId, @Param("bindTime") long bindTime);
 
 	@Select("SELECT userId FROM alarm_template_user_bind WHERE templateId=#{templateId}")
-    List<Integer> listUserIdByTemplateId(@Param("templateId") int templateId);
+    List<Long> listUserIdByTemplateId(@Param("templateId") long templateId);
 
 	@Delete("DELETE FROM alarm_template_user_bind WHERE templateId=#{templateId}")
     int deleteTemplateUserBindByTemplateId(@Param("templateId") long templateId);

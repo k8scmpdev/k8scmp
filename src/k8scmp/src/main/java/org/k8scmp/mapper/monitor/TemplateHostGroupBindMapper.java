@@ -14,4 +14,7 @@ public interface TemplateHostGroupBindMapper {
 
 	@Delete("DELETE FROM alarm_template_host_group_bind WHERE templateId=#{templateId}")
     int deleteTemplateHostGroupBindByTemplateId(@Param("templateId") long templateId);
+
+	@Delete("DELETE FROM alarm_template_host_group_bind WHERE hostGroupId=#{hostGroupId}")
+	int deleteTemplateHostGroupBindByHostGroupId(@Param("hostGroupId") long hostGroupId);
 }

@@ -1,7 +1,10 @@
 package org.k8scmp.monitormgmt.service.alarm;
 
+import java.util.List;
+
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
+import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
 
 /**
  * Created by baokangwang on 2016/4/13.
@@ -12,7 +15,7 @@ public interface TemplateService {
      *
      * @return
      */
-    HttpResponseTemp<?> listTemplateInfo();
+    List<TemplateInfoBasic> listTemplateInfo();
 
     /**
      *
@@ -33,7 +36,7 @@ public interface TemplateService {
      * @param id
      * @return
      */
-    HttpResponseTemp<?> getTemplateInfo(int id);
+    HttpResponseTemp<?> getTemplateInfo(long id);
 
     /**
      *

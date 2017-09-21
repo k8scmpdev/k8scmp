@@ -54,10 +54,10 @@ public class TemplateServiceImpl implements TemplateService {
 //    DeploymentBiz deploymentBiz;
 
     @Override
-    public HttpResponseTemp<?> listTemplateInfo() {
+    public List<TemplateInfoBasic> listTemplateInfo() {
 
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.GET, 0);
-        return ResultStat.OK.wrap(alarmDao.listTemplateInfoBasic());
+        return alarmDao.listTemplateInfoBasic();
     }
 
     @Override
@@ -128,7 +128,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public HttpResponseTemp<?> getTemplateInfo(int id) {
+    public HttpResponseTemp<?> getTemplateInfo(long id) {
 
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.GET, 0);
 
@@ -156,8 +156,8 @@ public class TemplateServiceImpl implements TemplateService {
         }
         templateInfo.setStrategyList(alarmDao.listStrategyInfoByTemplateId(id));
         List<User> userInfos = new LinkedList<>();
-        List<Integer> userIds = alarmDao.listUserIdByTemplateId(id);
-        for (Integer userId : userIds) {
+        List<Long> userIds = alarmDao.listUserIdByTemplateId(id);
+        for (Long userId : userIds) {
             if (userId == null) {
                 continue;
             }

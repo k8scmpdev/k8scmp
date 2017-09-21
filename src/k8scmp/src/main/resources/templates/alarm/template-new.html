@@ -35,27 +35,44 @@
 								<!-- <h5>请输入用户信息</h5> -->
 							</div>
 							<div class="widget-content nopadding"><!-- th:object="${TemplateInfo}" -->
-								<form class="form-horizontal" action="#"  method="post" name="create_template" id="create_template" novalidate="novalidate">
+								<form class="form-horizontal" action="/alarm/create" th:object="${TemplateInfo}" method="post" name="create_template" id="create_template" novalidate="novalidate">
                                     <div class="control-group">
                                         <label class="control-label">报警规则名称</label>
                                         <div class="controls">
-                                            <input id="templateName" name="templateName" type="text" />
+                                            <input id="templateName" name="templateName" type="text" th:field="*{templateName}"/>
                                         </div>
                                     </div>
                                     <div class="control-group">
                                         <label class="control-label">选择报警类型</label>
                                         <div class="controls">
-                                            <select id="templateType">
-                                            	<option>主机</option>
-                                            	<option>容器</option>
+                                            <select id="templateType" onchange="getHostOrDeploy();" th:field="*{templateType}">
+                                            	<option id="host" selected="selected" value="host">主机</option>
+                                            	<option id="deploy" value="deploy">容器</option>
                                             </select>
                                         </div>
                                     </div>
-                                    
-                                    <div class="control-group">
-											<label class="control-label">选择报警主机组</label>
-											<div class="controls">
-												<input id="hostGroup" name="hostGroup" type="text" />
+                                    <div class="control-group" id="selectHost">
+										<label class="control-label">选择报警主机组</label>
+										<div class="controls">
+											<select multiple="multiple" class="multiselect" name="hostGroupName" id="hostGroup" style="width: 864px;" th:field="*{hostGroupList}">	
+												<option th:each="hostGroupBasic:${templateInfo.hostGroupList}" th:value="${hostGroupBasic.id}" 	
+												th:selected="${#strings.contains(hostGroupBasic,hostGroupBasic.id)}"
+												th:text="${hostGroupBasic.hostGroupName}" ></option>	
+											</select>
+										</div>
+									</div>
+									<div class="control-group" id="selectPod" hidden="hide">
+											<label class="control-label">选择报警容器</label>
+											<div class="controls" id="deploymentInfo" th:field="*{deploymentInfo}">
+												<select id="clusterName" th:field="*{deploymentInfo.clusterName}">
+													<option th:value="${templateInfo.deploymentInfo.clusterName}" th:text="${templateInfo.deploymentInfo.clusterName}" ></option>
+												</select>
+												<select id="hostEnv" th:field="*{deploymentInfo.hostEnv}">
+													<option th:value="${templateInfo.deploymentInfo.hostEnv}" th:text="${templateInfo.deploymentInfo.hostEnv}"></option>
+												</select>
+												<select id="deploymentName" th:field="*{deploymentInfo.deploymentName}">
+													<option th:value="${templateInfo.deploymentInfo.deploymentName}" th:text="${templateInfo.deploymentInfo.deploymentName}"></option>
+												</select>
 											</div>
 									</div>
 									<div class="control-group">
@@ -64,20 +81,24 @@
                                            <a title="添加报警逻辑" class="btn btn-primary" href="javascript:void(0);" onclick="showTemplate();">添加</a>
                                        		<br/>
                                        		<br/>
-                                       		<div id="template"></div>
+                                       		<div id="strategyList" ></div>
 										</div>
 									</div>
 									
 									<div class="control-group">
                                         <label class="control-label">指定报警用户</label>
                                         <div class="controls">
-                                            <input id="user" type="text" />
+                                            <select multiple="multiple" class="multiselect" name="username" id="hostGroup" style="width: 864px;">	
+												<option th:each="category:${templateInfo.userList}" th:value="${category.id}" 	
+												th:selected="${#strings.contains(category.username,category.id)}"
+												th:text="${category.username}" ></option>	
+											</select>
                                         </div>
                                     </div>
                                     
                                     <div class="form-actions">
-                                    	<a  class="btn tip-bottom" href="/user/list">返回</a>
-                                        <input type="submit" value="提交" class="btn btn-primary" />
+                                    	<a  class="btn tip-bottom" href="/alarm">返回</a>
+                                        <input type="submit" value="提交" class="btn btn-primary" onclick=""/>
                                     </div>
                                 </form>
 							</div>
@@ -104,19 +125,35 @@
 		<script th:src="@{/js/unicorn.js}"></script>
 		<script th:src="@{/js/unicorn.tables.js}"></script>
 		<script th:src="@{/js/commonDisplay.js}"></script>
-		
 		<script type="text/javascript">
 			  
 			function showTemplate(){
-			    var childdiv=$('<div></div>');  
+				
+				var childdiv=$('<div></div>');  
 				childdiv.attr("id","id" + new Date().getTime());
-				$("#template").append(childdiv);
-				childdiv.load("/js/common.html #rulerTemplate");
-			}
-			
-			function deleteTemplate(){
+				$("#strategyList").append(childdiv);
+				childdiv.load("/js/template-strategy.html #strategyInfo");
 				
 			}
+			
+			$(document).ready(function() {
+		        
+		        getHostOrDeploy();
+		    });
+			function getHostOrDeploy(){
+				$("#templateType").change(function(){
+	                 var hideselect = $(this).val();
+	                 if(hideselect == "host"){
+		 				$("#selectPod").hide();
+		 				$("#selectHost").show();
+	 					
+	                 }else{
+						$("#selectHost").hide();
+						$("#selectPod").show();
+	                 }
+	             });
+			}
+			
 		
 		</script>
 	</body>

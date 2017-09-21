@@ -38,5 +38,10 @@ public interface TemplateInfoBasicMapper {
 
 	@Update("UPDATE alarm_template_info SET isRemoved = 1 WHERE id=#{id}")
     int deleteTemplateInfoBasicById(@Param("id") long id);
+
+	@Select("SELECT * FROM alarm_template_info LEFT OUTER JOIN alarm_template_host_group_bind ON " +
+            "alarm_template_info.id = alarm_template_host_group_bind.templateId WHERE alarm_template_host_group_bind.hostGroupId " +
+            "= #{hostGroupId} AND alarm_template_info.isRemoved = 0 order by alarm_template_host_group_bind.bindTime")
+    List<TemplateInfoBasic> getTemplateInfoBasicByHostGroupId(@Param("hostGroupId") long hostGroupId);
 	
 }

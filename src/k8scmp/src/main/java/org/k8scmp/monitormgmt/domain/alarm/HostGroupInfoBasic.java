@@ -13,49 +13,17 @@ public class HostGroupInfoBasic {
     private String creatorName;
     private long createTime;
     private long updateTime;
-    private String hostName;
-    private String IP;
-    private String cluster;
-    
 
-    public HostGroupInfoBasic(long id, String hostGroupName, long creatorId, String creatorName, long createTime, long updateTime,
-    		String hostName,String IP,String cluster) {
+    public HostGroupInfoBasic() {
+    }
+
+    public HostGroupInfoBasic(long id, String hostGroupName, long creatorId, String creatorName, long createTime, long updateTime) {
         this.id = id;
         this.hostGroupName = hostGroupName;
         this.creatorId = creatorId;
         this.creatorName = creatorName;
         this.createTime = createTime;
         this.updateTime = updateTime;
-        this.hostName = hostName;
-        this.IP = IP;
-        this.cluster = cluster;
-    }
-    
-    public String getHostName() {
-		return hostName;
-	}
-
-	public void setHostName(String hostName) {
-		this.hostName = hostName;
-	}
-
-	public String getIP() {
-		return IP;
-	}
-
-	public void setIP(String iP) {
-		IP = iP;
-	}
-
-	public String getCluster() {
-		return cluster;
-	}
-
-	public void setCluster(String cluster) {
-		this.cluster = cluster;
-	}
-
-	public HostGroupInfoBasic() {
     }
 
     public long getId() {

@@ -1,0 +1,49 @@
+<div id="strategyInfo" class="control-group" style="border:1px solid #000;width: 780px;margin-top:20px">
+	<a id="closediv" class="tip-bottom" onclick="javascript:$(this).parent().remove();" style="position:absolute;left:960px;">
+		<i class="icon-remove"></i>
+	</a>
+	<ul style="list-style:none;">
+   		<li class="filletLi">
+   		<br/>
+	   		<span>选择报警指标</span>
+	   			<select style="width: 18%">
+	   				<option>CPU占用率</option>
+	   				<option>内存占用率</option>
+	   				<option>磁盘占用率</option>
+	   				<option>网络流入</option>
+	   				<option>网络流出</option>
+				</select>
+		</li>
+		<li class="filletLi">
+			<div>
+				<br/>
+				该指标最新的
+				<input type="text" style="width:30px;height=20px;" name="leftValue" required="required" placeholder="3" pattern="/^[1-9]\d*$/" />&nbsp;个监控值,
+				<select style="width: 12%">
+					<option>平均值</option>
+					<option>最大值</option>
+					<option>最小值</option>
+					<option>和值</option>
+				</select>
+				<select style="width: 7%">
+					<option>&le;</option>
+					<option>&ge;</option>
+					<option>==</option>
+				</select>
+				<input type="text" style="width:50px;height=20px;" name="rightValue" required="required" placeholder="阈值" pattern="/^(\d*\.)?\d$/" />
+				%时，发送报警。
+			</div>
+		</li>
+		<li class="filletLi">
+			<br/>
+			邮件/短信的报警文字为：
+			<input type="text" style="width:160px;height=20px;" placeholder="如：CPU占用率报警" />
+			最大报警次数
+			<input type="text" style="width:30px;height=20px;" name="maxStep" placeholder="3" required="required" pattern="/^[1-9]\d*$/" />&nbsp;次
+			<a class="icon-question-sign" onshow="当连续报警次数达到最大报警次数时，即使没有恢复，也不会再发送报警"></a>
+			<br/>
+		</li>
+	</ul>
+	<br/>
+</div>
+

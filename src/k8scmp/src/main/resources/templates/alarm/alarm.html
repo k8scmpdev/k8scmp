@@ -64,20 +64,23 @@
 											<table class="table table-bordered data-table with-check" style="table-layout: fixed;">
 												<thead>
 													<tr>
-														<th></th>
-														<th data-field="hostName">规则名称</th>
-														<th data-field="phyCluster">创建者</th>
-														<th data-field="logicCluster">报警类型</th>
-														<th data-field="state">创建时间</th>
+														<th data-field="id">ID</th>
+														<th data-field="templateName">规则名称</th>
+														<th data-field="creatorName">创建者</th>
+														<th data-field="templateType">报警类型</th>
+														<th data-field="createTime">创建时间</th>
+														<th data-field="opration">操作</th>
 													</tr>
 												</thead>
 												<tbody id="hostTbody">
-													<tr>
-														<td>1</td>
-														<td>test</td>
-														<td>Dr.Z</td>
-														<td>host</td>
-														<td>2017-09-14</td>
+													<tr th:each="template,templateStat:${templateList}">
+														<td th:text="${template.id}"></td>
+														<td th:text="${template.templateName}"></td>
+														<td th:text="${template.creatorName}"></td>
+														<td th:text="${template.templateType}"></td>
+														<td th:text="${template.createTime}"></td>	
+														<td><a title='单击查看规则' th:href="@{/alarm/edit(templateType=${template.templateType},templateId=${template.id})}" class="tip-top">编辑</a>&nbsp;&nbsp;
+														<a title='单击删除规则' th:onclick="'deleteTemplate(\''+${template.id}+'\')'" class="tip-top">删除</a></td>
 													</tr>
 												</tbody>
 											</table>  
@@ -96,14 +99,15 @@
 								<div class="buttons" style="padding-top: 0%;padding-left: 0%">
 									<a title="添加主机组" class="btn tip-bottom" href="#"><i class="icon-plus"></i>添加主机组</a>
 								</div>
-									<div id="search" style="padding-top: 144px;padding-left: 68%;">
+									<div  style="float:right">
 										<form action="#" method="post">
 											<div>
-												<input name="hostName" type="text" placeholder="输入主机名称查询..." style="font-size: 11px;font-style: italic;color: white"/>
-												<button type="submit" class="tip-top" title="Search" ><i class="icon-search"></i></button>
+												<input name="hostGroupName" type="text" placeholder="输入主机名称查询..." style="font-size: 11px;font-style: italic"/>
+												<button type="submit" class="tip-top" title="Search" style="margin-top:-10px"><i class="icon-search icon-black"></i></button>
 											</div>
 										</form> 
 									</div>
+									
 								<br/>
 									<div class="widget-box">
 										<div class="widget-title">
@@ -155,7 +159,10 @@
 		<script th:src="@{/js/commonDisplay.js}"></script>
 		
 		<script type="text/javascript">
-			 
+			 function deleteTemplate(id){
+				 alert("您确定删除该规则吗？");
+				 window.localtion.href = "/alarm/delete"+id;
+			 }
 	
 		</script>
 	</body>

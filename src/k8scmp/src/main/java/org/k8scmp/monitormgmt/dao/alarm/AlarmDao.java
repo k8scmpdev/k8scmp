@@ -6,6 +6,7 @@ import org.k8scmp.login.domain.User;
 import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
+import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
 
@@ -33,7 +34,7 @@ public interface AlarmDao {
 
 	List<TemplateInfoBasic> listTemplateInfoBasic();
 
-	User getUserById(int userId);
+	User getUserById(long userId);
 
 	TemplateInfoBasic getTemplateInfoBasicById(long id);
 
@@ -45,7 +46,7 @@ public interface AlarmDao {
 
 	List<StrategyInfo> listStrategyInfoByTemplateId(long id);
 
-	List<Integer> listUserIdByTemplateId(int id);
+	List<Long> listUserIdByTemplateId(long id);
 
 	CallBackInfo getCallbackInfoByTemplateId(long id);
 
@@ -58,6 +59,39 @@ public interface AlarmDao {
 	void deleteCallbackInfoByTemplateId(long templateId);
 
 	void deleteTemplateInfoBasicById(long id);
+
+	List<HostGroupInfoBasic> listHostGroupInfoBasic();
+
+	HostGroupInfoBasic getHostGroupInfoBasicByName(String hostGroupName);
+
+	void addHostGroupInfoBasic(HostGroupInfoBasic hostGroupInfoBasic);
+
+	HostGroupInfoBasic getHostGroupInfoBasicById(long id);
+
+	void updateHostGroupInfoBasicById(HostGroupInfoBasic updatedHostGroupInfoBasic);
+
+	void deleteTemplateHostGroupBindByHostGroupId(long id);
+
+	void deleteHostGroupInfoBasicById(long id);
+
+	void deleteHostGroupHostBindByHostGroupId(long id);
+
+	HostInfo getHostInfoById(long id);
+
+	Long getHostGroupHostBindTime(long id, long hostId);
+
+	void updateHostGroupHostBind(long id, long hostId, long bindTime);
+
+	void addHostGroupHostBind(long id, long hostId, long bindTime);
+
+	void deleteHostGroupHostBind(long id, long hostId);
+
+	void addHostInfo(HostInfo hostInfo);
+
+	List<HostInfo> getHostInfoByHostGroupId(long hostGroupId);
+
+	List<TemplateInfoBasic> getTemplateInfoBasicByHostGroupId(long hostGroupId);
+
 
 
 

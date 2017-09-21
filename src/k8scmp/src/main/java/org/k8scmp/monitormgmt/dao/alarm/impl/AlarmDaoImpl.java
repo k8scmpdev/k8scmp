@@ -6,7 +6,9 @@ import org.k8scmp.login.domain.User;
 import org.k8scmp.mapper.login.UserMapper;
 import org.k8scmp.mapper.monitor.AlarmEventInfoMapper;
 import org.k8scmp.mapper.monitor.CallbackInfoMapper;
+import org.k8scmp.mapper.monitor.HostGroupHostBindMapper;
 import org.k8scmp.mapper.monitor.HostGroupInfoBasicMapper;
+import org.k8scmp.mapper.monitor.HostInfoMapper;
 import org.k8scmp.mapper.monitor.StrategyInfoMapper;
 import org.k8scmp.mapper.monitor.TemplateHostGroupBindMapper;
 import org.k8scmp.mapper.monitor.TemplateInfoBasicMapper;
@@ -15,6 +17,7 @@ import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
 import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
+import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,10 @@ public class AlarmDaoImpl implements AlarmDao{
 	AlarmEventInfoMapper alarmEventInfoMapper;
 	@Autowired
 	HostGroupInfoBasicMapper hostGroupInfoBasicMapper;
+	@Autowired
+	HostGroupHostBindMapper hostGroupHostBindMapper;
+	@Autowired
+	HostInfoMapper hostInfoMapper;
 	
 	@Override
 	public TemplateInfoBasic getTemplateInfoBasicByName(String templateName) {
@@ -89,7 +96,7 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public User getUserById(int id) {
+	public User getUserById(long id) {
 		return userMapper.getUserById(id);
 	}
 
@@ -119,7 +126,7 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public List<Integer> listUserIdByTemplateId(int templateId) {
+	public List<Long> listUserIdByTemplateId(long templateId) {
 		return templateUserBindMapper.listUserIdByTemplateId(templateId);
 	}
 
@@ -152,6 +159,88 @@ public class AlarmDaoImpl implements AlarmDao{
 	public void deleteTemplateInfoBasicById(long id) {
 		templateInfoBasicMapper.deleteTemplateInfoBasicById(id);
 	}
+
+	@Override
+	public List<HostGroupInfoBasic> listHostGroupInfoBasic() {
+		
+		return hostGroupInfoBasicMapper.listHostGroupInfoBasic();
+	}
+
+	@Override
+	public HostGroupInfoBasic getHostGroupInfoBasicByName(String hostGroupName) {
+		return hostGroupInfoBasicMapper.getHostGroupInfoBasicByName(hostGroupName);
+	}
+
+	@Override
+	public void addHostGroupInfoBasic(HostGroupInfoBasic hostGroupInfoBasic) {
+		hostGroupInfoBasicMapper.addHostGroupInfoBasic(hostGroupInfoBasic);
+	}
+
+	@Override
+	public HostGroupInfoBasic getHostGroupInfoBasicById(long id) {
+		return hostGroupInfoBasicMapper.getHostGroupInfoBasicById(id);
+	}
+
+	@Override
+	public void updateHostGroupInfoBasicById(HostGroupInfoBasic updatedHostGroupInfoBasic) {
+		hostGroupInfoBasicMapper.updateHostGroupInfoBasicById(updatedHostGroupInfoBasic);
+	}
+
+	@Override
+	public void deleteTemplateHostGroupBindByHostGroupId(long id) {
+		templateHostGroupBindMapper.deleteTemplateHostGroupBindByHostGroupId(id);
+	}
+
+	@Override
+	public void deleteHostGroupInfoBasicById(long id) {
+		hostGroupInfoBasicMapper.deleteHostGroupInfoBasicById(id);
+	}
+
+	@Override
+	public void deleteHostGroupHostBindByHostGroupId(long id) {
+		hostGroupHostBindMapper.deleteHostGroupHostBindByHostGroupId(id);
+	}
+
+	@Override
+	public HostInfo getHostInfoById(long id) {
+		return hostInfoMapper.getHostInfoById(id);
+	}
+
+	@Override
+	public Long getHostGroupHostBindTime(long hostGroupId, long hostId) {
+		return hostGroupHostBindMapper.getHostGroupHostBindTime(hostGroupId, hostId);
+	}
+
+	@Override
+	public void updateHostGroupHostBind(long hostGroupId, long hostId, long bindTime) {
+		hostGroupHostBindMapper.updateHostGroupHostBind(hostGroupId, hostId, bindTime);
+	}
+
+	@Override
+	public void addHostGroupHostBind(long hostGroupId, long hostId, long bindTime) {
+		hostGroupHostBindMapper.addHostGroupHostBind(hostGroupId, hostId, bindTime);
+	}
+
+	@Override
+	public void deleteHostGroupHostBind(long hostGroupId, long hostId) {
+		hostGroupHostBindMapper.deleteHostGroupHostBind(hostGroupId, hostId);
+	}
+
+	@Override
+	public void addHostInfo(HostInfo hostInfo) {
+		hostInfoMapper.addHostInfo(hostInfo);
+	}
+
+	@Override
+	public List<HostInfo> getHostInfoByHostGroupId(long hostGroupId) {
+		return hostInfoMapper.getHostInfoByHostGroupId(hostGroupId);
+	}
+
+	@Override
+	public List<TemplateInfoBasic> getTemplateInfoBasicByHostGroupId(long hostGroupId) {
+		return templateInfoBasicMapper.getTemplateInfoBasicByHostGroupId(hostGroupId);
+	}
+
 
 	
 
