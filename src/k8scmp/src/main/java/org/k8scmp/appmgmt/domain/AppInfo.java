@@ -5,7 +5,7 @@ public class AppInfo {
 
     private String appCode;
 
-    private String namespace;
+    private String namespace = "default";
 
     private String hostLabel;
 
