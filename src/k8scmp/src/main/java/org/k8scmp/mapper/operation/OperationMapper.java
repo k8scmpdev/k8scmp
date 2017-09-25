@@ -30,4 +30,10 @@ public interface OperationMapper {
     
     @Select("SELECT "+BASIC_COLUMN+" FROM operationLog order by operateTime desc limit 6")
     List<OperationRecord> listOperationRecord4Overview();
+    
+    @Select("SELECT "+BASIC_COLUMN+" FROM operationLog order by operateTime desc ")
+    List<OperationRecord> listAllOperationRecord4Overview();
+    
+    @Select("SELECT "+BASIC_COLUMN+" FROM operationLog WHERE resourceId like #{keyword} or userId like #{keyword} or userName like #{keyword} or message like #{keyword} order by operateTime desc ")
+    List<OperationRecord> listAllOperationRecordByKey(@Param("keyword") String keyword);
 }

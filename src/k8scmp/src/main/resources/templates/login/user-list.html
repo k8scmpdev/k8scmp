@@ -47,10 +47,11 @@
 					<div class="span12" style="margin-top:10px;margin-bottom:-10px">
 						<a title="新增用户" class="btn tip-bottom" href="/user/create"><i class="icon-plus"></i>新增</a>
 						<font color="red"><span th:text="${info}"></span></font>
-						<div  style="float:right">
+						<div class="buttons" style="float:right">
 						<form action="/user/get" method="post" id="getform">
-							<input name="keyword" id="keyword" type="text" placeholder="输入关键字查询..." style="font-size: 11px;font-style: italic" th:value="${keyword}"/>
-							<button type="button" onclick="getUser()"  title="Search" style="margin-top:-10px"><i class="icon-search icon-black"></i></button>
+							<div class="input-append" style="float:right">
+			                	<input type="text" id="keyword" placeholder="请输入查询内容" th:value="${keyword}"/><button class="btn prepend"  onclick="getUser()" ><i class="icon-search"></i> </button>
+			            	</div>
 						</form>	
 						</div>
 						

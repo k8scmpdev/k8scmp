@@ -41,4 +41,14 @@ public class OperationLogImpl implements OperationLog {
     public List<OperationRecord> listOperationRecord4Overview() {
         return mapper.listOperationRecord4Overview();
     }
+    
+    @Override
+    public List<OperationRecord> listAllOperationRecord4Overview() {
+        return mapper.listAllOperationRecord4Overview();
+    }
+    
+    @Override
+    public List<OperationRecord> listAllOperationRecordByKey(String keyword) {
+        return mapper.listAllOperationRecordByKey(keyword);
+    }
 }

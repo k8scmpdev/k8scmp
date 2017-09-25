@@ -16,4 +16,8 @@ public interface OperationLog {
     List<OperationRecord> listOperationRecordByUserNameTime(Integer userId, long operateTime);
 
 	List<OperationRecord> listOperationRecord4Overview();
+
+	List<OperationRecord> listAllOperationRecord4Overview();
+
+	List<OperationRecord> listAllOperationRecordByKey(String keyword);
 }
