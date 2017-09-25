@@ -3,6 +3,7 @@ package org.k8scmp.globalmgmt.dao;
 import org.k8scmp.globalmgmt.domain.ClusterInfo;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
+import org.k8scmp.globalmgmt.domain.RegisterInfo;
 
 import java.util.List;
 
@@ -98,6 +99,8 @@ public interface GlobalBiz {
 //    void updateSsoInfo(SsoInfo ssoInfo);
 //
 //    void deleteSsoInfo();
+
+	RegisterInfo getRegistry();
 
 
 }

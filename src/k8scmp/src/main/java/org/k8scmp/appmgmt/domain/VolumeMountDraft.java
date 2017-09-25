@@ -2,7 +2,7 @@ package org.k8scmp.appmgmt.domain;
 
 import org.k8scmp.util.StringUtils;
 
-public class VolumeMount {
+public class VolumeMountDraft {
     private String name; // name of volume, this must be set in deployment
     private boolean readOnly = false;
     private String mountPath;
@@ -12,7 +12,7 @@ public class VolumeMount {
         return name;
     }
 
-    public VolumeMount setName(String name) {
+    public VolumeMountDraft setName(String name) {
         this.name = name;
         return this;
     }
@@ -21,7 +21,7 @@ public class VolumeMount {
         return readOnly;
     }
 
-    public VolumeMount setReadOnly(boolean readOnly) {
+    public VolumeMountDraft setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
         return this;
     }
@@ -30,7 +30,7 @@ public class VolumeMount {
         return mountPath;
     }
 
-    public VolumeMount setMountPath(String mountPath) {
+    public VolumeMountDraft setMountPath(String mountPath) {
         this.mountPath = mountPath;
         return this;
     }
@@ -39,7 +39,7 @@ public class VolumeMount {
         return subPath;
     }
 
-    public VolumeMount setSubPath(String subPath) {
+    public VolumeMountDraft setSubPath(String subPath) {
         this.subPath = subPath;
         return this;
     }

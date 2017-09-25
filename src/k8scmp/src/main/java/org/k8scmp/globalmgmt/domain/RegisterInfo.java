@@ -1,5 +1,8 @@
 package org.k8scmp.globalmgmt.domain;
 
+import org.k8scmp.util.CommonUtil;
+import org.k8scmp.util.StringUtils;
+
 /**
  * Created by jason on 2017/9/11.
  */
@@ -46,5 +49,24 @@ public class RegisterInfo {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+	
+    public String registryDomain() {
+        return CommonUtil.domainUrl(url);
+    }
+
+    public String fullRegistry() {
+        return CommonUtil.fullUrl(url);
+    }
+
+	public String checkLegality() {
+        if (StringUtils.isBlank(url)) {
+            return  "url and host port cannot be null at the same time";
+        }
+        if (url.startsWith("http://")) {
+            url = "http://" + CommonUtil.domainUrl(url);
+        }
+        url = CommonUtil.fullUrl(url);
+        return null;
+    }
 
 }

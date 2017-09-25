@@ -5,7 +5,8 @@ import java.util.List;
 public class ServiceConfigInfo extends ServiceInfo{
 	private int defaultReplicas;
 	private List<String> externalIPs;
-	 
+	private String yamlPodSpec;
+	
 	public int getDefaultReplicas() {
 		return defaultReplicas;
 	}
@@ -17,5 +18,11 @@ public class ServiceConfigInfo extends ServiceInfo{
 	}
 	public void setExternalIPs(List<String> externalIPs) {
 		this.externalIPs = externalIPs;
+	}
+	public String getYamlPodSpec() {
+		return yamlPodSpec;
+	}
+	public void setYamlPodSpec(String yamlPodSpec) {
+		this.yamlPodSpec = yamlPodSpec;
 	}
 }

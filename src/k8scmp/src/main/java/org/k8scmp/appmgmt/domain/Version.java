@@ -19,16 +19,17 @@ import org.k8scmp.util.StringUtils;
 public class Version extends VersionBase {
     private String serviceId;  // separate column
     private int version = 0; //version id for the deploy, separate column
-    private List<Container> containers; // describe container configs for each container in this pod
-    private List<Volume> volumes; // describe volume configurations
+    private List<ContainerDraft> containerDrafts; // describe container configs for each container in this pod
+    private List<VolumeDraft> volumeDrafts; // describe volume configurations
+    private LogDraft logDraft;
     private List<LabelSelector> labelSelectors;
     private String podSpecStr;
     private VersionType versionType;
     private boolean deprecate = false;
     private List<String> hostList;
     
-    public List<Container> getContainerDrafts() {
-        return containers;
+    public List<ContainerDraft> getContainerDrafts() {
+        return containerDrafts;
     }
 
     public List<LabelSelector> getLabelSelectors() {
@@ -39,8 +40,8 @@ public class Version extends VersionBase {
         this.labelSelectors = labelSelectors;
     }
 
-    public void setContainerDrafts(List<Container> containers) {
-        this.containers = containers;
+    public void setContainerDrafts(List<ContainerDraft> containerDrafts) {
+        this.containerDrafts = containerDrafts;
     }
 
     public String getServiceId() {
@@ -59,12 +60,12 @@ public class Version extends VersionBase {
         this.version = version;
     }
 
-    public List<Volume> getVolumes() {
-        return volumes;
+    public List<VolumeDraft> getVolumeDrafts() {
+        return volumeDrafts;
     }
 
-    public Version setVolumes(List<Volume> volumes) {
-        this.volumes = volumes;
+    public Version setVolumeDrafts(List<VolumeDraft> volumeDrafts) {
+        this.volumeDrafts = volumeDrafts;
         return this;
     }
 
@@ -118,14 +119,14 @@ public class Version extends VersionBase {
                 }
             }
         }
-        if (containers != null) {
-            for (Container container : containers) {
-                if (!StringUtils.isBlank(container.checkLegality())) {
-                    return container.checkLegality();
-                } else if (container.getVolumeMounts() != null) {
-                    for (VolumeMount volumeMount : container.getVolumeMounts()) {
-                        if (!checkVolume(volumeMount.getName())) {
-                            return "volume name(" + volumeMount.getName() + ") error, check deployment volume drafts configuration";
+        if (containerDrafts != null) {
+            for (ContainerDraft containerDraft : containerDrafts) {
+                if (!StringUtils.isBlank(containerDraft.checkLegality())) {
+                    return containerDraft.checkLegality();
+                } else if (containerDraft.getVolumeMountDrafts() != null) {
+                    for (VolumeMountDraft volumeMountDraft : containerDraft.getVolumeMountDrafts()) {
+                        if (!checkVolume(volumeMountDraft.getName())) {
+                            return "volume name(" + volumeMountDraft.getName() + ") error, check deployment volume drafts configuration";
                         }
                     }
                 }
@@ -152,14 +153,22 @@ public class Version extends VersionBase {
     }
 
     private boolean checkVolume(String volumeName) {
-        if (volumes == null || StringUtils.isBlank(volumeName)) {
+        if (volumeDrafts == null || StringUtils.isBlank(volumeName)) {
             return false;
         }
-        for (Volume volumeDraft : volumes) {
+        for (VolumeDraft volumeDraft : volumeDrafts) {
             if (volumeName.equals(volumeDraft.getName())) {
                 return true;
             }
         }
         return false;
     }
+
+	public LogDraft getLogDraft() {
+		return logDraft;
+	}
+
+	public void setLogDraft(LogDraft logDraft) {
+		this.logDraft = logDraft;
+	}
 }

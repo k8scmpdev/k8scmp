@@ -4,6 +4,7 @@ import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.ClusterInfo;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
+import org.k8scmp.globalmgmt.domain.RegisterInfo;
 import org.k8scmp.mapper.global.GlobalMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -116,38 +117,26 @@ public class GlobalBizImpl implements GlobalBiz {
 //        return registry;
 //    }
 //
-//    @Override
-//    public Registry getRegistry() {
-//        GlobalInfo url = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_URL);
-//        GlobalInfo description = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_DESCRIPTION);
-//        GlobalInfo status = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_STATUS);
-//        GlobalInfo certification = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_CERTIFICATION);
-//        GlobalInfo issuer = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_ISSUER);
-//        GlobalInfo service = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_SERVICE);
-//        GlobalInfo private_key = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_AUTH_PRIVATE_KEY);
-//
-//        Registry registry = null;
-//        if (url != null) {
-//            registry = new Registry();
-//            registry.setUrl(url.getValue());
-//            registry.setCreateTime(url.getCreateTime());
-//            registry.setLastUpdate(url.getLastUpdate());
-//            if (description != null) {
-//                registry.setDescription(description.getValue());
-//            }
-//            if (status != null) {
-//                registry.setStatus(Integer.valueOf(status.getValue()));
-//            }
-//            if (certification != null) {
-//                registry.setCertification(certification.getValue());
-//            }
-//            if (issuer != null && service != null && private_key != null) {
-//                RegistryTokenInfo tokenInfo = new RegistryTokenInfo(issuer.getValue(), service.getValue(), private_key.getValue());
-//                registry.setTokenInfo(tokenInfo);
-//            }
-//        }
-//        return registry;
-//    }
+    @Override
+    public RegisterInfo getRegistry() {
+    	GlobalInfo name = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_NAME);
+        GlobalInfo url = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_URL);
+        GlobalInfo description = globalMapper.getGlobalInfoByType(GlobalType.REGISTRY_DESCRIPTION);
+
+        RegisterInfo registry = null;
+        if (url != null) {
+            registry = new RegisterInfo();
+           
+            registry.setUrl(url.getValue());
+            if (name != null) {
+            	registry.setName(name.getValue());
+            }
+            if (description != null) {
+                registry.setDescription(description.getValue());
+            }
+        }
+        return registry;
+    }
 //
 //    @Override
 //    public void deleteRegistry() {

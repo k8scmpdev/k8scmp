@@ -8,7 +8,7 @@ import org.k8scmp.util.StringUtils;
 
 /**
  */
-public class Container {
+public class ContainerDraft {
     private String registry;
     private String image;
     private String tag;
@@ -19,8 +19,9 @@ public class Container {
     private ImagePullPolicy imagePullPolicy;
     private List<Env> envs;
     private List<Env> envCheckers;
+    private List<LogItemDraft> logItemDrafts;
     private boolean autoDeploy = false;
-    private List<VolumeMount> volumeMounts;
+    private List<VolumeMountDraft> volumeMountDrafts;
     private List<String> args;
     private List<String> commands;
 
@@ -97,7 +98,7 @@ public class Container {
         }
     }
 
-    public Container setImagePullPolicy(ImagePullPolicy imagePullPolicy) {
+    public ContainerDraft setImagePullPolicy(ImagePullPolicy imagePullPolicy) {
         this.imagePullPolicy = imagePullPolicy;
         return this;
     }
@@ -111,12 +112,12 @@ public class Container {
     }
 
 
-    public List<VolumeMount> getVolumeMounts() {
-        return volumeMounts;
+    public List<VolumeMountDraft> getVolumeMountDrafts() {
+        return volumeMountDrafts;
     }
 
-    public Container setVolumeMounts(List<VolumeMount> volumeMounts) {
-        this.volumeMounts = volumeMounts;
+    public ContainerDraft setVolumeMountDrafts(List<VolumeMountDraft> volumeMountDrafts) {
+        this.volumeMountDrafts = volumeMountDrafts;
         return this;
     }
 
@@ -124,7 +125,7 @@ public class Container {
         return args;
     }
 
-    public Container setArgs(List<String> args) {
+    public ContainerDraft setArgs(List<String> args) {
         this.args = args;
         return this;
     }
@@ -133,7 +134,7 @@ public class Container {
         return commands;
     }
 
-    public Container setCommands(List<String> commands) {
+    public ContainerDraft setCommands(List<String> commands) {
         this.commands = commands;
         return this;
     }
@@ -158,10 +159,10 @@ public class Container {
                 }
             }
         }
-        if (volumeMounts != null) {
-            for (VolumeMount volumeMount : volumeMounts) {
-                if (!StringUtils.isBlank(volumeMount.checkLegality())) {
-                    return volumeMount.checkLegality();
+        if (volumeMountDrafts != null) {
+            for (VolumeMountDraft volumeMountDraft : volumeMountDrafts) {
+                if (!StringUtils.isBlank(volumeMountDraft.checkLegality())) {
+                    return volumeMountDraft.checkLegality();
                 }
             }
         }
@@ -186,8 +187,16 @@ public class Container {
         return autoDeploy;
     }
 
-    public Container setAutoDeploy(boolean autoDeploy) {
+    public ContainerDraft setAutoDeploy(boolean autoDeploy) {
         this.autoDeploy = autoDeploy;
         return this;
     }
+
+	public List<LogItemDraft> getLogItemDrafts() {
+		return logItemDrafts;
+	}
+
+	public void setLogItemDrafts(List<LogItemDraft> logItemDrafts) {
+		this.logItemDrafts = logItemDrafts;
+	}
 }

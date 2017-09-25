@@ -2,7 +2,7 @@ package org.k8scmp.appmgmt.domain;
 
 import org.k8scmp.util.StringUtils;
 
-public class Volume {
+public class VolumeDraft {
     private String name;
     private VolumeType volumeType;
     private String hostPath;
@@ -14,7 +14,7 @@ public class Volume {
         return name;
     }
 
-    public Volume setName(String name) {
+    public VolumeDraft setName(String name) {
         this.name = name;
         return this;
     }
@@ -23,7 +23,7 @@ public class Volume {
         return volumeType;
     }
 
-    public Volume setVolumeType(VolumeType volumeType) {
+    public VolumeDraft setVolumeType(VolumeType volumeType) {
         this.volumeType = volumeType;
         return this;
     }
@@ -32,7 +32,7 @@ public class Volume {
         return hostPath;
     }
 
-    public Volume setHostPath(String hostPath) {
+    public VolumeDraft setHostPath(String hostPath) {
         this.hostPath = hostPath;
         return this;
     }
@@ -41,7 +41,7 @@ public class Volume {
         return emptyDir;
     }
 
-    public Volume setEmptyDir(String emptyDir) {
+    public VolumeDraft setEmptyDir(String emptyDir) {
         this.emptyDir = emptyDir;
         return this;
     }
@@ -50,7 +50,7 @@ public class Volume {
         return volumePVC;
     }
 
-    public Volume setVolumePVC(VolumePVC volumePVC) {
+    public VolumeDraft setVolumePVC(VolumePVC volumePVC) {
         this.volumePVC = volumePVC;
         return this;
     }
@@ -59,7 +59,7 @@ public class Volume {
         return volumeConfigMap;
     }
 
-    public Volume setVolumeConfigMap(VolumeConfigMap volumeConfigMap) {
+    public VolumeDraft setVolumeConfigMap(VolumeConfigMap volumeConfigMap) {
         this.volumeConfigMap = volumeConfigMap;
         return this;
     }

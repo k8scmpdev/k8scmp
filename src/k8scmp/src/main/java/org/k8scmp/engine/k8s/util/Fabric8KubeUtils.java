@@ -8,8 +8,6 @@ import io.fabric8.kubernetes.api.model.extensions.*;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.*;
-import okhttp3.TlsVersion;
-
 import org.apache.log4j.Logger;
 import org.k8scmp.exception.K8sDriverException;
 import org.k8scmp.util.CommonUtil;
@@ -106,27 +104,27 @@ public class Fabric8KubeUtils implements KubeUtils<KubernetesClient> {
         Config config;
         if (master.toLowerCase().startsWith("https://")) {
             config = new ConfigBuilder().withMasterUrl(master)
-                    .withTrustCerts(true)
+//                    .withTrustCerts(true)
                     .withNamespace(namespace)
-                    .withOauthToken(cluster.getOauthToken())
-                    .withUsername(cluster.getUsername())
-                    .withPassword(cluster.getPassword())
-                    .removeFromTlsVersions(TlsVersion.TLS_1_0)
-                    .removeFromTlsVersions(TlsVersion.TLS_1_1)
-                    .removeFromTlsVersions(TlsVersion.TLS_1_2)
+//                    .withOauthToken(cluster.getOauthToken())
+//                    .withUsername(cluster.getUsername())
+//                    .withPassword(cluster.getPassword())
+//                    .removeFromTlsVersions(TlsVersion.TLS_1_0)
+//                    .removeFromTlsVersions(TlsVersion.TLS_1_1)
+//                    .removeFromTlsVersions(TlsVersion.TLS_1_2)
                     .withRequestTimeout(REQUEST_TIMEOUT)
                     .withConnectionTimeout(CONNECTION_TIMEOUT)
                     .build();
         } else {
             config = new ConfigBuilder().withMasterUrl(master)
                     .withNamespace(namespace)
-                    .withOauthToken(cluster.getOauthToken())
-                    .withUsername(cluster.getUsername())
-                    .withPassword(cluster.getPassword())
-                    .removeFromTlsVersions(TlsVersion.TLS_1_0)
-                    .removeFromTlsVersions(TlsVersion.TLS_1_1)
-                    .removeFromTlsVersions(TlsVersion.TLS_1_2)
-                    .withTrustCerts(true)
+//                    .withOauthToken(cluster.getOauthToken())
+//                    .withUsername(cluster.getUsername())
+//                    .withPassword(cluster.getPassword())
+//                    .removeFromTlsVersions(TlsVersion.TLS_1_0)
+//                    .removeFromTlsVersions(TlsVersion.TLS_1_1)
+//                    .removeFromTlsVersions(TlsVersion.TLS_1_2)
+//                    .withTrustCerts(true)
                     .withRequestTimeout(REQUEST_TIMEOUT)
                     .withConnectionTimeout(CONNECTION_TIMEOUT)
                     .build();
@@ -136,6 +134,12 @@ public class Fabric8KubeUtils implements KubeUtils<KubernetesClient> {
         return kubeUtils;
     }
 
+//    public static void main(String[] args) throws K8sDriverException {
+//    	Cluster cluster = new Cluster();
+//    	cluster.setApi("172.20.10.5:8080");
+//    	KubeUtils ku = buildKubeUtils(cluster, "default");
+//    	System.out.println(ku.listNode().getItems().get(0));
+//	}
     public static KubeUtils buildKubeUtils(Config config) throws K8sDriverException {
         KubernetesClient client;
         try {
@@ -888,7 +892,7 @@ public class Fabric8KubeUtils implements KubeUtils<KubernetesClient> {
         if (name == null || persistentVolume == null) {
             return null;
         }
-        logger.debug("replace persistent Volume with name=" + name + ", persistentVolume=\n" + persistentVolume);
+        logger.debug("replace persistent VolumeDraft with name=" + name + ", persistentVolume=\n" + persistentVolume);
         try {
             return client.persistentVolumes().withName(name).replace(persistentVolume);
         } catch (KubernetesClientException e) {

@@ -12,6 +12,10 @@ import org.k8scmp.exception.DaoConvertingException;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Created by sparkchen on 16/4/4.
+ */
+
 @JsonFilter("myFilter")
 public class DataModelBase implements IJsonable {
     private static Logger logger = LoggerFactory.getLogger(DataModelBase.class);
@@ -24,18 +28,18 @@ public class DataModelBase implements IJsonable {
     protected static CustomObjectMapper objectMapper = new CustomObjectMapper();
 
     private int ver = 1;
-    private String cn = "";
+    private String fqcn = "";
 
     protected Set<String> excludeForJSON() {
         return new HashSet<>();
     }
 
-    public String getCn() {
-        return cn;
+    public String getFqcn() {
+        return fqcn;
     }
 
-    public void setCn(String cn) {
-        this.cn = cn;
+    public void setFqcn(String fqcn) {
+        this.fqcn = fqcn;
     }
 
     public int getVer() {
@@ -52,9 +56,9 @@ public class DataModelBase implements IJsonable {
         }
         try {
             String str = inputstr.replaceAll("\r\n", "\\\\r\\\\n").replaceAll("\n", "\\\\n");
-            cn = objectMapper.readTree(str).get("cn").asText();
+            fqcn = objectMapper.readTree(str).get("fqcn").asText();
             ver = objectMapper.readTree(str).get("ver").asInt();
-            Class clazz = Class.forName(cn);
+            Class clazz = Class.forName(fqcn);
             T tmp = (T) clazz.newInstance();
             int versionNow = tmp.VERSION_NOW();
             if (versionNow == ver) {
@@ -82,7 +86,7 @@ public class DataModelBase implements IJsonable {
     public String toString() {
         try {
             ver = VERSION_NOW();
-            cn = this.getClass().getName();
+            fqcn = this.getClass().getName();
             SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.serializeAllExcept(
                     this.excludeForJSON());
             FilterProvider filterProvider = new SimpleFilterProvider().setFailOnUnknownId(false)
