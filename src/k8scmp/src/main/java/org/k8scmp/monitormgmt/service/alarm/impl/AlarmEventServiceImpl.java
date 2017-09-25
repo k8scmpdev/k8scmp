@@ -2,28 +2,16 @@ package org.k8scmp.monitormgmt.service.alarm.impl;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
 
-import org.k8scmp.appmgmt.domain.Container;
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
-import org.k8scmp.common.ClientConfigure;
-import org.k8scmp.common.CurrentThreadInfo;
-import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.exception.ApiException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
-import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
-import org.k8scmp.monitormgmt.domain.alarm.TemplateType;
 import org.k8scmp.monitormgmt.service.alarm.AlarmEventService;
-import org.k8scmp.operation.OperationType;
-import org.k8scmp.util.AuthUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
