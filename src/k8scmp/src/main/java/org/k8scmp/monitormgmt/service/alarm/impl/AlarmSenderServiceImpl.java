@@ -7,6 +7,7 @@ import javax.mail.MessagingException;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResultStat;
+import org.k8scmp.engine.groovy.GroovyLoadAndInvoke;
 import org.k8scmp.exception.ApiException;
 import org.k8scmp.monitormgmt.service.alarm.AlarmSenderService;
 import org.k8scmp.util.EncodingTool;
