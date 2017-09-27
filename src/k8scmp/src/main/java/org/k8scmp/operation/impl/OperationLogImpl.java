@@ -48,7 +48,7 @@ public class OperationLogImpl implements OperationLog {
     }
     
     @Override
-    public List<OperationRecord> listAllOperationRecordByKey(String keyword) {
-        return mapper.listAllOperationRecordByKey(keyword);
+    public List<OperationRecord> listAllOperationRecordByKey(String keyword,String rtype,String otype,String status) {
+        return mapper.listAllOperationRecordByKey(keyword,rtype,otype,status);
     }
 }

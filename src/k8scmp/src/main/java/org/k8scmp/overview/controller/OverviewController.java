@@ -26,10 +26,12 @@ import org.apache.shiro.subject.Subject;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.k8scmp.basemodel.HttpResponseTemp;
+import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.login.domain.UserPassword;
 import org.k8scmp.operation.OperationLog;
 import org.k8scmp.operation.OperationRecord;
+import org.k8scmp.operation.OperationType;
 import org.k8scmp.overview.domain.OverviewCountInfo;
 import org.k8scmp.overview.service.OverviewService;
 import org.k8scmp.util.AuthUtil;
@@ -69,14 +71,24 @@ public class OverviewController {
      	//获取操作日志
      	List<OperationRecord> operecords = operationLog.listAllOperationRecord4Overview();
      	model.addAttribute("operecords", operecords);
+     	model.addAttribute("ResourceType", ResourceType.values());
+     	model.addAttribute("OperationType", OperationType.values());
+     	String[] infos = {"","","",""};
+     	model.addAttribute("infos", infos);
         return "monitor/opelog-list";
     }
     
     @RequestMapping(value = "/opeloglist/getbykw", method = RequestMethod.POST)
-    public String getOpelogList(Model model,@RequestParam(defaultValue="") String keyword) {
-    	List<OperationRecord> operecords = operationLog.listAllOperationRecordByKey("%"+keyword+"%");
-     	model.addAttribute("operecords", operecords);
-     	model.addAttribute("keyword", keyword);
+    public String getOpelogList(Model model,@RequestParam List<String> infos) {
+    	String keyword = infos.get(0);
+    	String rtype = infos.get(1);
+    	String otype = infos.get(2);
+    	String status = infos.get(3);
+    	List<OperationRecord> operecords = operationLog.listAllOperationRecordByKey("%"+keyword+"%",rtype,otype,status);
+    	model.addAttribute("operecords", operecords);
+     	model.addAttribute("ResourceType", ResourceType.values());
+     	model.addAttribute("OperationType", OperationType.values());
+     	model.addAttribute("infos", infos);
      	return "monitor/opelog-list";
     }
     

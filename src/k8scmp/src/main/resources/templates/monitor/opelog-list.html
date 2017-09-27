@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
-		<title>Unicorn Admin</title>
+		<title>PaaS云管理平台</title>
 		<meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
@@ -15,7 +15,12 @@
 		<script>
 		function getLogList(){
 			var keyword = $('#keyword').val();
-			$('#getform').attr("action", "/opeloglist/getbykw?keyword="+keyword).submit();
+			var rtype = $('#rtype').val();
+			var otype = $('#otype').val();
+			var status = $('#status').val();
+			var infos = [keyword,rtype,otype,status];
+			var url = "/opeloglist/getbykw?infos="+infos;
+			$('#getform').attr("action", url).submit();
 		}
 		</script>
 	</head>
@@ -33,13 +38,29 @@
 			<div class="container-fluid">
 				<div class="row-fluid">
 					<div class="span12">
-						<div class="buttons">
-							<form action="/opeloglist/getbykw" method="post" id="getform">
-							<div class="input-append" style="float:right">
-			                	<input type="text" id="keyword" placeholder="请输入查询内容" th:value="${keyword}"/><button class="btn prepend"  onclick="getLogList()" ><i class="icon-search"></i> </button>
+					<form action="/opeloglist/getbykw" method="post" id="getform" >
+						<div style="display:inline-block">
+							资源类型：<select class="combine" style="width:150px" id="rtype" >
+								<option value="all">All</option>
+								<option th:each="rtype:${ResourceType}" th:value="${rtype}" th:text="${rtype.toString()}" th:selected="${rtype.toString()==infos[1]}"></option>
+							</select>
+							操作类型：<select class="combine" style="width:150px" id="otype">
+								<option value="all">All</option>
+								<option th:each="otype:${OperationType}" th:value="${otype}" th:text="${otype}" th:selected="${otype.toString()==infos[2]}"></option>
+							</select>
+							状态：<select class="combine" style="width:70px" id="status">
+								<option value="all">All</option>
+								<option value="ok" th:selected="${'ok'==infos[3]}">ok</option>
+								<option value="fail" th:selected="${'fail'==infos[3]}">fail</option>
+							</select>
+						</div>
+						<div style="float:right;display:inline-block">
+							
+							<div class="input-append" >
+			                	<input type="text" id="keyword" placeholder="请输入查询内容" th:value="${infos[0]}"/><button class="btn prepend"  onclick="getLogList()" ><i class="icon-search"></i> </button>
 			            	</div>
-			            	</form>
-						</div>	
+			            </div>
+			          </form>
 						<div class="widget-box">
 							<div class="widget-title">
 								<h5>应用列表</h5>
@@ -48,13 +69,13 @@
 								<table class="table table-bordered data-table" style="table-layout: fixed;">
 									<thead>
 										<tr>
-											<th>资源id</th>
+											<th><font color="red">*</font>资源id</th>
 											<th>资源类型</th>
-											<th>操作</th>
-											<th>操作用户Id</th>
-											<th>操作用户名</th>
+											<th>操作类型</th>
+											<th><font color="red">*</font>操作用户Id</th>
+											<th><font color="red">*</font>操作用户名</th>
 											<th>状态</th>
-											<th>详细信息</th>
+											<th><font color="red">*</font>详细信息</th>
 											<th>操作时间</th>
 										</tr>
 									</thead>

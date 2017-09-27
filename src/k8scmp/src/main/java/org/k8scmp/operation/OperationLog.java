@@ -19,5 +19,5 @@ public interface OperationLog {
 
 	List<OperationRecord> listAllOperationRecord4Overview();
 
-	List<OperationRecord> listAllOperationRecordByKey(String keyword);
+	List<OperationRecord> listAllOperationRecordByKey(String keyword,String rtype,String otype,String status);
 }
