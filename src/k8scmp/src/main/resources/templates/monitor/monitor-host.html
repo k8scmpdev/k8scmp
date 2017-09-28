@@ -23,30 +23,26 @@
 				<h2>主机监控</h2>
 			</div>
 			<div id="breadcrumb">
+					<a href="/monitor" class="current tip-bottom" title="监控">监控</a>
 					<a href="#" class="current tip-bottom" title="主机监控">主机监控</a>
 			</div>
 			<div class="container-fluid">
 				<div class="row-fluid">
 					<div class="span12">
-					<br/>
-						<div class="control-group">
-						  <div style="float:left;border:1px">
-							    集群：<strong><span class="text" th:text="cent-os-01"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							    主机：<strong><span class="text" th:text="node-dex003"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							    采样方式&nbsp;&nbsp;<select id="dataSpec" name="dataSpec" class="selectpicker show-tick form-control" data-live-search="false" onclick="javascript(0);">
+						  <div style="display:inline-block">
+                          		<form action="#" method="post"> 
+                          		 集群：<strong><span class="text" th:text="cent-os-01"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;
+								    主机：<strong><span class="text" th:text="node-dex003"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								    采样方式&nbsp;&nbsp;<select id="dataSpec" name="dataSpec" >
 									<option value="max">最大值</option>
 							        <option value="average" selected="selected">平均值</option>
 							        <option value="min">最小值</option>
 							    </select>
-						    </div>
-						    <div class="col-lg-5  pull-right" style="float:right;border:1px">
-                               		<form action="#" method="post"> 
-                                     	自定义&nbsp;&nbsp;<input id="date_begin" type="text" class="datepicker"/>
+                                     	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;自定义&nbsp;&nbsp;<input id="date_begin" type="text" class="datepicker"/>
                                      	-&nbsp;<input id="date_end" type="text" class="datepicker"/>
                                      	<button type="submit" class="tip-top" title="Search" ><i class="icon-search"></i></button>
-                                   	</form>
-						    </div>
-					    </div>
+                                </form>
+						  </div>
 					</div>
 				</div>
 
@@ -55,22 +51,22 @@
 						<div class="widget-box" >
 							<div class="widget-content">
 								<div class="row-fluid" style="margin-top:0px">
-									<div class="span4" style="width:48%">
+									<div class="span4" style="width:48%;min-width:450px">
 										
 										<ul class="site-stats" >
-											<li style="height:300px;width: 550px">
-												<div class="datashow-chart" id="hostCPU" style="min-width:200px;height:300px"></div>
+											<li style="">
+												<div class="datashow-chart" id="hostCPU" style="min-width:400px;height:300px"></div>
 											</li>
 											
-											<li style="height:300px;width: 550px">
-												<div class="datashow-chart" id="hostMemory" style="min-width:200px;height:300px"></div>
+											<li style="">
+												<div class="datashow-chart" id="hostMemory" style="min-width:400px;height:300px"></div>
 											</li>
 										</ul>
 									 </div>
-									<div class="span4" style="width:48%">
+									<div class="span4" style="width:48%;min-width:450px">
 										<ul class="site-stats" >
-											<li style="height:300px;width: 550px">
-												<div class="datashow-chart" id="hostDisk" style="min-width:200px;height:300px"></div>
+											<li style="">
+												<div class="datashow-chart" id="hostDisk" style="min-width:400px;height:300px"></div>
 											</li>
 										</ul>
 									</div>
@@ -98,6 +94,7 @@
         <script th:src="@{/highcharts/js/chart-hostCPU.js}"></script>
         <script th:src="@{/highcharts/js/chart-hostDisk.js}"></script>
         <script th:src="@{/highcharts/js/chart-hostMemory.js}"></script>
+        
         <script th:src="@{/js/jquery.min.js}"></script>
         <script th:src="@{/js/bootstrap.min.js}"></script>
         <script th:src="@{/js/bootstrap-colorpicker.js}"></script>
