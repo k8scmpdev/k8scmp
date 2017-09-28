@@ -23,7 +23,7 @@ public interface ServiceDao{
 
 	String getServiceStatu(String id);
 	
-	void updateServiceStatu(String state,String id);
+	void updateServiceStatu(String id,String state);
 
 	List<ServiceInfo> getNoRunningServicesByStartSeq(String appId, int startSeq);
 

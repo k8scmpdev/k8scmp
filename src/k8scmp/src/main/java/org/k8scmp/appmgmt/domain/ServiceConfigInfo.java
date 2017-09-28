@@ -2,11 +2,16 @@ package org.k8scmp.appmgmt.domain;
 
 import java.util.List;
 
+import org.k8scmp.model.VersionType;
+
+
+
 public class ServiceConfigInfo extends ServiceInfo{
 	private int defaultReplicas;
 	private List<String> externalIPs;
 	private String yamlPodSpec;
-	
+	private VersionType versionType;
+	 
 	public int getDefaultReplicas() {
 		return defaultReplicas;
 	}
@@ -24,5 +29,11 @@ public class ServiceConfigInfo extends ServiceInfo{
 	}
 	public void setYamlPodSpec(String yamlPodSpec) {
 		this.yamlPodSpec = yamlPodSpec;
+	}
+	public VersionType getVersionType() {
+		return versionType;
+	}
+	public void setVersionType(VersionType versionType) {
+		this.versionType = versionType;
 	}
 }

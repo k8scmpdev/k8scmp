@@ -25,16 +25,20 @@ public class DeployEvent extends DataModelBase {
         add("serviceId");
         add("operation");
         add("state");
+        add("content");
+        add("expireTime");
     }};
 
     String id;
     String serviceId;
     DeployOperation operation;
     DeployEventStatus state;
-
-    String startTime;
     String expireTime;
-    String operatorId;
+    String content;
+
+	String startTime;
+	String lastModifiedTime;
+	String operatorId;
     String userName;
     String message;
     List<DeploymentSnapshot> primarySnapshot;
@@ -82,14 +86,23 @@ public class DeployEvent extends DataModelBase {
         this.id = id;
     }
 
-    public DeployEventStatus getEventStatus() {
+    public DeployEventStatus getState() {
         return state;
     }
 
-    public void setEventStatus(DeployEventStatus eventStatus) {
-        this.state = eventStatus;
+    public void setState(DeployEventStatus state) {
+        this.state = state;
     }
 
+
+    public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+	
     public String getExpireTime() {
         return expireTime;
     }
@@ -98,6 +111,14 @@ public class DeployEvent extends DataModelBase {
         this.expireTime = expireTime;
     }
 
+    public String getLastModifiedTime() {
+		return lastModifiedTime;
+	}
+
+	public void setLastModifiedTime(String lastModifiedTime) {
+		this.lastModifiedTime = lastModifiedTime;
+	}
+	
     public String getMessage() {
         return message;
     }
@@ -155,8 +176,20 @@ public class DeployEvent extends DataModelBase {
         this.userName = userName;
     }
 
+    public DeployEvent toModel(){
+    	DeployEvent result = new DeployEvent();
+        if (content != null && content.length() != 0) {
+        	result = result.fromString(content);
+        }
+        result.setId(id);
+        result.setServiceId(serviceId);
+        result.setOperation(operation);
+        result.setState(state);
+        return result;
+    }
+    
     public boolean eventTerminated() {
-        if (getEventStatus() == null) {
+        if (getState() == null) {
             return false;
         }
         return DeployEventStatus.FAILED.equals(state) || DeployEventStatus.SUCCESS.equals(state)

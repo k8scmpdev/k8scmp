@@ -1,6 +1,7 @@
 package org.k8scmp.appmgmt.domain;
 
 import org.k8scmp.util.MD5Util;
+import org.k8scmp.util.StringUtils;
 
 
 /**
@@ -98,6 +99,37 @@ public class Cluster {
         this.etcd = etcd;
     }
 
+    public boolean equalWith(Cluster cluster) {
+        if (cluster == null) {
+            return false;
+        }
+        if (!StringUtils.equals(api, cluster.getApi())) {
+            return false;
+        }
+        if (!StringUtils.equals(username, cluster.getUsername())) {
+            return false;
+        }
+        if (!StringUtils.equals(password, cluster.getPassword())) {
+            return false;
+        }
+        if (!StringUtils.equals(oauthToken, cluster.getOauthToken())) {
+            return false;
+        }
+        if (!StringUtils.equals(tag, cluster.getTag())) {
+            return false;
+        }
+        if (!StringUtils.equals(domain, cluster.getDomain())) {
+            return false;
+        }
+        if (!StringUtils.equals(dns, cluster.getDns())) {
+            return false;
+        }
+        if (!StringUtils.equals(etcd, cluster.getEtcd())) {
+            return false;
+        }
+        return true;
+    }
+    
     public String md5Key(String namespace) {
         String key = api + username + password + oauthToken + getId() + namespace;
         return MD5Util.getMD5InHex(key);

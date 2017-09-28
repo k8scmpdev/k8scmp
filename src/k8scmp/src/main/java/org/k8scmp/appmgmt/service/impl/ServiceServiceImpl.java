@@ -12,6 +12,8 @@ import org.k8scmp.appmgmt.dao.AppDao;
 import org.k8scmp.appmgmt.dao.ServiceDao;
 import org.k8scmp.appmgmt.dao.VersionDao;
 import org.k8scmp.appmgmt.domain.AppInfo;
+import org.k8scmp.appmgmt.domain.Cluster;
+import org.k8scmp.appmgmt.domain.Env;
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
 import org.k8scmp.appmgmt.domain.ServiceDetail;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
@@ -22,11 +24,18 @@ import org.k8scmp.appmgmt.service.ServiceStatusManager;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ClientConfigure;
+import org.k8scmp.engine.ClusterRuntimeDriver;
+import org.k8scmp.engine.RuntimeDriver;
+import org.k8scmp.engine.exception.DriverException;
 import org.k8scmp.exception.ApiException;
+import org.k8scmp.globalmgmt.dao.GlobalBiz;
+import org.k8scmp.globalmgmt.domain.GlobalInfo;
+import org.k8scmp.globalmgmt.domain.GlobalType;
 import org.k8scmp.model.ServiceStatus;
 import org.k8scmp.operation.OperationLog;
 import org.k8scmp.operation.OperationRecord;
 import org.k8scmp.operation.OperationType;
+import org.k8scmp.util.AuthUtil;
 import org.k8scmp.util.DateUtil;
 import org.k8scmp.util.StringUtils;
 import org.k8scmp.util.UUIDUtil;
@@ -51,6 +60,9 @@ public class ServiceServiceImpl implements ServiceService {
     
     @Autowired
     ServiceStatusManager serviceStatusManager;
+    
+    @Autowired
+    GlobalBiz globalBiz;
     
     private static Logger logger = LoggerFactory.getLogger(ServiceServiceImpl.class);
 
@@ -79,7 +91,7 @@ public class ServiceServiceImpl implements ServiceService {
         }
 		String serviceId = UUIDUtil.generateUUID();
 		service.setCreateTime(DateUtil.dateFormatToMillis(new Date()));
-		service.setCreatorId("");
+		service.setCreatorId(AuthUtil.getCurrentLoginName());
 		service.setId(serviceId);
 		service.setState(ServiceStatus.STOP.name());
 		
@@ -96,8 +108,8 @@ public class ServiceServiceImpl implements ServiceService {
         if (!StringUtils.isBlank(errInfo)) {
             throw new ApiException(ResultStat.SERVICE_NOT_LEGAL,errInfo);
         }
+        version.setCreatorId(AuthUtil.getCurrentLoginName());
         version.setCreateTime(DateUtil.dateFormatToMillis(new Date()));
-		version.setCreateTime("");
 		version.setId(serviceId);
 		version.setState("");
 		
@@ -112,10 +124,10 @@ public class ServiceServiceImpl implements ServiceService {
 				serviceId, 
 				ResourceType.SERVICE,
 				OperationType.SET, 
-				"", 
-				"", 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(),
 				"OK", 
-				"", 
+				"新增服务信息", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
 		
@@ -138,10 +150,10 @@ public class ServiceServiceImpl implements ServiceService {
 				id, 
 				ResourceType.SERVICE,
 				OperationType.DELETE, 
-				"", 
-				"", 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(),
 				"OK", 
-				"", 
+				"删除服务信息",  
 				DateUtil.dateFormatToMillis(new Date())
 		));
 	}
@@ -149,17 +161,17 @@ public class ServiceServiceImpl implements ServiceService {
 
 	@Override
 	public void modifyService(ServiceInfo serviceInfo) {
-		serviceInfo.setLastModifierId("");
+		serviceInfo.setLastModifierId(AuthUtil.getCurrentLoginName());
 		serviceInfo.setLastModifiedTime(DateUtil.dateFormatToMillis(new Date()));
 		serviceDao.updateDescription(serviceInfo);
 		operationLog.insertRecord(new OperationRecord(
 				serviceInfo.getId(), 
 				ResourceType.SERVICE,
 				OperationType.MODIFY, 
-				"", 
-				"", 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(),
 				"OK", 
-				"", 
+				"编辑服务信息", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
 	}
@@ -243,6 +255,13 @@ public class ServiceServiceImpl implements ServiceService {
 			throw ApiException.wrapMessage(ResultStat.PARAM_ERROR, "no such service version:" + serviceId);
 		}
 		
+		GlobalInfo cluster_host = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
+		GlobalInfo cluster_name = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_NAME);
+    	Cluster cluster = new Cluster();
+    	cluster.setApi(cluster_host.getValue());
+    	cluster.setId(cluster_host.getId()+"");
+    	cluster.setName(cluster_name.getValue());
+    	
 		Version ver = verBase.toModel(Version.class);
 		if (ver.isDeprecate()) {
             throw ApiException.wrapMessage(ResultStat.SERVICE_START_FAILED, "can't start deprecated version");
@@ -260,10 +279,44 @@ public class ServiceServiceImpl implements ServiceService {
 		}
 		serviceInfo.setData(service.toString());
 		serviceDao.updateService(serviceInfo);
+		RuntimeDriver driver = ClusterRuntimeDriver.getClusterDriver(cluster.getId());
+		if (driver == null) {
+            throw ApiException.wrapMessage(ResultStat.CLUSTER_NOT_EXIST, "cluster: " + cluster.toString());
+        }
 		
+		AppInfo appInfo = appDao.getApp(serviceInfo.getAppId());
+		try {
+            List<Env> allExtraEnvs = buildExtraEnv(cluster);
+            driver.startDeploy(appInfo, service, ver, AuthUtil.getUser(), allExtraEnvs);
+            // add operation record
+            operationLog.insertRecord(new OperationRecord(
+            		serviceId, 
+    				ResourceType.SERVICE,
+    				OperationType.START, 
+    				AuthUtil.getCurrentLoginName(), 
+    				AuthUtil.getUserName(),
+    				"OK", 
+    				"部署服务", 
+    				DateUtil.dateFormatToMillis(new Date())
+    		));
+        } catch (DriverException e) {
+            serviceStatusManager.failedEventForDeployment(serviceId, null, e.getMessage());
+            throw ApiException.wrapMessage(ResultStat.SERVICE_START_FAILED, e.getMessage());
+        }
 		return null;
 	}
 	
+	 private List<Env> buildExtraEnv(Cluster cluster) {
+	        List<Env> extraEnvs = new LinkedList<>();
+//	        GlobalInfo info = globalMapper.getGlobalInfoByType(GlobalType.SERVER);
+//	        if (info == null) {
+//	            throw ApiException.wrapMessage(ResultStat.PARAM_ERROR, "domeos api is null!");
+//	        }
+//	        extraEnvs.add(new EnvDraft("DOMEOS_SERVER_ADDR", CommonUtil.fullUrl(info.getValue())));
+	        extraEnvs.add(new Env("CLUSTER_NAME", cluster.getName()));
+	        return extraEnvs;
+	    }
+	 
 	/**
 	 * 检查启动服务的依赖服务是否是运行态
 	 * @param appId

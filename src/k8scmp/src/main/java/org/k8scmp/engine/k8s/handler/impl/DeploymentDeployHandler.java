@@ -26,7 +26,6 @@ import org.k8scmp.exception.K8sDriverException;
 
 
 /**
- * Created by KaiRen on 2016/11/9.
  */
 public class DeploymentDeployHandler implements DeployResourceHandler<Deployment> {
     private AppInfo appInfo;
@@ -57,7 +56,7 @@ public class DeploymentDeployHandler implements DeployResourceHandler<Deployment
         String deployName = getDeploymentName();
         Map<String, String> deploymentLabel = buildDeploymentLabel();
 
-        io.fabric8.kubernetes.api.model.extensions.Deployment k8sDeployment =
+        Deployment k8sDeployment =
                 new DeploymentBuilder().withNewMetadata().withName(deployName.toLowerCase())
                         .withLabels(deploymentLabel).withNamespace(appInfo.getNamespace()).endMetadata()
                         .build();

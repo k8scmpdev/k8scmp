@@ -66,7 +66,7 @@ public interface ServiceMapper {
     String getServiceStatu(@Param("id") String id);
     
     @Update("update service set state=#{state} where id=#{id}")
-    int updateServiceStatu(@Param("state") String state,@Param("id") String id);
+    int updateServiceStatu(@Param("id") String id,@Param("state") String state);
 
     @Select("SELECT" + BASIC_COLUMN + " FROM service"
 			+" where appId=#{appId} and startSeq<#{startSeq} and state!='RUNNING'")

@@ -57,8 +57,8 @@ public class ServiceDaoImpl implements ServiceDao {
 	}
 
 	@Override
-	public void updateServiceStatu(String state, String id) {
-		mapper.updateServiceStatu(state, id);
+	public void updateServiceStatu(String id, String state) {
+		mapper.updateServiceStatu(id, state);
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
+import org.k8scmp.appmgmt.domain.AppInfo;
 import org.k8scmp.appmgmt.domain.Cluster;
 import org.k8scmp.appmgmt.domain.DeployEvent;
 import org.k8scmp.appmgmt.domain.Env;
@@ -11,21 +12,22 @@ import org.k8scmp.appmgmt.domain.Policy;
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
 import org.k8scmp.appmgmt.domain.Version;
 import org.k8scmp.engine.exception.DriverException;
+import org.k8scmp.exception.DeploymentEventException;
 import org.k8scmp.login.domain.User;
 
 /**
  */
 public interface RuntimeDriver {
 
-//    void updateList(Cluster cluster);
+    void updateList(Cluster cluster);
 
     RuntimeDriver init(Cluster cluster);
 
-//    boolean isDriverLatest(Cluster cluster);
+    boolean isDriverLatest(Cluster cluster);
 
     // Operation
-    void startDeploy(ServiceConfigInfo serviceConfigInfo, Version version, User user, List<Env> allExtraEnvs)
-            throws DriverException,IOException;
+    void startDeploy(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, Version version, User user, List<Env> allExtraEnvs)
+            throws DriverException,IOException, DeploymentEventException;
 
 //    void stopDeploy(ServiceConfigInfo serviceConfigInfo, User user) throws  IOException;
 //

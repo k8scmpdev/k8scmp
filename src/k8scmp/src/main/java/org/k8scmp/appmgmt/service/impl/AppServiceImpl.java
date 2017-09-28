@@ -10,6 +10,7 @@ import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.operation.OperationLog;
 import org.k8scmp.operation.OperationRecord;
 import org.k8scmp.operation.OperationType;
+import org.k8scmp.util.AuthUtil;
 import org.k8scmp.util.DateUtil;
 import org.k8scmp.util.UUIDUtil;
 import org.slf4j.Logger;
@@ -40,10 +41,10 @@ public class AppServiceImpl implements AppService {
 				appInfo.getId(), 
 				ResourceType.APPLICATION,
 				OperationType.SET, 
-				"", 
-				"", 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(),
 				"OK", 
-				"", 
+				"新增应用信息", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
 		
@@ -57,10 +58,10 @@ public class AppServiceImpl implements AppService {
 				id, 
 				ResourceType.APPLICATION,
 				OperationType.DELETE, 
-				"", 
-				"", 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(),
 				"OK", 
-				"", 
+				"删除应用信息", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
 	}
@@ -74,10 +75,10 @@ public class AppServiceImpl implements AppService {
 				appInfo.getId(), 
 				ResourceType.APPLICATION,
 				OperationType.MODIFY, 
-				"", 
-				"", 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(),
 				"OK", 
-				"", 
+				"编辑应用信息", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
 	}

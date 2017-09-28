@@ -27,6 +27,7 @@ public class Version extends VersionBase {
     private VersionType versionType;
     private boolean deprecate = false;
     private List<String> hostList;
+    private List<NodePortDraft> nodePorts;
     
     public List<ContainerDraft> getContainerDrafts() {
         return containerDrafts;
@@ -170,5 +171,13 @@ public class Version extends VersionBase {
 
 	public void setLogDraft(LogDraft logDraft) {
 		this.logDraft = logDraft;
+	}
+
+	public List<NodePortDraft> getNodePorts() {
+		return nodePorts;
+	}
+
+	public void setNodePorts(List<NodePortDraft> nodePorts) {
+		this.nodePorts = nodePorts;
 	}
 }

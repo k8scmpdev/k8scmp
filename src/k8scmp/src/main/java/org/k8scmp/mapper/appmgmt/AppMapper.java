@@ -30,9 +30,9 @@ public interface AppMapper {
     @Delete("delete from application where id = #{id}")
 	int deleteApp(@Param("id") String id);
     
-    @Select("selete"+BASIC_COLUMN+" from application where id=#{id}")
+    @Select("select"+BASIC_COLUMN+" from application where id=#{id}")
     AppInfo getApp(@Param("id") String id);
     
-    @Select("selete"+BASIC_COLUMN+" from application where id in(select appId from service where serviceCode=#{serviceCode})")
+    @Select("select"+BASIC_COLUMN+" from application where id in(select appId from service where serviceCode=#{serviceCode})")
     List<AppInfo> getAppsByserviceCode(@Param("serviceCode") String serviceCode);
 }

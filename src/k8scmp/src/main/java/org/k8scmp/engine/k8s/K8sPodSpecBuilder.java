@@ -1,7 +1,6 @@
 package org.k8scmp.engine.k8s;
 
 import io.fabric8.kubernetes.api.model.*;
-import io.fabric8.kubernetes.api.model.Container;
 
 import java.util.*;
 
@@ -18,6 +17,7 @@ import org.k8scmp.engine.k8s.util.SecretUtils;
 import org.k8scmp.appmgmt.domain.LabelSelector;
 import org.k8scmp.appmgmt.domain.LogDraft;
 import org.k8scmp.appmgmt.domain.LogItemDraft;
+import org.k8scmp.appmgmt.domain.NodePortDraft;
 import org.k8scmp.util.StringUtils;
 
 /**
@@ -192,6 +192,10 @@ public class K8sPodSpecBuilder {
             List<EnvVar> envVarList = formatEnv(containerEnvs);
             envVarList.addAll(DownwardAPIUtil.generateDownwardEnvs());
 
+            List<ContainerPort> containerPorts = buildContainerPort(version.getNodePorts());
+            if(containerPorts!=null){
+            	container.setPorts(containerPorts);
+            }
             container.setEnv(envVarList);
 
             container.setArgs(containerDraft.getArgs());
@@ -284,6 +288,23 @@ public class K8sPodSpecBuilder {
         }
 
         return containers;
+    }
+    
+    private List<ContainerPort> buildContainerPort(List<NodePortDraft> nodePorts){
+    	if(nodePorts == null || nodePorts.size()==0){
+    		return null;
+    	}
+    	int size = nodePorts.size();
+    	List<ContainerPort> containerPorts = new ArrayList<>(size);
+    	
+    	for(NodePortDraft nodePort : nodePorts){
+    		ContainerPort containerPort = new ContainerPortBuilder()
+    				.withContainerPort(nodePort.getContainerPort())
+    				.withProtocol(nodePort.getProtocol())
+    				.build();
+    		containerPorts.add(containerPort);
+    	}
+    	return containerPorts;
     }
 
 //    private Probe buildProbe(HealthChecker healthChecker) {
