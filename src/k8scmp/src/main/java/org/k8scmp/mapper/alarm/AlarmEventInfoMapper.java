@@ -1,4 +1,4 @@
-package org.k8scmp.mapper.monitor;
+package org.k8scmp.mapper.alarm;
 
 import java.util.List;
 

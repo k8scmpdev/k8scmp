@@ -1,4 +1,4 @@
-package org.k8scmp.mapper.monitor;
+package org.k8scmp.mapper.alarm;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -18,9 +18,9 @@ public interface CallbackInfoMapper {
 
 	@Select("SELECT * FROM alarm_callback_info WHERE id IN " +
             "(SELECT callbackId FROM alarm_template_info WHERE id=#{templateId})")
-    CallBackInfo getCallbackInfoByTemplateId(@Param("templateId") long templateId);
+    CallBackInfo getCallbackInfoByTemplateId(@Param("templateId") int templateId);
 
 	@Delete("DELETE FROM alarm_callback_info WHERE id IN " +
             "(SELECT callbackId FROM alarm_template_info WHERE id=#{templateId})")
-    int deleteCallbackInfoByTemplateId(@Param("templateId") long templateId);
+    int deleteCallbackInfoByTemplateId(@Param("templateId") int templateId);
 }

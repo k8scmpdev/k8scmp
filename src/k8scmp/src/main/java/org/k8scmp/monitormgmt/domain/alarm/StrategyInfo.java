@@ -5,8 +5,8 @@ package org.k8scmp.monitormgmt.domain.alarm;
  */
 public class StrategyInfo {
 
-    private long id;
-    private long templateId;
+    private int id;
+    private int templateId;
     private String metric;
     private String tag;
     private int pointNum;
@@ -15,12 +15,12 @@ public class StrategyInfo {
     private double rightValue;
     private String note;
     private int maxStep;
-    private long createTime;
+    private String createTime;
     public StrategyInfo() {
     }
 
-    public StrategyInfo(long id, long templateId,String metric, String tag, int pointNum, String aggregateType, String operator, double rightValue,
-    		String note, int maxStep, long createTime) {
+    public StrategyInfo(int id, int templateId,String metric, String tag, int pointNum, String aggregateType, String operator, double rightValue,
+    		String note, int maxStep, String createTime) {
         this.id = id;
         this.templateId = templateId;
         this.metric = metric;
@@ -34,27 +34,27 @@ public class StrategyInfo {
         this.createTime = createTime;
     }
 
-    public long getTemplateId() {
+    public int getTemplateId() {
 		return templateId;
 	}
 
-	public void setTemplateId(long templateId) {
+	public void setTemplateId(int templateId) {
 		this.templateId = templateId;
 	}
 
-	public long getCreateTime() {
+	public String getCreateTime() {
 		return createTime;
 	}
 
-	public void setCreateTime(long createTime) {
+	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
 
-	public long getId() {
+	public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

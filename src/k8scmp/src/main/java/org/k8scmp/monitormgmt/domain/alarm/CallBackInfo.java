@@ -5,7 +5,7 @@ package org.k8scmp.monitormgmt.domain.alarm;
  */
 public class CallBackInfo {
 
-    private long id;
+    private int id;
     private String url;
     private boolean beforeCallbackSms;
     private boolean beforeCallbackMail;
@@ -15,7 +15,7 @@ public class CallBackInfo {
     public CallBackInfo() {
     }
 
-    public CallBackInfo(long id, String url, boolean beforeCallbackSms, boolean beforeCallbackMail, boolean afterCallbackSms, boolean afterCallbackMail) {
+    public CallBackInfo(int id, String url, boolean beforeCallbackSms, boolean beforeCallbackMail, boolean afterCallbackSms, boolean afterCallbackMail) {
         this.id = id;
         this.url = url;
         this.beforeCallbackSms = beforeCallbackSms;
@@ -24,11 +24,11 @@ public class CallBackInfo {
         this.afterCallbackMail = afterCallbackMail;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

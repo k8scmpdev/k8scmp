@@ -1,15 +1,10 @@
 package org.k8scmp.monitormgmt.domain.alarm;
 
-
 import java.util.List;
 
 import org.k8scmp.login.domain.User;
-import org.k8scmp.util.StringUtils;
 
-/**
- * Created by baokangwang on 2016/3/31.
- */
-public class TemplateInfo {
+public class TemplateIn {
 
     private int id;
     private String templateName;
@@ -20,17 +15,25 @@ public class TemplateInfo {
     private String updateTime;
     private List<HostGroupInfoBasic> hostGroupList;
     private DeploymentInfo deploymentInfo;
-    private List<StrategyInfo> strategyList;
+//    private List<StrategyInfo> strategyList;
 //    private List<UserGroupInfo> userGroupList;
     private List<User> userList;
+    private String[] metricList;
+    private int[] pointNumList;
+    private String[] aggregateTypeList;
+    private String[] operatorList;
+    private int[] rightValueList;
+    private String[] noteValueList;
+    private int[] maxStepList;
     private CallBackInfo callback;
-
-    public TemplateInfo() {
+    
+    public TemplateIn() {
     }
 
-    public TemplateInfo(int id, String templateName, String templateType, int creatorId, String creatorName,
+    public TemplateIn(int id, String templateName, String templateType, int creatorId, String creatorName,
                         String createTime, String updateTime, List<HostGroupInfoBasic> hostGroupList, List<User> userList,
-                        DeploymentInfo deploymentInfo, List<StrategyInfo> strategyList, CallBackInfo callback) {
+                        DeploymentInfo deploymentInfo, String[] metricList, int[] pointNumList, String[] aggregateTypeList,
+                        String[] operatorList, int[] rightValueList, String[] noteValueList, int[] maxStepList, CallBackInfo callback) {
         this.id = id;
         this.templateName = templateName;
         this.templateType = templateType;
@@ -40,21 +43,72 @@ public class TemplateInfo {
         this.updateTime = updateTime;
         this.hostGroupList = hostGroupList;
         this.deploymentInfo = deploymentInfo;
-        this.strategyList = strategyList;
         this.userList = userList;
-//        this.userGroupList = userGroupList;
+        this.metricList = metricList;
+        this.pointNumList = pointNumList;
+        this.aggregateTypeList = aggregateTypeList;
+        this.operatorList = operatorList;
+        this.rightValueList = rightValueList;
+        this.noteValueList = noteValueList;
+        this.maxStepList = maxStepList;
         this.callback = callback;
     }
+    
+    public String[] getMetricList() {
+		return metricList;
+	}
 
-    public TemplateInfo(TemplateInfoBasic templateInfoBasic) {
-        this.id = templateInfoBasic.getId();
-        this.templateName = templateInfoBasic.getTemplateName();
-        this.templateType = templateInfoBasic.getTemplateType();
-//        this.creatorId = templateInfoBasic.getCreatorId();
-//        this.creatorName = templateInfoBasic.getCreatorName();
-        this.createTime = templateInfoBasic.getCreateTime();
-        this.updateTime = templateInfoBasic.getUpdateTime();
-    }
+	public void setMetricList(String[] metricList) {
+		this.metricList = metricList;
+	}
+
+	public int[] getPointNumList() {
+		return pointNumList;
+	}
+
+	public void setPointNumList(int[] pointNumList) {
+		this.pointNumList = pointNumList;
+	}
+
+	public String[] getAggregateTypeList() {
+		return aggregateTypeList;
+	}
+
+	public void setAggregateTypeList(String[] aggregateTypeList) {
+		this.aggregateTypeList = aggregateTypeList;
+	}
+
+	public String[] getOperatorList() {
+		return operatorList;
+	}
+
+	public void setOperatorList(String[] operatorList) {
+		this.operatorList = operatorList;
+	}
+
+	public int[] getRightValueList() {
+		return rightValueList;
+	}
+
+	public void setRightValueList(int[] rightValueList) {
+		this.rightValueList = rightValueList;
+	}
+
+	public String[] getNoteValueList() {
+		return noteValueList;
+	}
+
+	public void setNoteValueList(String[] noteValueList) {
+		this.noteValueList = noteValueList;
+	}
+
+	public int[] getMaxStepList() {
+		return maxStepList;
+	}
+
+	public void setMaxStepList(int[] maxStepList) {
+		this.maxStepList = maxStepList;
+	}
 
     public int getId() {
         return id;
@@ -128,22 +182,6 @@ public class TemplateInfo {
         this.deploymentInfo = deploymentInfo;
     }
 
-    public List<StrategyInfo> getStrategyList() {
-        return strategyList;
-    }
-
-    public void setStrategyList(List<StrategyInfo> strategyList) {
-        this.strategyList = strategyList;
-    }
-
-//    public List<UserGroupInfo> getUserGroupList() {
-//        return userGroupList;
-//    }
-//
-//    public void setUserGroupList(List<UserGroupInfo> userGroupList) {
-//        this.userGroupList = userGroupList;
-//    }
-    
     public List<User> getUserList() {
 	      return userList;
 	  }
@@ -160,31 +198,4 @@ public class TemplateInfo {
         this.callback = callback;
     }
 
-    public String checkLegality() {
-        if (StringUtils.isBlank(templateName)) {
-            return "template name is blank";
-        }
-        if (templateType == null) {
-            return "template type is blank";
-        }
-        if (templateType.equals(TemplateType.host.name()) && hostGroupList == null) {
-            return "host group is blank";
-        }
-        if (templateType.equals(TemplateType.deploy.name()) && deploymentInfo == null) {
-            return "deployment info is blank";
-        }
-        if (!templateType.equals(TemplateType.host.name()) && !templateType.equals(TemplateType.deploy.name())) {
-            return "illegal template type";
-        }
-        if (strategyList == null) {
-            return "strategy list is blank";
-        }
-//        if (userGroupList == null) {
-//            return "user group list is blank";
-//        }
-        if (callback == null) {
-            return "callback is blank";
-        }
-        return null;
-    }
 }

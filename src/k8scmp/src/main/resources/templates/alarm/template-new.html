@@ -16,7 +16,6 @@
 	
 	<body>
 		<div id="common-header"></div>
-		
 		<div id="content">
 			<div id="content-header">
 				<h2>新建规则</h2>
@@ -34,12 +33,12 @@
 								</span>
 								<!-- <h5>请输入用户信息</h5> -->
 							</div>
-							<div class="widget-content nopadding"><!-- th:object="${TemplateInfo}" -->
-								<form class="form-horizontal" action="/alarm/create" th:object="${TemplateInfo}" method="post" name="create_template" id="create_template" novalidate="novalidate">
+							<div class="widget-content nopadding">
+								<form class="form-horizontal" th:object="${TemplateInfo}" name="create_template" id="create_template" novalidate="novalidate">
                                     <div class="control-group">
                                         <label class="control-label">报警规则名称</label>
                                         <div class="controls">
-                                            <input id="templateName" name="templateName" type="text" th:field="*{templateName}"/>
+                                            <input id="templateName" name="templateName" type="text" th:field="*{templateName}" placeholder="请输入规则名称" required="required"/>
                                         </div>
                                     </div>
                                     <div class="control-group">
@@ -54,7 +53,7 @@
                                     <div class="control-group" id="selectHost">
 										<label class="control-label">选择报警主机组</label>
 										<div class="controls">
-											<select multiple="multiple" class="multiselect" name="hostGroupName" id="hostGroup" style="width: 864px;" th:field="*{hostGroupList}">	
+											<select multiple="multiple" class="multiselect" name="hostGroup" id="hostGroup" style="width: 854px;" th:field="*{hostGroupList}">	
 												<option th:each="hostGroupBasic:${templateInfo.hostGroupList}" th:value="${hostGroupBasic.id}" 	
 												th:selected="${#strings.contains(hostGroupBasic,hostGroupBasic.id)}"
 												th:text="${hostGroupBasic.hostGroupName}" ></option>	
@@ -80,66 +79,76 @@
 										<div class="controls">
                                            <a title="添加报警逻辑" class="btn btn-primary" href="javascript:void(0);" onclick="showTemplate();">添加</a>
                                        		<br/>
-                                       		<br/>
-                                       		<div id="strategyList" ></div>
+                                       		<div id="strategyList"></div>
 										</div>
 									</div>
 									
 									<div class="control-group">
                                         <label class="control-label">指定报警用户</label>
                                         <div class="controls">
-                                            <select multiple="multiple" class="multiselect" name="username" id="hostGroup" style="width: 864px;">	
+                                            <select multiple="multiple" class="multiselect" name="users" id="users" style="width: 854px;" required="required">	
 												<option th:each="category:${templateInfo.userList}" th:value="${category.id}" 	
-												th:selected="${#strings.contains(category.username,category.id)}"
-												th:text="${category.username}" ></option>	
+												th:selected="${#strings.contains(category,category.id)}"
+												th:text="${category.loginname}" ></option>	
+											</select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="control-group">
+                                        <label class="control-label">指定报警回调</label>
+                                        <div class="controls">
+                                        	<input type="text" placeholder="请指定报警地址" id="callbackurl"
+                                        	pattern="：/^[a-z]([a-z0-9]*[-_]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?$/i"/><br/><br/>
+                                                                               报警前发提醒短信:&nbsp;<select name="beforeCallbackSms" id="beforeCallbackSms">	
+												<option value="true">是</option>	
+												<option value="false" selected="selected">否</option>
+											</select>
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											报警前发提醒邮件:&nbsp;<select name="beforeCallbackMail" id="beforeCallbackMail">	
+												<option value="true">是</option>	
+												<option value="false" selected="selected">否</option>
+											</select>
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											报警后发结果短信:&nbsp;<select name="afterCallbackSms" id="afterCallbackSms">	
+												<option value="true">是</option>	
+												<option value="false" selected="selected">否</option>
+											</select>
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											报警后发结果邮件:&nbsp;<select name="afterCallbackMail" id="afterCallbackMail">	
+												<option value="true">是</option>	
+												<option value="false" selected="selected">否</option>
 											</select>
                                         </div>
                                     </div>
                                     
                                     <div class="form-actions">
                                     	<a  class="btn tip-bottom" href="/alarm">返回</a>
-                                        <input type="submit" value="提交" class="btn btn-primary" onclick=""/>
+                                        <input type="submit" value="提交" class="btn btn-primary" onclick="submitForm();"/>
                                     </div>
-                                </form>
+                                </form> 
 							</div>
 						</div>
 					</div>
 				</div>
-
-				<div class="row-fluid">
-					<div id="footer" class="span12">
-						2017 &copy; k8scmp. 
-					</div>
-				</div>
+				<div id="common-footer"></div>
 			</div>
 		</div>	
-
 
 		<script th:src="@{/js/jquery.min.js}"></script>
 		<script th:src="@{/js/jquery.ui.custom.js}"></script>
 		<script th:src="@{/js/bootstrap.min.js}"></script>
-		
 		<script th:src="@{/js/jquery.uniform.js}"></script>
 		<script th:src="@{/js/select2.min.js}"></script>
 		<script th:src="@{/js/jquery.dataTables.min.js}"></script>
 		<script th:src="@{/js/unicorn.js}"></script>
 		<script th:src="@{/js/unicorn.tables.js}"></script>
 		<script th:src="@{/js/commonDisplay.js}"></script>
+		
 		<script type="text/javascript">
-			  
-			function showTemplate(){
-				
-				var childdiv=$('<div></div>');  
-				childdiv.attr("id","id" + new Date().getTime());
-				$("#strategyList").append(childdiv);
-				childdiv.load("/js/template-strategy.html #strategyInfo");
-				
-			}
-			
 			$(document).ready(function() {
-		        
-		        getHostOrDeploy();
+				getHostOrDeploy();
 		    });
+			
 			function getHostOrDeploy(){
 				$("#templateType").change(function(){
 	                 var hideselect = $(this).val();
@@ -154,6 +163,130 @@
 	             });
 			}
 			
+			function showTemplate(){
+				var childdiv=$('<div></div>');  
+				childdiv.attr("id","id" + new Date().getTime());
+				$("#strategyList").append(childdiv);
+				childdiv.load("/js/template-strategy.html #strategyInfo");
+			}
+			
+			function submitForm(){
+				var templateName = $("#templateName").val();
+				var templateType = $("#templateType option:selected").val();  
+				var hostGroupList = [];
+				//var strategyList = [];
+				var userList = [];
+				var hostGroupInfoBasic = new Object();
+				
+				var user = new Object();
+				var deploymentInfo = new Object();
+				var callback = new Object();
+				
+				var templateIn = new Object();
+				templateIn.templateName = templateName;
+				templateIn.templateType = templateType;
+				if(templateType == 'host'){
+					//hostGroup
+					$("#hostGroup option:selected").each(function(){ 
+						hostGroupInfoBasic.hostGroupName = $(this).text();
+						hostGroupInfoBasic.id = $(this).val();
+						hostGroupList.push(hostGroupInfoBasic);
+					})
+					templateIn.hostGroupList = hostGroupList;
+					
+				}else{
+					//deployment
+					deploymentInfo.clusterName = $("#clusterName option:selected").text();
+					deploymentInfo.hostEnv = $("#hostEnv option:selected").text();
+					deploymentInfo.deploymentName = $("#deploymentName option:selected").text();
+					templateIn.deploymentInfo = deploymentInfo;
+				}
+				
+				//strategy
+				/* $.each($("#strategyList").children('div'),function(i,v){
+					alert(v.id);
+					$("#"+v.id).children('li').children('select').contents();
+					alert($("#"+v.id).children('li').next('select').val());
+				}) */
+				
+				var metricList = new Array();
+				$.each($("[name*=metric]"),function(i,v){
+					 metricList.push(v.value);
+				}) 
+				templateIn.metricList=metricList;
+				var pointNumList = new Array();
+				 $.each($("[name*=pointNum]"),function(i,v){
+					 pointNumList.push(v.value);
+				}) 
+				templateIn.pointNumList=pointNumList;
+				var aggregateTypeList = new Array();
+				 $.each($("[name*=aggregateType]"),function(i,v){
+					 aggregateTypeList.push(v.value);
+				 })
+				 templateIn.aggregateTypeList=aggregateTypeList;
+				 var operatorList = new Array();
+				 $.each($("[name*=operator]"),function(i,v){
+					 operatorList.push(v.value);
+				 })
+				 templateIn.operatorList=operatorList;
+				 var rightValueList = new Array();
+				 $.each($("[name*=rightValue]"),function(i,v){
+					 rightValueList.push(v.value);
+				 })
+				 templateIn.rightValueList=rightValueList;
+				 var noteValueList = new Array();
+				 $.each($("[name*=note]"),function(i,v){
+					 noteValueList.push(v.value);
+				 })
+				 templateIn.noteValueList=noteValueList;
+				 var maxStepList = new Array();
+				 $.each($("[name*=maxStep]"),function(i,v){
+					 maxStepList.push(v.value);
+				 })
+				 templateIn.maxStepList=maxStepList;
+				 /* for(var i in metricList){
+					var strategyInfo = new Object();
+					strategyInfo.metric = metricList[i];
+					strategyInfo.pointNum = pointNumList[i];
+					strategyInfo.aggregateType = aggregateTypeList[i];
+					strategyInfo.operator = operatorList[i];
+					strategyInfo.rightValue = rightValueList[i];
+					/*strategyInfo.note = noteList[i];
+					alert(strategyInfo.note);
+					strategyInfo.maxStep = maxStepList[i]; 
+					alert(strategyInfo.maxStep);
+					strategyList.push(strategyInfo);
+				 }*/
+				 //alert(strategyInfo);
+				 //templateIn.strategyList = strategyList; */
+				 
+				//user
+				$("#users option:selected").each(function(){ 
+					user.loginname = $(this).text();
+					user.id = $(this).val();
+					userList.push(user);
+					});
+				 templateIn.userList = userList;
+				
+				//callback
+				callback.url = $("#callbackurl").val();
+				callback.beforeCallbackSms = $("#beforeCallbackSms option:selected").val();
+				callback.beforeCallbackMail = $("#beforeCallbackMail option:selected").val();
+				callback.afterCallbackSms = $("#afterCallbackSms option:selected").val();
+				callback.afterCallbackMail = $("#afterCallbackMail option:selected").val();
+				templateIn.callback = callback;
+				$.ajax({
+					 url:"/alarm/create", 
+					 data:JSON.stringify(templateIn), 
+					 type: "post",
+					 dataType: "json",
+					 contentType : 'application/json;charset=utf-8',
+					 success: function(data) {
+						window.location.href = "/alarm/templatelist";
+					 }
+				 });
+			}
+		
 		
 		</script>
 	</body>

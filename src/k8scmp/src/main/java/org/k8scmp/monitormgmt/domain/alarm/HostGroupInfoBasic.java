@@ -7,17 +7,17 @@ import org.k8scmp.util.StringUtils;
  */
 public class HostGroupInfoBasic {
 
-    private long id;
+    private int id;
     private String hostGroupName;
-    private long creatorId;
+    private int creatorId;
     private String creatorName;
-    private long createTime;
-    private long updateTime;
+    private String createTime;
+    private String updateTime;
 
     public HostGroupInfoBasic() {
     }
 
-    public HostGroupInfoBasic(long id, String hostGroupName, long creatorId, String creatorName, long createTime, long updateTime) {
+    public HostGroupInfoBasic(int id, String hostGroupName, int creatorId, String creatorName, String createTime, String updateTime) {
         this.id = id;
         this.hostGroupName = hostGroupName;
         this.creatorId = creatorId;
@@ -26,11 +26,11 @@ public class HostGroupInfoBasic {
         this.updateTime = updateTime;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -42,11 +42,11 @@ public class HostGroupInfoBasic {
         this.hostGroupName = hostGroupName;
     }
 
-    public long getCreatorId() {
+    public int getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(long creatorId) {
+    public void setCreatorId(int creatorId) {
         this.creatorId = creatorId;
     }
 
@@ -58,19 +58,19 @@ public class HostGroupInfoBasic {
         this.creatorName = creatorName;
     }
 
-    public long getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(long createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
-    public long getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(long updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 

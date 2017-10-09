@@ -1,4 +1,4 @@
-package org.k8scmp.mapper.monitor;
+package org.k8scmp.mapper.alarm;
 
 import org.apache.ibatis.annotations.*;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
@@ -15,7 +15,7 @@ public interface HostGroupInfoBasicMapper {
     List<HostGroupInfoBasic> listHostGroupInfoBasic();
 
     @Select("SELECT * FROM alarm_host_group_info WHERE id=#{id}")
-    HostGroupInfoBasic getHostGroupInfoBasicById(@Param("id") long id);
+    HostGroupInfoBasic getHostGroupInfoBasicById(@Param("id") int id);
 
     @Select("SELECT * FROM alarm_host_group_info WHERE hostGroupName=#{hostGroupName}")
     HostGroupInfoBasic getHostGroupInfoBasicByName(@Param("hostGroupName") String hostGroupName);
@@ -29,9 +29,12 @@ public interface HostGroupInfoBasicMapper {
     int updateHostGroupInfoBasicById(HostGroupInfoBasic hostGroupInfoBasic);
 
     @Delete("DELETE FROM alarm_host_group_info WHERE id=#{id}")
-    int deleteHostGroupInfoBasicById(@Param("id") long id);
+    int deleteHostGroupInfoBasicById(@Param("id") int id);
 
     @Select("SELECT * FROM alarm_host_group_info WHERE id IN " +
             "(SELECT hostGroupId FROM alarm_template_host_group_bind WHERE templateId=#{templateId})")
-    List<HostGroupInfoBasic> listHostGroupInfoBasicByTemplateId(@Param("templateId") long templateId);
+    List<HostGroupInfoBasic> listHostGroupInfoBasicByTemplateId(@Param("templateId") int templateId);
+    
+    @Select("SELECT * FROM alarm_host_group_info WHERE hostGroupName like #{hostGroupName}")
+	List<HostGroupInfoBasic> listHostGroupInfoBasicByName(@Param("hostGroupName") String hostGroupName);
 }

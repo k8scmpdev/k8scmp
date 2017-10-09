@@ -3,16 +3,16 @@ package org.k8scmp.monitormgmt.dao.alarm.impl;
 import java.util.List;
 
 import org.k8scmp.login.domain.User;
+import org.k8scmp.mapper.alarm.AlarmEventInfoMapper;
+import org.k8scmp.mapper.alarm.CallbackInfoMapper;
+import org.k8scmp.mapper.alarm.HostGroupHostBindMapper;
+import org.k8scmp.mapper.alarm.HostGroupInfoBasicMapper;
+import org.k8scmp.mapper.alarm.HostInfoMapper;
+import org.k8scmp.mapper.alarm.StrategyInfoMapper;
+import org.k8scmp.mapper.alarm.TemplateHostGroupBindMapper;
+import org.k8scmp.mapper.alarm.TemplateInfoBasicMapper;
+import org.k8scmp.mapper.alarm.TemplateUserBindMapper;
 import org.k8scmp.mapper.login.UserMapper;
-import org.k8scmp.mapper.monitor.AlarmEventInfoMapper;
-import org.k8scmp.mapper.monitor.CallbackInfoMapper;
-import org.k8scmp.mapper.monitor.HostGroupHostBindMapper;
-import org.k8scmp.mapper.monitor.HostGroupInfoBasicMapper;
-import org.k8scmp.mapper.monitor.HostInfoMapper;
-import org.k8scmp.mapper.monitor.StrategyInfoMapper;
-import org.k8scmp.mapper.monitor.TemplateHostGroupBindMapper;
-import org.k8scmp.mapper.monitor.TemplateInfoBasicMapper;
-import org.k8scmp.mapper.monitor.TemplateUserBindMapper;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
 import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
@@ -61,12 +61,12 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public void addTemplateHostGroupBind(long templateId, long hostGroupId, long bindTime) {
+	public void addTemplateHostGroupBind(int templateId, int hostGroupId, String bindTime) {
 		templateHostGroupBindMapper.addTemplateHostGroupBind(templateId, hostGroupId, bindTime);
 	}
 
 	@Override
-	public void setTemplateDeployIdByTemplateId(long templateId, int deployId) {
+	public void setTemplateDeployIdByTemplateId(int templateId, int deployId) {
 		templateInfoBasicMapper.setTemplateDeployIdByTemplateId(templateId, deployId);
 	}
 
@@ -76,7 +76,7 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public void addTemplateUserGroupBind(long templateId, int userId, long bindTime) {
+	public void addTemplateUserGroupBind(int templateId, int userId, String bindTime) {
 		templateUserBindMapper.addTemplateUserGroupBind(templateId, userId, bindTime);
 	}
 
@@ -86,7 +86,7 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public void setTemplateCallbackIdByTemplateId(long templateId, long callbackId) {
+	public void setTemplateCallbackIdByTemplateId(int templateId, int callbackId) {
 		templateInfoBasicMapper.setTemplateCallbackIdByTemplateId(templateId, callbackId);
 	}
 
@@ -101,7 +101,7 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public TemplateInfoBasic getTemplateInfoBasicById(long id) {
+	public TemplateInfoBasic getTemplateInfoBasicById(int id) {
 		return templateInfoBasicMapper.getTemplateInfoBasicById(id);
 	}
 
@@ -116,47 +116,47 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public List<HostGroupInfoBasic> listHostGroupInfoBasicByTemplateId(long templateId) {
+	public List<HostGroupInfoBasic> listHostGroupInfoBasicByTemplateId(int templateId) {
 		return hostGroupInfoBasicMapper.listHostGroupInfoBasicByTemplateId(templateId);
 	}
 
 	@Override
-	public List<StrategyInfo> listStrategyInfoByTemplateId(long templateId) {
+	public List<StrategyInfo> listStrategyInfoByTemplateId(int templateId) {
 		return strategyInfoMapper.listStrategyInfoByTemplateId(templateId);
 	}
 
 	@Override
-	public List<Long> listUserIdByTemplateId(long templateId) {
+	public List<Long> listUserIdByTemplateId(int templateId) {
 		return templateUserBindMapper.listUserIdByTemplateId(templateId);
 	}
 
 	@Override
-	public CallBackInfo getCallbackInfoByTemplateId(long templateId) {
+	public CallBackInfo getCallbackInfoByTemplateId(int templateId) {
 		return callbackInfoMapper.getCallbackInfoByTemplateId(templateId);
 	}
 
 	@Override
-	public void deleteTemplateHostGroupBindByTemplateId(long templateId) {
+	public void deleteTemplateHostGroupBindByTemplateId(int templateId) {
 		templateHostGroupBindMapper.deleteTemplateHostGroupBindByTemplateId(templateId);
 	}
 
 	@Override
-	public void deleteStrategyInfoByTemplateId(long templateId) {
+	public void deleteStrategyInfoByTemplateId(int templateId) {
 		strategyInfoMapper.deleteStrategyInfoByTemplateId(templateId);
 	}
 
 	@Override
-	public void deleteTemplateUserBindByTemplateId(long templateId) {
+	public void deleteTemplateUserBindByTemplateId(int templateId) {
 		templateUserBindMapper.deleteTemplateUserBindByTemplateId(templateId);
 	}
 
 	@Override
-	public void deleteCallbackInfoByTemplateId(long templateId) {
+	public void deleteCallbackInfoByTemplateId(int templateId) {
 		callbackInfoMapper.deleteCallbackInfoByTemplateId(templateId);
 	}
 
 	@Override
-	public void deleteTemplateInfoBasicById(long id) {
+	public void deleteTemplateInfoBasicById(int id) {
 		templateInfoBasicMapper.deleteTemplateInfoBasicById(id);
 	}
 
@@ -172,12 +172,12 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public void addHostGroupInfoBasic(HostGroupInfoBasic hostGroupInfoBasic) {
-		hostGroupInfoBasicMapper.addHostGroupInfoBasic(hostGroupInfoBasic);
+	public int addHostGroupInfoBasic(HostGroupInfoBasic hostGroupInfoBasic) {
+		return hostGroupInfoBasicMapper.addHostGroupInfoBasic(hostGroupInfoBasic);
 	}
 
 	@Override
-	public HostGroupInfoBasic getHostGroupInfoBasicById(long id) {
+	public HostGroupInfoBasic getHostGroupInfoBasicById(int id) {
 		return hostGroupInfoBasicMapper.getHostGroupInfoBasicById(id);
 	}
 
@@ -187,42 +187,42 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public void deleteTemplateHostGroupBindByHostGroupId(long id) {
+	public void deleteTemplateHostGroupBindByHostGroupId(int id) {
 		templateHostGroupBindMapper.deleteTemplateHostGroupBindByHostGroupId(id);
 	}
 
 	@Override
-	public void deleteHostGroupInfoBasicById(long id) {
+	public void deleteHostGroupInfoBasicById(int id) {
 		hostGroupInfoBasicMapper.deleteHostGroupInfoBasicById(id);
 	}
 
 	@Override
-	public void deleteHostGroupHostBindByHostGroupId(long id) {
+	public void deleteHostGroupHostBindByHostGroupId(int id) {
 		hostGroupHostBindMapper.deleteHostGroupHostBindByHostGroupId(id);
 	}
 
 	@Override
-	public HostInfo getHostInfoById(long id) {
+	public HostInfo getHostInfoById(int id) {
 		return hostInfoMapper.getHostInfoById(id);
 	}
 
 	@Override
-	public Long getHostGroupHostBindTime(long hostGroupId, long hostId) {
+	public Long getHostGroupHostBindTime(int hostGroupId, int hostId) {
 		return hostGroupHostBindMapper.getHostGroupHostBindTime(hostGroupId, hostId);
 	}
 
 	@Override
-	public void updateHostGroupHostBind(long hostGroupId, long hostId, long bindTime) {
+	public void updateHostGroupHostBind(int hostGroupId, int hostId, String bindTime) {
 		hostGroupHostBindMapper.updateHostGroupHostBind(hostGroupId, hostId, bindTime);
 	}
 
 	@Override
-	public void addHostGroupHostBind(long hostGroupId, long hostId, long bindTime) {
+	public void addHostGroupHostBind(int hostGroupId, int hostId, String bindTime) {
 		hostGroupHostBindMapper.addHostGroupHostBind(hostGroupId, hostId, bindTime);
 	}
 
 	@Override
-	public void deleteHostGroupHostBind(long hostGroupId, long hostId) {
+	public void deleteHostGroupHostBind(int hostGroupId, int hostId) {
 		hostGroupHostBindMapper.deleteHostGroupHostBind(hostGroupId, hostId);
 	}
 
@@ -232,13 +232,23 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public List<HostInfo> getHostInfoByHostGroupId(long hostGroupId) {
+	public List<HostInfo> getHostInfoByHostGroupId(int hostGroupId) {
 		return hostInfoMapper.getHostInfoByHostGroupId(hostGroupId);
 	}
 
 	@Override
-	public List<TemplateInfoBasic> getTemplateInfoBasicByHostGroupId(long hostGroupId) {
+	public List<TemplateInfoBasic> getTemplateInfoBasicByHostGroupId(int hostGroupId) {
 		return templateInfoBasicMapper.getTemplateInfoBasicByHostGroupId(hostGroupId);
+	}
+
+	@Override
+	public List<HostGroupInfoBasic> listHostGroupInfoBasicByName(String hostGroupName) {
+		return hostGroupInfoBasicMapper.listHostGroupInfoBasicByName(hostGroupName);
+	}
+
+	@Override
+	public List<TemplateInfoBasic> getTemplateInfoByName(String templateName) {
+		return templateInfoBasicMapper.getTemplateInfoByName(templateName);
 	}
 
 

@@ -39,33 +39,43 @@
                                     <div class="control-group">
                                         <label class="control-label">报警规则名称</label>
                                         <div class="controls">
-                                            <input id="templateName" name="templateName" type="text" th:text="${}" readonly="readonly"/>
+                                            <input id="templateName" name="templateName" type="text"/>
                                         </div>
                                     </div>
                                     <!-- 根据传入的值判断是主机还是容器，相应显示 -->
                                     <div class="control-group">
                                         <label class="control-label">报警类型</label>
                                         <div class="controls">
-                                            <select id="templateType">
-                                            	<option>主机</option>
+                                            <select id="templateType" disabled="disabled">
                                             	<option>容器</option>
                                             </select>
                                         </div>
                                     </div>
-                                    
-                                    <div class="control-group">
-											<label class="control-label">选择报警主机组</label>
-											<div class="controls">
-												<input id="hostGroup" name="hostGroup" type="text" />
-											</div>
+                                    <div class="control-group" id="selectPod" hidden="hide">
+										<label class="control-label">选择报警容器</label>
+										<div class="controls" id="deploymentInfo" >
+											<select id="clusterName" ><!-- th:field="*{deploymentInfo.clusterName}" -->
+												<!-- th:field="*{deploymentInfo}" <option th:value="${templateInfo.deploymentInfo.clusterName}" th:text="${templateInfo.deploymentInfo.clusterName}" ></option> -->
+												<option>centos-k8s</option>
+											</select>
+											<select id="hostEnv" >
+												<!-- th:field="*{deploymentInfo.hostEnv}" <option th:value="${templateInfo.deploymentInfo.hostEnv}" th:text="${templateInfo.deploymentInfo.hostEnv}"></option> -->
+												<option>test</option>
+											</select>
+											<select id="deploymentName" >
+												<!-- th:field="*{deploymentInfo.deploymentName}" <option th:value="${templateInfo.deploymentInfo.deploymentName}" th:text="${templateInfo.deploymentInfo.deploymentName}"></option> -->
+												<option>123</option>
+											</select>
+										</div>
 									</div>
+                                    
 									<div class="control-group">
 										<label class="control-label">添加报警逻辑</label>
 										<div class="controls">
                                            <a title="添加报警逻辑" class="btn btn-primary" href="javascript:void(0);" onclick="showTemplate();">添加</a>
                                        		<br/>
                                        		<br/>
-                                       		<div id="template"></div>
+                                       		<div id="templateList"></div>
 										</div>
 									</div>
 									
@@ -85,12 +95,7 @@
 						</div>
 					</div>
 				</div>
-
-				<div class="row-fluid">
-					<div id="footer" class="span12">
-						2017 &copy; k8scmp. 
-					</div>
-				</div>
+				<div id="common-footer"></div>
 			</div>
 		</div>	
 
@@ -107,7 +112,14 @@
 		<script th:src="@{/js/commonDisplay.js}"></script>
 		
 		<script type="text/javascript">
-			
+		
+			function showTemplate(){
+				var childdiv=$('<div></div>');  
+				childdiv.attr("id","id" + new Date().getTime());
+				$("#templateList").append(childdiv);
+				childdiv.load("/js/template-strategy.html #strategyInfo");
+				
+			}
 		
 		</script>
 	</body>

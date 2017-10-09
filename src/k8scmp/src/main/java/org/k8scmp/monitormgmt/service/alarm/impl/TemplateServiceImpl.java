@@ -1,27 +1,26 @@
 package org.k8scmp.monitormgmt.service.alarm.impl;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
-import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.exception.ApiException;
 import org.k8scmp.login.dao.AuthBiz;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
 import org.k8scmp.monitormgmt.dao.alarm.PortalDao;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
-import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
-import org.k8scmp.monitormgmt.domain.alarm.HostEnv;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateType;
 import org.k8scmp.monitormgmt.service.alarm.TemplateService;
-import org.k8scmp.operation.OperationType;
+import org.k8scmp.util.AuthUtil;
+import org.k8scmp.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +58,13 @@ public class TemplateServiceImpl implements TemplateService {
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.GET, 0);
         return alarmDao.listTemplateInfoBasic();
     }
+    
+    @Override
+    public HttpResponseTemp<?> searchTemplateInfo(String templateName) {
+
+//        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.GET, 0);
+        return ResultStat.OK.wrap(alarmDao.getTemplateInfoByName(templateName));
+    }
 
     @Override
     public HttpResponseTemp<?> createTemplate(TemplateInfo templateInfo) {
@@ -78,9 +84,9 @@ public class TemplateServiceImpl implements TemplateService {
         TemplateInfoBasic templateInfoBasic = new TemplateInfoBasic();
         templateInfoBasic.setTemplateName(templateInfo.getTemplateName());
         templateInfoBasic.setTemplateType(templateInfo.getTemplateType());
-//        templateInfoBasic.setCreatorId(AuthUtil.getUserId());
-//        templateInfoBasic.setCreatorName(AuthUtil.getCurrentUserName());
-        templateInfoBasic.setCreateTime(System.currentTimeMillis());
+        templateInfoBasic.setCreatorId(AuthUtil.getUserId());
+        templateInfoBasic.setCreatorName(AuthUtil.getCurrentLoginName());
+        templateInfoBasic.setCreateTime(DateUtil.dateFormat(new Date()));
         templateInfoBasic.setUpdateTime(templateInfoBasic.getCreateTime());
         alarmDao.addTemplateInfoBasic(templateInfoBasic);
         templateInfo.setId(templateInfoBasic.getId());
@@ -112,7 +118,7 @@ public class TemplateServiceImpl implements TemplateService {
         }
 
         updatedTemplateInfoBasic.setTemplateName(templateInfo.getTemplateName());
-        updatedTemplateInfoBasic.setUpdateTime(System.currentTimeMillis());
+        updatedTemplateInfoBasic.setUpdateTime(DateUtil.dateFormat(new Date()));
         alarmDao.updateTemplateInfoBasicById(updatedTemplateInfoBasic);
 
         deleteTemplateRelated(templateInfo.getId());
@@ -128,7 +134,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public HttpResponseTemp<?> getTemplateInfo(long id) {
+    public HttpResponseTemp<?> getTemplateInfo(int id) {
 
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.GET, 0);
 
@@ -175,7 +181,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public HttpResponseTemp<?> deleteTemplate(long id) {
+    public HttpResponseTemp<?> deleteTemplate(int id) {
 
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.MODIFY, 0);
 
@@ -195,8 +201,8 @@ public class TemplateServiceImpl implements TemplateService {
 
     private void createTemplateRelated(TemplateInfo templateInfo) {
 
-        long templateId = templateInfo.getId();
-        long current = System.currentTimeMillis();
+        int templateId = templateInfo.getId();
+        String current = DateUtil.dateFormat(new Date());
 
         if (templateInfo.getTemplateType().equals(TemplateType.host.name())) {
             // for host group : only host alarm need to record this
@@ -215,10 +221,11 @@ public class TemplateServiceImpl implements TemplateService {
             if (strategyInfo == null) {
                 continue;
             }
-            strategyInfo.setCreateTime(System.currentTimeMillis());
+            strategyInfo.setCreateTime(DateUtil.dateFormat(new Date()));
             strategyInfo.setTemplateId(templateId);
             alarmDao.addStrategyInfo(strategyInfo);
         }
+        
         // for user group
         for (User userInfo : templateInfo.getUserList()) {
             if (userInfo == null) {
@@ -232,7 +239,7 @@ public class TemplateServiceImpl implements TemplateService {
         alarmDao.setTemplateCallbackIdByTemplateId(templateId, callbackInfo.getId());
     }
 
-    private void deleteTemplateRelated(long templateId) {
+    private void deleteTemplateRelated(int templateId) {
 
         TemplateInfoBasic templateInfoBasic = alarmDao.getTemplateInfoBasicById(templateId);
         if (templateInfoBasic == null) {
@@ -251,11 +258,5 @@ public class TemplateServiceImpl implements TemplateService {
         // for callback
         alarmDao.deleteCallbackInfoByTemplateId(templateId);
     }
-
-//    private long createStrategy(StrategyInfo strategyInfo) {
-//
-//        alarmDao.addStrategyInfo(strategyInfo);
-//        return strategyInfo.getId();
-//    }
 
 }

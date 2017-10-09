@@ -5,18 +5,19 @@ package org.k8scmp.monitormgmt.domain.alarm;
  */
 public class TemplateInfoBasic {
 
-    private long id;
+    private int id;
     private String templateName;
     private String templateType;
-    private long creatorId;
+    private int creatorId;
     private String creatorName;
-    private long createTime;
-    private long updateTime;
+    private String createTime;
+    private String updateTime;
+    //private String isRemoved;
 
     public TemplateInfoBasic() {
     }
 
-    public TemplateInfoBasic(long id, String templateName, String templateType, long creatorId, String creatorName, long createTime, long updateTime) {
+    public TemplateInfoBasic(int id, String templateName, String templateType, int creatorId, String creatorName, String createTime, String updateTime) {
         this.id = id;
         this.templateName = templateName;
         this.templateType = templateType;
@@ -26,11 +27,11 @@ public class TemplateInfoBasic {
         this.updateTime = updateTime;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -50,11 +51,11 @@ public class TemplateInfoBasic {
         this.templateType = templateType;
     }
 
-    public long getCreatorId() {
+    public int getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(long creatorId) {
+    public void setCreatorId(int creatorId) {
         this.creatorId = creatorId;
     }
 
@@ -66,19 +67,19 @@ public class TemplateInfoBasic {
         this.creatorName = creatorName;
     }
 
-    public long getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(long createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
-    public long getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(long updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 }

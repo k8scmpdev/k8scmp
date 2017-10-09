@@ -1,25 +1,30 @@
 package org.k8scmp.monitormgmt.domain.alarm;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+
+import org.k8scmp.util.DateUtil;
 
 
 public class HostGroupInfo {
 
-    private long id;
+    private int id;
     private String hostGroupName;
-    private long creatorId;
+    private int creatorId;
     private String creatorName;
-    private long createTime;
-    private long updateTime;
+    private String createTime;
+    private String updateTime;
     private List<HostInfo> hostList;
     private List<TemplateInfoBasic> templateList;
 
     public HostGroupInfo() {
     }
 
-    public HostGroupInfo(long id, String hostGroupName, long creatorId, String creatorName, long createTime,
-                         long updateTime, List<HostInfo> hostList, List<TemplateInfoBasic> templateList) {
+    public HostGroupInfo(int id, String hostGroupName, int creatorId, String creatorName, String createTime,
+                         String updateTime, List<HostInfo> hostList, List<TemplateInfoBasic> templateList) {
         this.id = id;
         this.hostGroupName = hostGroupName;
         this.creatorId = creatorId;
@@ -39,11 +44,11 @@ public class HostGroupInfo {
         this.updateTime = hostGroupInfoBasic.getUpdateTime();
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -55,11 +60,11 @@ public class HostGroupInfo {
         this.hostGroupName = hostGroupName;
     }
 
-    public long getCreatorId() {
+    public int getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(long creatorId) {
+    public void setCreatorId(int creatorId) {
         this.creatorId = creatorId;
     }
 
@@ -71,19 +76,19 @@ public class HostGroupInfo {
         this.creatorName = creatorName;
     }
 
-    public long getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(long createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
-    public long getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(long updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -106,13 +111,21 @@ public class HostGroupInfo {
     public static class HostGroupInfoComparator implements Comparator<HostGroupInfo> {
         @Override
         public int compare(HostGroupInfo t1, HostGroupInfo t2) {
-            if (t2.getCreateTime() - t1.getCreateTime() > 0) {
-                return 1;
-            } else if (t2.getCreateTime() - t1.getCreateTime() < 0) {
-                return -1;
-            } else {
-                return 0;
-            }
+            try {
+            	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            	long T1 = sdf.parse(t1.getCreateTime()).getTime();
+            	long T2 = sdf.parse(t2.getCreateTime()).getTime();
+				if ((T2 - T1) > 0) {
+				    return 1;
+				} else if (T2 - T1 < 0) {
+				    return -1;
+				} else {
+				    return 0;
+				}
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+            return 0;
         }
     }
 }

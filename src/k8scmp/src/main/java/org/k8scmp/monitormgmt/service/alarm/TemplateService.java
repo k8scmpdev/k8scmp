@@ -36,12 +36,15 @@ public interface TemplateService {
      * @param id
      * @return
      */
-    HttpResponseTemp<?> getTemplateInfo(long id);
+    HttpResponseTemp<?> getTemplateInfo(int id);
 
     /**
      *
      * @param id
      * @return
      */
-    HttpResponseTemp<?> deleteTemplate(long id);
+    HttpResponseTemp<?> deleteTemplate(int id);
+
+	HttpResponseTemp<?> searchTemplateInfo(String templateName);
+
 }

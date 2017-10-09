@@ -1,0 +1,66 @@
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<div style="float:left">
+				<input id="hostGroupNameInput" name="hostGropName" type="text" placeholder="请输入主机组名称" style="font-size: 11px;font-style: italic" />
+				<button class="tip-top" title="添加主机组" style="margin-top:-10px" onclick="postHostGroupName();"><i class="icon-plus"></i>添加主机组</button>
+			</div>
+			<div class="input-append" style="float:right">
+               	<input id="searchHostGroup" type="text" placeholder="请输入查询内容"/><button class="btn prepend" onclick="searchHostGroup();"><i class="icon-search"></i> </button>
+           	</div>
+			<br/>
+			<div class="widget-box">
+				<div class="widget-title">
+					<h5>主机组</h5>
+				</div>
+				<div class="widget-content nopadding">
+					<table class="table table-bordered data-table" style="table-layout: fixed;">
+						<thead>
+							<tr>
+								<th data-field="id">id</th>
+								<th data-field="hostGroupName">组名</th>
+								<th data-field="creatorName">创建者</th>
+								<th data-field="createTime">创建时间</th>
+								<th data-field="hostList">主机</th>
+								<th data-field="operation">操作</th>
+							</tr>
+						</thead>
+						<tbody id="hostGroupTbody">
+							<tr th:each="hostGroup,hostGroupStat:${hostGroupInfoList}">
+								<td th:text="${hostGroup.id}"></td>
+								<td th:text="${hostGroup.hostGroupName}"></td>
+								<td th:text="${hostGroup.creatorName}"></td>
+								<td th:text="${hostGroup.createTime}"></td>
+								<td >
+									<div style="width: 200px">
+										<table>
+											<thead>
+												<!-- <tr>
+													<th data-field="id">id</th>
+													<th data-field="hostname">主机名</th>
+													<th data-field="ip">IP</th>
+												</tr> -->
+											</thead>
+											<tbody>
+												<tr th:each="host,hostStat:${hostGroup.hostList}">
+													<td th:text="${host.id}"></td>
+													<td th:text="${host.hostname}"></td>
+													<td th:text="${host.ip}"></td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</td>
+								<td>
+									<a title='单击添加主机' class="tip-top">添加主机</a>&nbsp;&nbsp;
+									<a title='单击修改组名' th:onclick="'editHostGroup(\''+${hostGroup.id}+'\')'" class="tip-top">修改</a>&nbsp;&nbsp;
+									<a title='单击删除组' th:onclick="'deleteHostGroup(\''+${hostGroup.id}+'\')'" class="tip-top">删除</a>
+								</td>
+							</tr>
+						</tbody> 
+					</table>  
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

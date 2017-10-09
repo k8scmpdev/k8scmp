@@ -1,4 +1,4 @@
-package org.k8scmp.mapper.monitor;
+package org.k8scmp.mapper.alarm;
 
 import java.util.List;
 
@@ -18,10 +18,10 @@ public interface StrategyInfoMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
 	int addStrategyInfo(StrategyInfo strategyInfo);
 	
-	@Select("SELECT * FROM alarm_strategy_info WHERE templateId=#{templateId})")
-    List<StrategyInfo> listStrategyInfoByTemplateId(@Param("templateId") long templateId);
+	@Select("SELECT * FROM alarm_strategy_info WHERE templateId=#{templateId}")
+    List<StrategyInfo> listStrategyInfoByTemplateId(@Param("templateId") int templateId);
 
-	@Delete("DELETE FROM alarm_strategy_info WHERE templateId=#{templateId})")
-    int deleteStrategyInfoByTemplateId(@Param("templateId") long templateId);
+	@Delete("DELETE FROM alarm_strategy_info WHERE templateId=#{templateId}")
+    int deleteStrategyInfoByTemplateId(@Param("templateId") int templateId);
 	
 }

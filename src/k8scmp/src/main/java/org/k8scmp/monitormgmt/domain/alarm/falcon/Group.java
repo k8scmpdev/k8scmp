@@ -9,7 +9,7 @@ public class Group {
 
     // grp
 
-    private long id;
+    private int id;
     private String grp_name = "";
     private String create_user = "";
     private Timestamp create_at = new Timestamp(System.currentTimeMillis());
@@ -18,11 +18,11 @@ public class Group {
     public Group() {
     }
 
-    public Group(long id) {
+    public Group(int id) {
         this.id = id;
     }
 
-    public Group(long id, String grp_name, String create_user, Timestamp create_at, int come_from) {
+    public Group(int id, String grp_name, String create_user, Timestamp create_at, int come_from) {
         this.id = id;
         this.grp_name = grp_name;
         this.create_user = create_user;
@@ -30,11 +30,11 @@ public class Group {
         this.come_from = come_from;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

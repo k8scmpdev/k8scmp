@@ -19,78 +19,83 @@ public interface AlarmDao {
 
 	void addTemplateInfoBasic(TemplateInfoBasic templateInfoBasic);
 
-	void addTemplateHostGroupBind(long templateId, long id, long current);
+	void addTemplateHostGroupBind(int templateId, int id, String current);
 
-	void setTemplateDeployIdByTemplateId(long templateId, int id);
+	void setTemplateDeployIdByTemplateId(int templateId, int id);
 
 
 	void addStrategyInfo(StrategyInfo strategyInfo);
 
-	void addTemplateUserGroupBind(long templateId, int id, long current);
+	void addTemplateUserGroupBind(int templateId, int id, String current);
 
 	void addCallBackInfo(CallBackInfo callbackInfo);
 
-	void setTemplateCallbackIdByTemplateId(long templateId, long id);
+	void setTemplateCallbackIdByTemplateId(int templateId, int id);
 
 	List<TemplateInfoBasic> listTemplateInfoBasic();
 
 	User getUserById(long userId);
 
-	TemplateInfoBasic getTemplateInfoBasicById(long id);
+	TemplateInfoBasic getTemplateInfoBasicById(int id);
 
 	void updateTemplateInfoBasicById(TemplateInfoBasic updatedTemplateInfoBasic);
 
 	List<AlarmEventInfoDraft> listAlarmEventInfoDraft();
 
-	List<HostGroupInfoBasic> listHostGroupInfoBasicByTemplateId(long id);
+	List<HostGroupInfoBasic> listHostGroupInfoBasicByTemplateId(int id);
 
-	List<StrategyInfo> listStrategyInfoByTemplateId(long id);
+	List<StrategyInfo> listStrategyInfoByTemplateId(int id);
 
-	List<Long> listUserIdByTemplateId(long id);
+	List<Long> listUserIdByTemplateId(int id);
 
-	CallBackInfo getCallbackInfoByTemplateId(long id);
+	CallBackInfo getCallbackInfoByTemplateId(int id);
 
-	void deleteTemplateHostGroupBindByTemplateId(long templateId);
+	void deleteTemplateHostGroupBindByTemplateId(int templateId);
 
-	void deleteStrategyInfoByTemplateId(long templateId);
+	void deleteStrategyInfoByTemplateId(int templateId);
 
-	void deleteTemplateUserBindByTemplateId(long templateId);
+	void deleteTemplateUserBindByTemplateId(int templateId);
 
-	void deleteCallbackInfoByTemplateId(long templateId);
+	void deleteCallbackInfoByTemplateId(int templateId);
 
-	void deleteTemplateInfoBasicById(long id);
+	void deleteTemplateInfoBasicById(int id);
 
 	List<HostGroupInfoBasic> listHostGroupInfoBasic();
 
 	HostGroupInfoBasic getHostGroupInfoBasicByName(String hostGroupName);
 
-	void addHostGroupInfoBasic(HostGroupInfoBasic hostGroupInfoBasic);
+	int addHostGroupInfoBasic(HostGroupInfoBasic hostGroupInfoBasic);
 
-	HostGroupInfoBasic getHostGroupInfoBasicById(long id);
+	HostGroupInfoBasic getHostGroupInfoBasicById(int id);
 
 	void updateHostGroupInfoBasicById(HostGroupInfoBasic updatedHostGroupInfoBasic);
 
-	void deleteTemplateHostGroupBindByHostGroupId(long id);
+	void deleteTemplateHostGroupBindByHostGroupId(int id);
 
-	void deleteHostGroupInfoBasicById(long id);
+	void deleteHostGroupInfoBasicById(int id);
 
-	void deleteHostGroupHostBindByHostGroupId(long id);
+	void deleteHostGroupHostBindByHostGroupId(int id);
 
-	HostInfo getHostInfoById(long id);
+	HostInfo getHostInfoById(int id);
 
-	Long getHostGroupHostBindTime(long id, long hostId);
+	Long getHostGroupHostBindTime(int id, int hostId);
 
-	void updateHostGroupHostBind(long id, long hostId, long bindTime);
+	void updateHostGroupHostBind(int id, int hostId, String bindTime);
 
-	void addHostGroupHostBind(long id, long hostId, long bindTime);
+	void addHostGroupHostBind(int id, int hostId, String bindTime);
 
-	void deleteHostGroupHostBind(long id, long hostId);
+	void deleteHostGroupHostBind(int id, int hostId);
 
 	void addHostInfo(HostInfo hostInfo);
 
-	List<HostInfo> getHostInfoByHostGroupId(long hostGroupId);
+	List<HostInfo> getHostInfoByHostGroupId(int hostGroupId);
 
-	List<TemplateInfoBasic> getTemplateInfoBasicByHostGroupId(long hostGroupId);
+	List<TemplateInfoBasic> getTemplateInfoBasicByHostGroupId(int hostGroupId);
+
+	List<HostGroupInfoBasic> listHostGroupInfoBasicByName(String hostGroupName);
+
+	List<TemplateInfoBasic> getTemplateInfoByName(String templateName);
+
 
 
 

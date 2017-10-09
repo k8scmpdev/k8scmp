@@ -1,4 +1,4 @@
-package org.k8scmp.mapper.monitor;
+package org.k8scmp.mapper.alarm;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,7 +15,7 @@ import java.util.List;
 public interface HostInfoMapper {
 
     @Select("SELECT * FROM alarm_host_info WHERE id=#{id}")
-    HostInfo getHostInfoById(@Param("id") long id);
+    HostInfo getHostInfoById(@Param("id") int id);
 
     @Select("SELECT * FROM alarm_host_info WHERE hostname=#{hostname} ORDER BY createTime DESC LIMIT 1")
     HostInfo getHostInfoByHostname(@Param("hostname") String hostname);
@@ -30,5 +30,5 @@ public interface HostInfoMapper {
     @Select("SELECT * FROM alarm_host_info LEFT OUTER JOIN alarm_host_group_host_bind ON " +
             "alarm_host_info.id = alarm_host_group_host_bind.hostId WHERE alarm_host_group_host_bind.hostGroupId " +
             "= #{hostGroupId} order by alarm_host_group_host_bind.bindTime")
-    List<HostInfo> getHostInfoByHostGroupId(@Param("hostGroupId") long hostGroupId);
+    List<HostInfo> getHostInfoByHostGroupId(@Param("hostGroupId") int hostGroupId);
 }

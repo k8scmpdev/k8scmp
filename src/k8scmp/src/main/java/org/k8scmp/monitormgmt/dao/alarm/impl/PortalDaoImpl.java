@@ -1,19 +1,22 @@
 package org.k8scmp.monitormgmt.dao.alarm.impl;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.login.domain.User;
-import org.k8scmp.mapper.monitor.AlarmEventInfoMapper;
-import org.k8scmp.mapper.monitor.portal.PortalActionMapper;
-import org.k8scmp.mapper.monitor.portal.PortalGroupHostMapper;
-import org.k8scmp.mapper.monitor.portal.PortalGroupMapper;
-import org.k8scmp.mapper.monitor.portal.PortalGroupTemplateMapper;
-import org.k8scmp.mapper.monitor.portal.PortalHostMapper;
-import org.k8scmp.mapper.monitor.portal.PortalMockcfgMapper;
-import org.k8scmp.mapper.monitor.portal.PortalStrategyMapper;
-import org.k8scmp.mapper.monitor.portal.PortalTemplateMapper;
+import org.k8scmp.mapper.alarm.AlarmEventInfoMapper;
+import org.k8scmp.monitormapper.portal.PortalActionMapper;
+import org.k8scmp.monitormapper.portal.PortalGroupHostMapper;
+import org.k8scmp.monitormapper.portal.PortalGroupMapper;
+import org.k8scmp.monitormapper.portal.PortalGroupTemplateMapper;
+import org.k8scmp.monitormapper.portal.PortalHostMapper;
+import org.k8scmp.monitormapper.portal.PortalMockcfgMapper;
+import org.k8scmp.monitormapper.portal.PortalStrategyMapper;
+import org.k8scmp.monitormapper.portal.PortalTemplateMapper;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
 import org.k8scmp.monitormgmt.dao.alarm.PortalDao;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
@@ -28,6 +31,7 @@ import org.k8scmp.monitormgmt.domain.alarm.falcon.GroupTemplate;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Mockcfg;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Strategy;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Template;
+import org.k8scmp.util.DateUtil;
 import org.k8scmp.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,7 +73,7 @@ public class PortalDaoImpl implements PortalDao {
         template.setTpl_name(templateInfo.getTemplateName());
         template.setAction_id(actionId);
         template.setCreate_user(templateInfo.getCreatorName());
-        template.setCreate_at(new Timestamp(templateInfo.getCreateTime()));
+        template.setCreate_at(Timestamp.valueOf(templateInfo.getCreateTime()));
         portalTemplateMapper.insertTemplateById(template);
 		
 	}
@@ -145,7 +149,7 @@ public class PortalDaoImpl implements PortalDao {
         return action.getId();
     }
 	
-	 private void createGroupTemplateBind(long hostGroupId, long templateId, String creatorName) {
+	 private void createGroupTemplateBind(int hostGroupId, int templateId, String creatorName) {
         GroupTemplate groupTemplate = new GroupTemplate();
         groupTemplate.setGrp_id(hostGroupId);
         groupTemplate.setTpl_id(templateId);
@@ -153,7 +157,7 @@ public class PortalDaoImpl implements PortalDao {
         insertGroupTemplateBind(groupTemplate);
 	 }
 	 
-	 private void createStrategyForHost(StrategyInfo strategyInfo, long templateId) {
+	 private void createStrategyForHost(StrategyInfo strategyInfo, int templateId) {
 
 	        Strategy strategy = new Strategy();
 	        // strategy.setId(strategyInfo.getId());
@@ -233,7 +237,7 @@ public class PortalDaoImpl implements PortalDao {
         portalTemplateMapper.updateTemplateById(template);
     }
 
-	 private void deleteTemplateRelatedByTemplateInfo(long templateId, String templateType) {
+	 private void deleteTemplateRelatedByTemplateInfo(int templateId, String templateType) {
 
 	        Template template = portalTemplateMapper.getTemplateById(templateId);
 	        if (template == null) {
@@ -262,7 +266,7 @@ public class PortalDaoImpl implements PortalDao {
 	    }
 
 	@Override
-	public void deleteTemplateByIdAndType(long templateId, String templateType) {
+	public void deleteTemplateByIdAndType(int templateId, String templateType) {
 		// delete related
         deleteTemplateRelatedByTemplateInfo(templateId, templateType);
 
@@ -270,17 +274,21 @@ public class PortalDaoImpl implements PortalDao {
 	}
 
 	@Override
-	public void insertHostGroupByHostGroupBasicInfo(HostGroupInfoBasic hostGroupInfoBasic) {
+	public int insertHostGroupByHostGroupBasicInfo(HostGroupInfoBasic hostGroupInfoBasic) {
 		Group group = new Group();
         group.setId(hostGroupInfoBasic.getId());
         group.setGrp_name(hostGroupInfoBasic.getHostGroupName());
         group.setCreate_user(hostGroupInfoBasic.getCreatorName());
-        group.setCreate_at(new Timestamp(hostGroupInfoBasic.getCreateTime()));
+        try {
+        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+			group.setCreate_at(new Timestamp(sdf.parse(hostGroupInfoBasic.getCreateTime()).getTime()));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
         group.setCome_from(1);
-        portalGroupMapper.insertHostGroupById(group);
-
         // update nodata config
         updateNodataObj(getHostGroupList());
+        return portalGroupMapper.insertHostGroupById(group);
 	}
 
 	private void updateNodataObj(String groups) {
@@ -321,7 +329,7 @@ public class PortalDaoImpl implements PortalDao {
 
 	@Override
 	public void updateHostGroupByHostGroupBasicInfo(HostGroupInfoBasic hostGroupInfoBasic) {
-		long id = hostGroupInfoBasic.getId();
+		int id = hostGroupInfoBasic.getId();
         String grp_name = hostGroupInfoBasic.getHostGroupName();
         portalGroupMapper.updateHostGroup(id, grp_name);
 
@@ -335,7 +343,7 @@ public class PortalDaoImpl implements PortalDao {
 	}
 
 	@Override
-	public void insertGroupHostBind(long grp_id, long host_id) {
+	public void insertGroupHostBind(int grp_id, int host_id) {
 
         GroupHost groupHost = new GroupHost(grp_id, host_id);
         if (portalGroupHostMapper.checkGroupHostBind(groupHost) != null) {
@@ -345,8 +353,18 @@ public class PortalDaoImpl implements PortalDao {
     }
 
 	@Override
-	public void deleteGroupHostBind(long grp_id, long host_id) {
+	public void deleteGroupHostBind(int grp_id, int host_id) {
 		 portalGroupHostMapper.deleteGroupHostBind(grp_id, host_id);
+	}
+
+	@Override
+	public void deleteHostGroupById(int id) {
+		portalGroupHostMapper.deleteByHostGroup(id);
+        portalGroupTemplateMapper.deleteByHostGroup(id);
+        portalGroupMapper.deleteHostGroup(id);
+
+        // update nodata config
+        updateNodataObj(getHostGroupList());
 	} 
 	 
 	 

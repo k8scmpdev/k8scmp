@@ -5,7 +5,6 @@
 		<meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		
 		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
 		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
 		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
@@ -13,157 +12,220 @@
 		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	</head>
-	
 	<body>
-			<div id="common-header"></div>
+		<div id="common-header"></div>
+		<div id="content">
+			<div id="content-header">
+				<h2>报警</h2>
+			</div>
+			<div id="breadcrumb">
+				<a href="#" class="current tip-bottom" title="报警">报警</a>
+			</div>
+			<ul id="myTab" class="nav nav-tabs">
+				<li class="active">
+					<a target="/alarm/templatelist" data-toggle="tab" >报警规则</a>
+				</li>
+				<li>
+					<a target="/hostgroup/list" data-toggle="tab">主机组</a>
+				</li>
+				<li>
+					<!-- <a href="#userTemplate" data-toggle="tab" >用户</a> -->
+				</li>
+			</ul>
+			<div id="myTabContent" class="tab-content">
 			
-			<div id="content">
-				<div id="content-header">
-					<h2>报警</h2>
-				</div>
-				<div id="breadcrumb">
-					<a href="#" class="current tip-bottom" title="报警">报警</a>
-				</div>
-				
-				<ul id="myTab" class="nav nav-tabs">
-					<li class="active">
-						<a href="#alarmTemplate" data-toggle="tab" >报警规则</a>
-					</li>
-					<li>
-						<a href="#hostTemplate" data-toggle="tab" >主机组</a>
-					</li>
-					<li>
-						<!-- <a href="#userTemplate" data-toggle="tab" >用户</a> -->
-					</li>
-				</ul>
-		
-				<div id="myTabContent" class="tab-content">
-					<!-- 第一个标签页 -->
-					<div class="tab-pane fade in active" id="alarmTemplate">
-						<div class="container-fluid">
-							<div class="row-fluid">
-								<div class="span12">
-								<div class="buttons">
-									<a title="创建规则" class="btn tip-bottom" href="/alarm/templatenew"><i class="icon-plus"></i>创建规则</a>
-								</div>
-									<div  style="float:right">
-										<form action="#" method="post">
-											<div>
-												<input name="hostName" type="text" placeholder="输入主机名称查询..." style="font-size: 11px;font-style: italic"/>
-												<button type="submit" class="tip-top" title="Search" style="margin-top:-10px"><i class="icon-search icon-black"></i></button>
-											</div>
-										</form> 
-									</div>
-								<br/>
-									<div class="widget-box">
-										<div class="widget-title">
-											<h5>报警规则</h5>
-										</div>
-										<div class="widget-content nopadding" id="alarmTemplate">
-			
-											<table class="table table-bordered data-table with-check" style="table-layout: fixed;">
-												<thead>
-													<tr>
-														<th data-field="id">ID</th>
-														<th data-field="templateName">规则名称</th>
-														<th data-field="creatorName">创建者</th>
-														<th data-field="templateType">报警类型</th>
-														<th data-field="createTime">创建时间</th>
-														<th data-field="opration">操作</th>
-													</tr>
-												</thead>
-												<tbody id="hostTbody">
-													<tr th:each="template,templateStat:${templateList}">
-														<td th:text="${template.id}"></td>
-														<td th:text="${template.templateName}"></td>
-														<td th:text="${template.creatorName}"></td>
-														<td th:text="${template.templateType}"></td>
-														<td th:text="${template.createTime}"></td>	
-														<td><a title='单击查看规则' th:href="@{/alarm/edit(templateType=${template.templateType},templateId=${template.id})}" class="tip-top">编辑</a>&nbsp;&nbsp;
-														<a title='单击删除规则' th:onclick="'deleteTemplate(\''+${template.id}+'\')'" class="tip-top">删除</a></td>
-													</tr>
-												</tbody>
-											</table>  
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				
-				<!-- 第二个标签页 -->
-				<div class="tab-pane fade" id="hostTemplate">
-						<div class="container-fluid">
-							<div class="row-fluid">
-								<div class="span12">
-								<div class="buttons" style="padding-top: 0%;padding-left: 0%">
-									<a title="添加主机组" class="btn tip-bottom" href="#"><i class="icon-plus"></i>添加主机组</a>
-								</div>
-									<div  style="float:right">
-										<form action="#" method="post">
-											<div>
-												<input name="hostGroupName" type="text" placeholder="输入主机名称查询..." style="font-size: 11px;font-style: italic"/>
-												<button type="submit" class="tip-top" title="Search" style="margin-top:-10px"><i class="icon-search icon-black"></i></button>
-											</div>
-										</form> 
-									</div>
-									
-								<br/>
-									<div class="widget-box">
-										<div class="widget-title">
-											<h5>主机组</h5>
-										</div>
-										<div class="widget-content nopadding" id="hostTemplate">
-			
-											<table class="table table-bordered data-table with-check" style="table-layout: fixed;">
-												<thead>
-													<tr>
-														<th></th>
-														<th data-field="hostName">组名</th>
-														<th data-field="phyCluster">创建者</th>
-														<th data-field="state">创建时间</th>
-													</tr>
-												</thead>
-												<tbody id="hostGroupTbody">
-													<tr>
-														<td align="center">1</td>
-														<td align="center">test</td>
-														<td align="center">Dr.Z</td>
-														<td align="center">2017-09-14</td>
-													</tr>
-												</tbody>
-											</table>  
-										</div>
-									</div>
-								</div>
-							</div>
-							
-						</div>
-					</div>
-					
-				<!-- 第三个标签页 -->
 			</div>
 			<div id="common-footer"></div>
 		</div>	
 
-
 		<script th:src="@{/js/jquery.min.js}"></script>
 		<script th:src="@{/js/jquery.ui.custom.js}"></script>
 		<script th:src="@{/js/bootstrap.min.js}"></script>
-		
 		<script th:src="@{/js/jquery.uniform.js}"></script>
 		<script th:src="@{/js/select2.min.js}"></script>
 		<script th:src="@{/js/jquery.dataTables.min.js}"></script>
+		<script th:src="@{/js/commonDisplay.js}"></script>
 		<script th:src="@{/js/unicorn.js}"></script>
 		<script th:src="@{/js/unicorn.tables.js}"></script>
-		<script th:src="@{/js/commonDisplay.js}"></script>
-		
+		<script th:src="@{/js/bootpopup.js}"></script>
 		<script type="text/javascript">
+			$(document).ready(function(){ 
+			　　$.get("/alarm/templatelist",function(data){ //初始將a.html include div#iframe
+					$('#myTabContent').html(data);
+				}); 
+			
+				$(function(){
+					$(".nav-tabs li").click(function(){
+						var $this= $(this);
+						_clickTab = $this.find('a').attr('target');
+						 $.get(_clickTab,function(data){
+							$('#myTabContent').html(data);
+							
+						}); 
+					});
+				});
+			});  
+			//规则
+			//删除规则
 			 function deleteTemplate(id){
 				 alert("您确定删除该规则吗？");
-				 window.localtion.href = "/alarm/delete"+id;
+				 $.ajax({
+					 url:"/alarm/delete/"+id,
+					 data:{
+						 id:id
+					 },
+				 	 type:"delete",
+				 	 dataType:"json",
+				 	 success:function(data){
+				 		var redata = eval(data);
+						$.get("/alarm/templatelist",function(data){
+							$('#myTabContent').html(data);
+						});
+				 	 }
+				 });
 			 }
-	
+			 //搜索规则
+			 function getTemplatByName(){
+				var templateName = $("#searchTemplate").val();
+				 $.ajax({
+					url:"/alarm/search",
+					data:{
+						templateName : templateName
+					},
+					type:"post",
+					dataType:"json",
+					success:function(data){
+						var templateList = eval(data.result);
+						//alert(templateList);
+						$("#hostTbody").empty();
+						$.each(templateList,function(k,v){
+							
+						var tr = '<tr>'
+							+'<td>'+v.id+'</td>'
+							+'<td>'+v.templateName+'</td>'
+							+'<td>'+v.creatorName+'</td>'
+							+'<td>'+v.templateType+'</td>'
+							+'<td>'+v.createTime+'</td>	'
+							+'<td><a title="单击查看规则" th:href="@{/alarm/edit(templateType='+v.templateType+',templateId='+v.id+')}" class="tip-top">编辑</a>&nbsp;&nbsp;'
+							+'<a title="单击删除规则" onclick="deleteTemplate('+v.id+')" class="tip-top">删除</a></td>'
+							+'</tr>';
+							$("#hostTbody").append(tr);	
+							
+						})
+				 	 }
+				})  
+			 }
+			
+			
+			 //主机组
+			 //删除主机组
+			 function deleteHostGroup(id){
+				 alert("您确定删除该组吗？");
+				 $.ajax({
+					 url:"/hostgroup/delete/"+id,
+					 data:{
+						 id:id
+					 },
+				 	 type:"delete",
+				 	 dataType:"json",
+				 	 success:function(data){
+				 		var redata = eval(data);
+						$.get("/hostgroup/list",function(data){
+							$('#myTabContent').html(data);
+						});
+				 	 }
+				 });
+			 }
+			 //修改主机组名
+			 function editHostGroup(id){
+				 bootpopup.prompt("主机组名", function(data) {
+					 //alert(data);
+					 var hostGroupInfoBasic = new Object();
+					 hostGroupInfoBasic.id = id;
+					 hostGroupInfoBasic.hostGroupName = data;
+					 $.ajax({
+						 url:"/hostgroup/modify",
+					 	data:JSON.stringify(hostGroupInfoBasic),
+					 	contentType : 'application/json;charset=utf-8',
+					 	type:"post",
+					 	dataType:"json",
+					 	success:function(res){
+					 		$.get("/hostgroup/list",function(data){
+								$('#myTabContent').html(data);
+							});
+					 	}
+					 });
+				 });
+			 }
+			 //创建主机组
+			 function postHostGroupName(){
+				 $.ajax({
+					 url:"/hostgroup/create", 
+					 data:{
+						 hostGropName : $('#hostGroupNameInput').val()
+						 }, 
+					 type: "post",
+					 dataType: "json",
+					 success: function(data) {
+						var redata = eval(data);
+						$.get("/hostgroup/list",function(data){
+							$('#myTabContent').html(data);
+						});
+					 }
+				 })
+			 }
+			 //搜索主机组
+			  function searchHostGroup(){
+				  var hostGroupName = $("#searchHostGroup").val();
+					 $.ajax({
+						url:"/hostgroup/search",
+						data:{
+							hostGroupName : hostGroupName
+						},
+						type:"post",
+						dataType:"json",
+						success:function(data){
+							var hostGroupList = eval(data.result);
+							//alert(templateList);
+							$("#hostGroupTbody").empty();
+							$.each(hostGroupList,function(k,v){
+								var tr = '<tr>'
+								+'<td>'+v.id+'</td>'
+								+'<td>'+v.hostGroupName+'</td>'
+								+'<td>'+v.creatorName+'</td>'
+								+'<td>'+v.createTime+'</td>'
+								+'<td >'
+									+'<div style="width: 200px">'
+										+'<table>'
+											+'<thead>'
+											+'</thead>'
+											+'<tbody id="htbody">'
+											+'</tbody>'
+										+'</table>'
+									+'</div>'
+								+'</td>'
+								+'<td>'
+									+'<a title="单击添加主机" class="tip-top">添加主机</a>&nbsp;&nbsp;'
+									+'<a title="单击修改组名" onclick="editHostGroup('+v.id+')" class="tip-top">修改</a>&nbsp;&nbsp;'
+									+'<a title="单击删除组" onclick="deleteHostGroup('+v.id+')" class="tip-top">删除</a>'
+								+'</td>'
+							+'</tr>';
+								$("#hostGroupTbody").append(tr);	
+								
+								$("#htbody").empty();
+								$.each(v.hostList,function(k,host){
+									var trr = '<tr>'
+										+'<td>'+host.id+'</td>'
+										+'<td>'+host.hostname+'</td>'
+										+'<td>'+host.ip+'</td>'
+									+'</tr>'
+									$("#htbody").append(trr);
+								});
+								
+							})
+					 	 }
+					}) 
+			 } 
 		</script>
 	</body>
 </html>

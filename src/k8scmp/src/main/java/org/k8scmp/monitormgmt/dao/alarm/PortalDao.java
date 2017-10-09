@@ -9,16 +9,18 @@ public interface PortalDao {
 
 	void updateTemplateByTemplateInfo(TemplateInfo templateInfo);
 
-	void deleteTemplateByIdAndType(long id, String templateType);
+	void deleteTemplateByIdAndType(int id, String templateType);
 
-	void insertHostGroupByHostGroupBasicInfo(HostGroupInfoBasic hostGroupInfoBasic);
+	int insertHostGroupByHostGroupBasicInfo(HostGroupInfoBasic hostGroupInfoBasic);
 
 	void updateHostGroupByHostGroupBasicInfo(HostGroupInfoBasic updatedHostGroupInfoBasic);
 
 	Integer getHostIdByHostname(String hostname);
 
-	void insertGroupHostBind(long id, long hostId);
+	void insertGroupHostBind(int id, int hostId);
 
-	void deleteGroupHostBind(long id, long hostId);
+	void deleteGroupHostBind(int id, int hostId);
+
+	void deleteHostGroupById(int id);
 
 }

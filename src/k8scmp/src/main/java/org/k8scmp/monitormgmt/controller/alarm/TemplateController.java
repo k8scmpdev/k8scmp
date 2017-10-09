@@ -1,21 +1,28 @@
 package org.k8scmp.monitormgmt.controller.alarm;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.common.ApiController;
 import org.k8scmp.login.domain.User;
+import org.k8scmp.login.service.UserService;
 import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostEnv;
+import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
+import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
+import org.k8scmp.monitormgmt.domain.alarm.TemplateIn;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
+import org.k8scmp.monitormgmt.service.alarm.HostGroupService;
 import org.k8scmp.monitormgmt.service.alarm.TemplateService;
+import org.k8scmp.util.AuthUtil;
+import org.k8scmp.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,64 +41,55 @@ public class TemplateController extends ApiController {
 
     @Autowired
     TemplateService templateService;
+    @Autowired
+    HostGroupService hostGropService;
+    @Autowired
+    UserService userService;
     
     @RequestMapping(value = "")
-    public ModelAndView getTemplate() throws Exception {
-        return listTemplateInfo();
+    public String getTemplate() throws Exception {
+        return "alarm/alarm";
     }
     
     @ResponseBody
-    @RequestMapping(value = "/template", method = RequestMethod.GET)
+    @RequestMapping(value = "/templatelist", method = RequestMethod.GET)
     public ModelAndView listTemplateInfo() {
-    	TemplateInfoBasic basic = new TemplateInfoBasic();
-    	List<TemplateInfoBasic> templateList = new ArrayList<TemplateInfoBasic>();
-    	basic.setId(3);
-    	basic.setTemplateName("tpl1");
-    	basic.setCreatorName("jbyb");
-    	basic.setTemplateType("host");
-    	basic.setCreateTime(System.currentTimeMillis());
-    	templateList.add(basic);
-        return new ModelAndView("alarm/alarm","templateList",templateList);
+    	List<TemplateInfoBasic> templateList = templateService.listTemplateInfo();
+        return new ModelAndView("alarm/alarm-template", "templateList", templateList);
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    public HttpResponseTemp<?> listTemplateInfo(Model model,@RequestParam("templateName") String templateName) {
+        return templateService.searchTemplateInfo("%"+templateName+"%");
     }
     
     @RequestMapping(value = "/templatenew")
     public String createTemplate(Model model) throws Exception {
     	
     	TemplateInfo templateInfo = new TemplateInfo();
+    	//获取hostGroup
+    	List<HostGroupInfo> hostGroupInfos = hostGropService.listHostGroupInfo();
+    	List<HostGroupInfoBasic> hostGroupInfoList = new ArrayList<HostGroupInfoBasic>();
+    	for (HostGroupInfo hostGroupInfo : hostGroupInfos) {
+    		HostGroupInfoBasic hostGroupInfoBasic = new HostGroupInfoBasic();
+    		hostGroupInfoBasic.setId(hostGroupInfo.getId());
+    		hostGroupInfoBasic.setHostGroupName(hostGroupInfo.getHostGroupName());
+    		hostGroupInfoList.add(hostGroupInfoBasic);
+		}
+    	//获取user
+    	List<User> userList = userService.listAllUserInfo().getResult();
     	
-    	
-    	
-//    	List<StrategyInfo> strategyList = new ArrayList<StrategyInfo>();
-    	//后台获取host Group
-    	List<HostGroupInfoBasic> hostGroupList = new ArrayList<HostGroupInfoBasic>();
-    	HostGroupInfoBasic hostGroup = new HostGroupInfoBasic();
-    	HostGroupInfoBasic hostGroup1 = new HostGroupInfoBasic();
-    	hostGroup.setHostGroupName("aaa");
-    	hostGroup.setId(3);
-    	hostGroupList.add(hostGroup);
-    	hostGroup1.setHostGroupName("ccc");
-    	hostGroup1.setId(4);
-    	hostGroupList.add(hostGroup1);
-    	
-    	//后台获取user
-    	List<User> userList = new ArrayList<User>();
-    	User user = new User();
-    	user.setUsername("jbyb");
-    	user.setId(6);
-    	userList.add(user);
-    	
-    	//后台获取deployment
+    	//获取deployment
     	DeploymentInfo deploymentInfo = new DeploymentInfo();
     	deploymentInfo.setClusterName("centos-k8s");
     	deploymentInfo.setHostEnv(HostEnv.TEST);
     	deploymentInfo.setDeploymentName("qazsw");
     	deploymentInfo.setId(1);
     	
-    	templateInfo.setHostGroupList(hostGroupList);
-//    	templateInfo.setStrategyList(strategyList);
+    	templateInfo.setHostGroupList(hostGroupInfoList);
     	templateInfo.setUserList(userList);
     	templateInfo.setDeploymentInfo(deploymentInfo);
-    	model.addAttribute("hostGroupBasic", new HostGroupInfoBasic());
     	model.addAttribute("templateInfo", templateInfo);
     	model.addAttribute("TemplateInfo", new TemplateInfo());
     	
@@ -100,17 +98,38 @@ public class TemplateController extends ApiController {
     
     @ResponseBody
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public HttpResponseTemp<?> createTemplate(@ModelAttribute TemplateInfo templateInfo, @ModelAttribute List<HostGroupInfoBasic> hostGroupList) {
-    	System.out.println(templateInfo);
-    	System.out.println(hostGroupList);
-//        return templateService.createTemplate(templateInfo);
-    	return null;
+    public HttpResponseTemp<?> createTemplate(@RequestBody TemplateIn templateIn) {
+    	TemplateInfo templateInfo = new TemplateInfo();
+    	templateInfo.setTemplateName(templateIn.getTemplateName());
+    	templateInfo.setTemplateType(templateIn.getTemplateType());
+    	templateInfo.setCreateTime(DateUtil.dateFormat(new Date()));
+    	templateInfo.setCreatorId(AuthUtil.getUserId());
+    	templateInfo.setCreatorName(AuthUtil.getCurrentLoginName());
+    	templateInfo.setDeploymentInfo(templateIn.getDeploymentInfo());
+    	templateInfo.setHostGroupList(templateIn.getHostGroupList());
+    	templateInfo.setUserList(templateIn.getUserList());
+    	templateInfo.setCallback(templateIn.getCallback());
+    	templateInfo.setUpdateTime(DateUtil.dateFormat(new Date()));
+    	List<StrategyInfo> strategyInfolist = new ArrayList<StrategyInfo>();
+    	for (int i=0;i<templateIn.getMetricList().length;i++) {
+    		StrategyInfo strategyInfo = new StrategyInfo();
+    		strategyInfo.setAggregateType(templateIn.getAggregateTypeList()[i]);
+    		strategyInfo.setMaxStep(templateIn.getMaxStepList()[i]);
+    		strategyInfo.setMetric(templateIn.getMetricList()[i]);
+    		strategyInfo.setNote(templateIn.getNoteValueList()[i]);
+    		strategyInfo.setOperator(templateIn.getOperatorList()[i]);
+    		strategyInfo.setPointNum(templateIn.getPointNumList()[i]);
+    		strategyInfo.setRightValue(templateIn.getRightValueList()[i]);
+    		strategyInfolist.add(strategyInfo);
+		}
+    	templateInfo.setStrategyList(strategyInfolist);
+        return templateService.createTemplate(templateInfo);
     }
     
-    @RequestMapping(value = "/edit")
-    public String editTemplate(Model model, @RequestParam("templateId") long templateId, @RequestParam("templateType") String templateType) throws Exception {
-    	HttpResponseTemp<?> templateInfo = templateService.getTemplateInfo(templateId);
-    	
+    @RequestMapping(value = "/edit", method=RequestMethod.GET)
+    public String editTemplate(Model model, @RequestParam("templateId") int templateId, @RequestParam("templateType") String templateType) {
+    	//int id = Integer.parseInt(templateId);
+    	TemplateInfo templateInfo = (TemplateInfo)templateService.getTemplateInfo(templateId).getResult();
     	model.addAttribute("templateInfo", templateInfo);
     	if(templateType.equals("host")){
     		return "alarm/template-hostEdit";
@@ -121,21 +140,22 @@ public class TemplateController extends ApiController {
     }
     
     @ResponseBody
-    @RequestMapping(value = "/template", method = RequestMethod.PUT)
+    @RequestMapping(value = "/modify", method = RequestMethod.PUT)
     public HttpResponseTemp<?> modifyTemplate(@RequestBody TemplateInfo templateInfo) {
         return templateService.modifyTemplate(templateInfo);
     }
 
     @ResponseBody
     @RequestMapping(value = "/template/{id}", method = RequestMethod.GET)
-    public HttpResponseTemp<?> getTemplateInfo(@PathVariable long id) {
-        return templateService.getTemplateInfo(id);
+    public HttpResponseTemp<?> getTemplateInfo(@PathVariable String id) {
+    	int ID = Integer.parseInt(id);
+        return templateService.getTemplateInfo(ID);
     }
 
     @ResponseBody
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public HttpResponseTemp<?> deleteTemplate(@PathVariable long id) {
-        return templateService.deleteTemplate(id);
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    public HttpResponseTemp<?> deleteTemplate(@PathVariable String id) {
+    	int ID = Integer.parseInt(id);
+        return templateService.deleteTemplate(ID);
     }
-
 }

@@ -14,14 +14,21 @@ import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
 import org.k8scmp.monitormgmt.service.alarm.HostGroupService;
+import org.k8scmp.operation.OperationLog;
+import org.k8scmp.operation.OperationRecord;
 import org.k8scmp.operation.OperationType;
 import org.k8scmp.util.AuthUtil;
+import org.k8scmp.util.DateUtil;
+import org.k8scmp.util.UUIDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.sun.tools.javac.util.Convert;
+
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -41,15 +48,37 @@ public class HostGroupServiceImpl implements HostGroupService {
 
     @Autowired
     PortalDao portalBiz;
+    
+    @Autowired
+    OperationLog operationLog;
 
     @Override
-    public HttpResponseTemp<?> listHostGroupInfo() {
+    public List<HostGroupInfo> listHostGroupInfo() {
 
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.GET, 0);
 
         List<HostGroupInfoBasic> hostGroupInfoBasics = alarmBiz.listHostGroupInfoBasic();
         if (hostGroupInfoBasics == null) {
-            return ResultStat.OK.wrap(null);
+            return null;
+        }
+        List<HostGroupInfoTask> hostGroupInfoTasks = new LinkedList<>();
+
+        for (HostGroupInfoBasic hostGroupInfoBasic : hostGroupInfoBasics) {
+            hostGroupInfoTasks.add(new HostGroupInfoTask(hostGroupInfoBasic));
+        }
+        List<HostGroupInfo> hostGroupInfos = ClientConfigure.executeCompletionService(hostGroupInfoTasks);
+        Collections.sort(hostGroupInfos, new HostGroupInfo.HostGroupInfoComparator());
+        return hostGroupInfos;
+    }
+    
+    @Override
+    public HttpResponseTemp<?> searchHostGroupInfo(String hostGroupName) {
+
+//        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.GET, 0);
+
+        List<HostGroupInfoBasic> hostGroupInfoBasics = alarmBiz.listHostGroupInfoBasicByName(hostGroupName);
+        if (hostGroupInfoBasics == null) {
+            return null;
         }
         List<HostGroupInfoTask> hostGroupInfoTasks = new LinkedList<>();
 
@@ -60,7 +89,8 @@ public class HostGroupServiceImpl implements HostGroupService {
         Collections.sort(hostGroupInfos, new HostGroupInfo.HostGroupInfoComparator());
         return ResultStat.OK.wrap(hostGroupInfos);
     }
-
+    
+    
     @Override
     public HttpResponseTemp<?> createHostGroup(HostGroupInfoBasic hostGroupInfoBasic) {
 
@@ -75,16 +105,38 @@ public class HostGroupServiceImpl implements HostGroupService {
         if (alarmBiz.getHostGroupInfoBasicByName(hostGroupInfoBasic.getHostGroupName()) != null) {
             throw ApiException.wrapResultStat(ResultStat.HOSTGROUP_EXISTED);
         }
-
-//        hostGroupInfoBasic.setCreatorId(AuthUtil.getUserId());
-//        hostGroupInfoBasic.setCreatorName(AuthUtil.getCurrentUserName());
-        hostGroupInfoBasic.setCreateTime(System.currentTimeMillis());
+//        String id= UUIDUtil.generateUUID();
+//        hostGroupInfoBasic.setId(id);
+        hostGroupInfoBasic.setCreatorId(AuthUtil.getUserId());
+        hostGroupInfoBasic.setCreatorName(AuthUtil.getCurrentLoginName());
+        hostGroupInfoBasic.setCreateTime(DateUtil.dateFormatToMillis(new Date()));
         hostGroupInfoBasic.setUpdateTime(hostGroupInfoBasic.getCreateTime());
 
-        alarmBiz.addHostGroupInfoBasic(hostGroupInfoBasic);
+        int hostback = alarmBiz.addHostGroupInfoBasic(hostGroupInfoBasic);
 
         // insert host group info into portal database
-        portalBiz.insertHostGroupByHostGroupBasicInfo(hostGroupInfoBasic);
+        int portalback = portalBiz.insertHostGroupByHostGroupBasicInfo(hostGroupInfoBasic);
+        
+        String state = null;
+        String info = null;
+        if(hostback > 0 && portalback > 0 ){
+        	state = "ok";
+        	info = "创建用户组成功!";
+        }else{
+        	state = "faile";
+        	info = "创建用户组失败!";
+        }
+        
+        operationLog.insertRecord(new OperationRecord(
+				"1",//uuid 
+				ResourceType.ALARM,
+				OperationType.SET, 
+				AuthUtil.getCurrentLoginName(),
+				AuthUtil.getUserName(), 
+				state, 
+				info, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
 
         return ResultStat.OK.wrap(hostGroupInfoBasic);
     }
@@ -106,7 +158,7 @@ public class HostGroupServiceImpl implements HostGroupService {
         }
 
         updatedHostGroupInfoBasic.setHostGroupName(hostGroupInfoBasic.getHostGroupName());
-        updatedHostGroupInfoBasic.setUpdateTime(System.currentTimeMillis());
+        updatedHostGroupInfoBasic.setUpdateTime(DateUtil.dateFormat(new Date()));
 
         alarmBiz.updateHostGroupInfoBasicById(updatedHostGroupInfoBasic);
 
@@ -117,7 +169,7 @@ public class HostGroupServiceImpl implements HostGroupService {
     }
 
     @Override
-    public HttpResponseTemp<?> deleteHostGroup(long id) {
+    public HttpResponseTemp<?> deleteHostGroup(int id) {
 
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.MODIFY, 0);
 
@@ -131,13 +183,13 @@ public class HostGroupServiceImpl implements HostGroupService {
         alarmBiz.deleteHostGroupInfoBasicById(id);
 
         // delete host group info in portal database
-//        portalBiz.deleteHostGroupById(id);
+        portalBiz.deleteHostGroupById(id);
 
         return ResultStat.OK.wrap(null);
     }
 
     @Override
-    public HttpResponseTemp<?> bindHostList(long id, List<HostInfo> hostInfoList) {
+    public HttpResponseTemp<?> bindHostList(int id, List<HostInfo> hostInfoList) {
 
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.MODIFY, 0);
 
@@ -161,13 +213,13 @@ public class HostGroupServiceImpl implements HostGroupService {
 
         for (HostInfo hostInfo : hostInfoList) {
 
-            long hostId = portalBiz.getHostIdByHostname(hostInfo.getHostname()).longValue();
+            int hostId = portalBiz.getHostIdByHostname(hostInfo.getHostname());
             hostInfo.setId(hostId);
             createHostIfNotExist(hostInfo);
             if (alarmBiz.getHostGroupHostBindTime(id, hostId) != null) {
-                alarmBiz.updateHostGroupHostBind(id, hostId, System.currentTimeMillis());
+                alarmBiz.updateHostGroupHostBind(id, hostId, DateUtil.dateFormat(new Date()));
             } else {
-                alarmBiz.addHostGroupHostBind(id, hostId, System.currentTimeMillis());
+                alarmBiz.addHostGroupHostBind(id, hostId, DateUtil.dateFormat(new Date()));
                 portalBiz.insertGroupHostBind(id, hostId);
             }
         }
@@ -176,7 +228,7 @@ public class HostGroupServiceImpl implements HostGroupService {
     }
 
     @Override
-    public HttpResponseTemp<?> unbindHost(long id, long hostId) {
+    public HttpResponseTemp<?> unbindHost(int id, int hostId) {
 
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.MODIFY, 0);
 
@@ -199,7 +251,7 @@ public class HostGroupServiceImpl implements HostGroupService {
             return;
         }
 
-        hostInfo.setCreateTime(System.currentTimeMillis());
+        hostInfo.setCreateTime(DateUtil.dateFormat(new Date()));
         alarmBiz.addHostInfo(hostInfo);
     }
 
@@ -214,7 +266,7 @@ public class HostGroupServiceImpl implements HostGroupService {
         public HostGroupInfo call() throws Exception {
             HostGroupInfo hostGroupInfo = new HostGroupInfo(hostGroupInfoBasic);
 
-            long hostGroupId = hostGroupInfoBasic.getId();
+            int hostGroupId = hostGroupInfoBasic.getId();
             List<HostInfo> hostInfoList = alarmBiz.getHostInfoByHostGroupId(hostGroupId);
             hostGroupInfo.setHostList(hostInfoList);
             List<TemplateInfoBasic> templateInfoBasicList = alarmBiz.getTemplateInfoBasicByHostGroupId(hostGroupId);

@@ -4,8 +4,10 @@ package org.k8scmp.monitormgmt.service.alarm;
 import java.util.List;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
+import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
+import org.springframework.ui.Model;
 
 /**
  * Created by baokangwang on 2016/4/13.
@@ -16,7 +18,7 @@ public interface HostGroupService {
      *
      * @return
      */
-    HttpResponseTemp<?> listHostGroupInfo();
+    List<HostGroupInfo> listHostGroupInfo();
 
     /**
      *
@@ -37,7 +39,7 @@ public interface HostGroupService {
      * @param id
      * @return
      */
-    HttpResponseTemp<?> deleteHostGroup(long id);
+    HttpResponseTemp<?> deleteHostGroup(int id);
 
     /**
      *
@@ -45,7 +47,7 @@ public interface HostGroupService {
      * @param hostInfoList
      * @return
      */
-    HttpResponseTemp<?> bindHostList(long id, List<HostInfo> hostInfoList);
+    HttpResponseTemp<?> bindHostList(int id, List<HostInfo> hostInfoList);
 
     /**
      *
@@ -53,11 +55,13 @@ public interface HostGroupService {
      * @param hostId
      * @return
      */
-    HttpResponseTemp<?> unbindHost(long id, long hostId);
+    HttpResponseTemp<?> unbindHost(int id, int hostId);
 
     /**
      *
      * @param hostInfo
      */
     void createHostIfNotExist(HostInfo hostInfo);
+
+	HttpResponseTemp<?> searchHostGroupInfo(String hostGroupName);
 }

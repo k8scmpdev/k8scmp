@@ -7,16 +7,16 @@ import org.k8scmp.util.StringUtils;
  */
 public class HostInfo {
 
-    private long id;
+    private int id;
     private String hostname;
     private String ip;
     private String cluster;
-    private long createTime;
+    private String createTime;
 
     public HostInfo() {
     }
 
-    public HostInfo(long id, String hostname, String ip, String cluster, long createTime) {
+    public HostInfo(int id, String hostname, String ip, String cluster, String createTime) {
         this.id = id;
         this.hostname = hostname;
         this.ip = ip;
@@ -24,11 +24,11 @@ public class HostInfo {
         this.createTime = createTime;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -56,11 +56,11 @@ public class HostInfo {
         this.cluster = cluster;
     }
 
-    public long getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(long createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
