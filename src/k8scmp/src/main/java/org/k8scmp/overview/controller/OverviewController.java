@@ -74,6 +74,7 @@ public class OverviewController {
      	model.addAttribute("ResourceType", ResourceType.values());
      	model.addAttribute("OperationType", OperationType.values());
      	String[] infos = {"","","",""};
+     	infos[0].equalsIgnoreCase("");
      	model.addAttribute("infos", infos);
         return "monitor/opelog-list";
     }

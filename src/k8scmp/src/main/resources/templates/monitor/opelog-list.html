@@ -14,6 +14,14 @@
 		
 		<script>
 		function getLogList(){
+			var arr = new Array("first", "second", "third") 
+			var arr2 = new Array("first", "second", "third") 
+			for(var item in arr) {
+				alert(item);
+				alert(arr[item]);
+				alert(arr2[item]);
+			}
+			
 			var keyword = $('#keyword').val();
 			var rtype = $('#rtype').val();
 			var otype = $('#otype').val();

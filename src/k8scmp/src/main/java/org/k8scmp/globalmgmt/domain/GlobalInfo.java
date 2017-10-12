@@ -1,11 +1,11 @@
 package org.k8scmp.globalmgmt.domain;
 
 /**
- * Created by feiliu206363 on 2016/1/20.
+ * Created by jason on 2017/1/20.
  */
 public class GlobalInfo {
 
-    private int id;
+    private String id;
     private GlobalType type;
     private String value;
     private String description;
@@ -26,14 +26,14 @@ public class GlobalInfo {
         this.description = description;
     }
 
-    public GlobalInfo(int id, GlobalType type, String value) {
+    public GlobalInfo(String id, GlobalType type, String value) {
         this.id = id;
         this.type = type;
         this.value = value;
         this.description = null;
     }
 
-    public GlobalInfo(int id, GlobalType type, String value, String description) {
+    public GlobalInfo(String id, GlobalType type, String value, String description) {
         this.id = id;
         this.type = type;
         this.value = value;
@@ -47,7 +47,7 @@ public class GlobalInfo {
         this.lastUpdate = lastUpdate;
     }
 
-    public GlobalInfo(int id, GlobalType type, String value, long createTime, long lastUpdate) {
+    public GlobalInfo(String id, GlobalType type, String value, long createTime, long lastUpdate) {
         this.id = id;
         this.type = type;
         this.value = value;
@@ -55,11 +55,11 @@ public class GlobalInfo {
         this.lastUpdate = lastUpdate;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
