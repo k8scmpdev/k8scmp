@@ -1,4 +1,4 @@
-package org.k8scmp.mapper.graph;
+package org.k8scmp.monitormapper.graph;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
