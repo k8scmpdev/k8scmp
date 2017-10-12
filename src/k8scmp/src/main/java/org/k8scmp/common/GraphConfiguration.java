@@ -20,26 +20,31 @@ import com.alibaba.druid.pool.DruidDataSource;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan(basePackages = "org.k8scmp.mapper.graph", sqlSessionFactoryRef = "graphSqlSessionFactory")
+@MapperScan(basePackages = "org.k8scmp.monitormapper.graph", sqlSessionFactoryRef = "graphSqlSessionFactory")
 public class GraphConfiguration {
 
     @Bean(initMethod = "init", destroyMethod = "close", name = "graphDataSource")
     public DataSource graphDataSource() throws Exception {
-        String mysqlHost = System.getenv(GlobalConstant.GRAPH_MYSQL_HOST);
+//        String mysqlHost = System.getenv(GlobalConstant.GRAPH_MYSQL_HOST);
+        String mysqlHost = "127.0.0.1";
         if (StringUtils.isBlank(mysqlHost)) {
             mysqlHost = System.getenv(GlobalConstant.k8scmp_MYSQL_HOST);
+        	
         }
         String mysqlPort = System.getenv(GlobalConstant.GRAPH_MYSQL_PORT);
         if (StringUtils.isBlank(mysqlPort)) {
-            mysqlPort = System.getenv(GlobalConstant.k8scmp_MYSQL_PORT);
+//            mysqlPort = System.getenv(GlobalConstant.k8scmp_MYSQL_PORT);
+        	mysqlPort = "3306";
         }
         String mysqlUsername = System.getenv(GlobalConstant.GRAPH_MYSQL_USERNAME);
         if (StringUtils.isBlank(mysqlUsername)) {
-            mysqlUsername = System.getenv(GlobalConstant.k8scmp_MYSQL_USERNAME);
+//            mysqlUsername = System.getenv(GlobalConstant.k8scmp_MYSQL_USERNAME);
+        	mysqlUsername = "root";
         }
         String mysqlPassword = System.getenv(GlobalConstant.GRAPH_MYSQL_PASSWORD);
         if (StringUtils.isBlank(mysqlPassword)) {
-            mysqlPassword = System.getenv(GlobalConstant.k8scmp_MYSQL_PASSWORD);
+//            mysqlPassword = System.getenv(GlobalConstant.k8scmp_MYSQL_PASSWORD);
+        	mysqlPassword = "1234";
         }
         String mysqlDB = System.getenv(GlobalConstant.GRAPH_MYSQL_DB);
         if (StringUtils.isBlank(mysqlDB)) {
