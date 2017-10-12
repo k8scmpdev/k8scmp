@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Unicorn Admin</title>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
+		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<div id="common-header"></div>
+		<div id="content">
+			<div id="content-header">
+				<h2>添加主机</h2>
+			</div>
+			<div id="breadcrumb">
+				<a href="#" class="current tip-bottom" title="添加主机">添加主机</a>
+			</div>
+			
+			<div class="container-fluid">
+				<div class="row-fluid" >
+					<div class="span12">
+						<div class="widget-box">
+							<table width="100%" height="100%">
+							  <tr> 
+							    <td width="45%" valign="top">
+							    	<div>
+							    	<div class="controls">
+							    		<br/>
+										&nbsp;&nbsp;&nbsp;&nbsp;选择集群&nbsp;<select name="clusterName" id="clusterName" style="width: 65px;">	
+											<!-- <option th:each="hostGroupBasic:${templateInfo.hostGroupList}" th:value="${hostGroupBasic.id}" 	
+											th:selected="${#strings.contains(hostGroupBasic,hostGroupBasic.id)}"
+											th:text="${hostGroupBasic.hostGroupName}" ></option> -->	
+											<option>生产</option>
+											<option>测试</option>
+										</select>
+									</div>
+									<br/>
+							    	&nbsp;&nbsp;&nbsp;&nbsp;<span>选择主机</span>
+							    	&nbsp;&nbsp;&nbsp;&nbsp;<i style="font-size: 10px">勾选要添加的主机之后可在所选主机列表中查看。</i>
+							    	<br/>
+							    	<br/>
+							    	<br/>
+							    	<table class="table">
+							    		<thead>
+							    			<tr>
+							    				<td>
+							    					<div style="text-align: center;width: 40px">
+							    						<input type="checkbox" />
+							    					</div>
+							    				</td>
+							    				<td>
+							    					<div style="text-align: center;width: 80px">
+							    						主机
+							    					</div>
+							    				</td>
+							    				<td>
+							    					<div style="text-align: center;width: 80px">
+							    						IP
+							    					</div>
+							    				</td>
+							    			</tr>
+							    		</thead>
+							    		<tbody>
+							    			<tr>
+							    				<td >
+							    					<div style="text-align: center;width: 40px">
+							    						<input type="checkbox" />
+							    					</div>
+							    				</td>
+							    				<td >
+							    					<div style="text-align: center;width: 80px">
+							    						k8s-node-1
+							    					</div>
+							    				</td>
+							    				<td>
+							    					<div style="text-align: center;width: 80px">
+							    						192.168.80.134
+							    					</div>
+							    				</td>
+							    			</tr>
+							    		</tbody>
+							    	</table>
+							    	<br/><br/><br/>
+							    	</div>
+							    </td>
+							    <td style="border-left:#cccccc 5px solid;" width="55%" valign="top">
+							    	<div>
+							    	<br/>
+								    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>所选主机</span>
+								    	&nbsp;&nbsp;&nbsp;&nbsp;<i style="font-size: 10px">展示上一步勾选的所有主机。</i>
+								    	<br/>
+								    	<br/>
+								    	<table class="table" width="100%">
+								    		<thead>
+								    			<tr>
+								    				<td>
+								    					<div style="text-align: center;width: 80px">
+								    						主机
+								    					</div>
+								    				</td>
+								    				<td>
+								    					<div style="text-align: center;width: 80px">
+								    						IP
+								    					</div>
+								    				</td>
+								    				<td>
+								    					<div style="text-align: center;width: 80px">
+								    						集群
+								    					</div>
+								    				</td>
+								    				<td>
+								    					<div style="text-align: center;width: 80px">
+								    						操作
+								    					</div>
+								    				</td>
+								    			</tr>
+								    		</thead>
+								    		<tbody>
+								    			<tr>
+								    				<td>
+								    					<div style="text-align: right;width: 80px">
+								    						k8s-node-1
+								    					</div>
+								    				</td>
+								    				<td>
+								    					<div style="text-align: center;width: 80px">
+								    						192.168.80.134
+								    					</div>
+								    				</td>
+								    				<td>
+								    					<div style="text-align: center;width: 80px">
+								    						k8s-centos
+								    					</div>
+								    				</td>
+								    				<td>
+								    					<div style="text-align: center;width: 80px">
+								    						<a>解除</a>
+								    					</div>
+								    				</td>
+								    			</tr>
+								    		</tbody>
+								    	</table>
+								    	
+								    	
+								    	<br/><br/><br/>
+								    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a th:href="@{/alarm}" class="btn tip-bottom">返回</a>
+								    	<input type="submit" value="提交" class="btn btn-primary"></input>
+							    	</div>
+							    </td>
+							  </tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="common-footer"></div>
+		</div>	
+
+		<script th:src="@{/js/jquery.min.js}"></script>
+		<script th:src="@{/js/jquery.ui.custom.js}"></script>
+		<script th:src="@{/js/bootstrap.min.js}"></script>
+		<script th:src="@{/js/jquery.uniform.js}"></script>
+		<script th:src="@{/js/select2.min.js}"></script>
+		<script th:src="@{/js/jquery.dataTables.min.js}"></script>
+		<script th:src="@{/js/commonDisplay.js}"></script>
+		<script th:src="@{/js/unicorn.js}"></script>
+		<script th:src="@{/js/unicorn.tables.js}"></script>
+		<script th:src="@{/js/bootpopup.js}"></script>
+		<script type="text/javascript">
+			
+		
+		
+		
+		</script>
+	</body>
+</html>

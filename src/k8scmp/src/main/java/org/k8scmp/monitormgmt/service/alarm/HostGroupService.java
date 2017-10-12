@@ -7,6 +7,7 @@ import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
+import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
 import org.springframework.ui.Model;
 
 /**
@@ -64,4 +65,6 @@ public interface HostGroupService {
     void createHostIfNotExist(HostInfo hostInfo);
 
 	HttpResponseTemp<?> searchHostGroupInfo(String hostGroupName);
+
+	List<NodeInfo> getNodeList();
 }

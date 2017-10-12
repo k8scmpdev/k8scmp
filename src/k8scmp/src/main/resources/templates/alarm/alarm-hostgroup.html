@@ -52,7 +52,7 @@
 									</div>
 								</td>
 								<td>
-									<a title='单击添加主机' class="tip-top">添加主机</a>&nbsp;&nbsp;
+									<a title='单击添加主机' th:href="@{/hostgroup/bindHostGroup}" class="tip-top">添加主机</a>&nbsp;&nbsp;
 									<a title='单击修改组名' th:onclick="'editHostGroup(\''+${hostGroup.id}+'\')'" class="tip-top">修改</a>&nbsp;&nbsp;
 									<a title='单击删除组' th:onclick="'deleteHostGroup(\''+${hostGroup.id}+'\')'" class="tip-top">删除</a>
 								</td>

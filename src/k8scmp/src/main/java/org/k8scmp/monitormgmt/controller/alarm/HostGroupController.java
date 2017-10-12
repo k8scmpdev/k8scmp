@@ -9,6 +9,7 @@ import org.k8scmp.common.ApiController;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
+import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
 import org.k8scmp.monitormgmt.service.alarm.HostGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -69,7 +70,15 @@ public class HostGroupController extends ApiController {
     	int ID = Integer.parseInt(id);
         return hostGroupService.deleteHostGroup(ID);
     }
-
+    
+    @ResponseBody
+    @RequestMapping(value = "/bindHostGroup", method = RequestMethod.GET)
+    public ModelAndView bindHostGroup() {
+    	//获取主机列表
+    	List<NodeInfo> nodeList = hostGroupService.getNodeList();
+        return new ModelAndView("alarm/hostGroup-bind", "nodeList", nodeList);
+    }
+    
     @ResponseBody
     @RequestMapping(value = "/bind/{id}", method = RequestMethod.POST)
     public HttpResponseTemp<?> bindHostList(@PathVariable String id, @RequestBody List<HostInfo> hostInfoList) {

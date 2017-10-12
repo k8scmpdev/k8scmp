@@ -1,11 +1,16 @@
 package org.k8scmp.monitormgmt.service.alarm.impl;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ClientConfigure;
-import org.k8scmp.common.CurrentThreadInfo;
-import org.k8scmp.common.GlobalConstant;
+import org.k8scmp.engine.k8s.util.NodeWrapper;
 import org.k8scmp.exception.ApiException;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
 import org.k8scmp.monitormgmt.dao.alarm.PortalDao;
@@ -13,25 +18,17 @@ import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
+import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
 import org.k8scmp.monitormgmt.service.alarm.HostGroupService;
 import org.k8scmp.operation.OperationLog;
 import org.k8scmp.operation.OperationRecord;
 import org.k8scmp.operation.OperationType;
 import org.k8scmp.util.AuthUtil;
 import org.k8scmp.util.DateUtil;
-import org.k8scmp.util.UUIDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.sun.tools.javac.util.Convert;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Created by baokangwang on 2016/4/13.
@@ -51,7 +48,7 @@ public class HostGroupServiceImpl implements HostGroupService {
     
     @Autowired
     OperationLog operationLog;
-
+    
     @Override
     public List<HostGroupInfo> listHostGroupInfo() {
 
@@ -275,4 +272,17 @@ public class HostGroupServiceImpl implements HostGroupService {
             return hostGroupInfo;
         }
     }
+    
+    @Override
+    public List<NodeInfo> getNodeList(){
+    	try {
+			NodeWrapper nodeWrapper = new NodeWrapper().init("default");
+			return nodeWrapper.getNodeInfoListWithoutPods();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+    }
+    
+    
 }
