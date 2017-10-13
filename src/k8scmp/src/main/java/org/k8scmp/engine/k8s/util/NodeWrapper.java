@@ -300,23 +300,23 @@ public class NodeWrapper {
 //        return labels;
 //    }
 
-//    public List<NodeInfo> getNodeListByLabel(Map<String, String> labels) {
-//        NodeList nodeList = getNodeListByLabels(labels);
-//        if (nodeList != null && nodeList.getItems() != null) {
-//            List<NodeInfo> nodeInfos = new ArrayList<>(nodeList.getItems().size());
-//            for (Node node : nodeList.getItems()) {
-//                NodeInfo nodeInfo = null;
-//                try {
-//                    nodeInfo = generateNodeInfo(node);
-//                } catch (ParseException e) {
-//                    logger.error("parse node info error: " + e.getMessage());
-//                }
-//                nodeInfos.add(nodeInfo);
-//            }
-//            return nodeInfos;
-//        }
-//        return null;
-//    }
+    public List<NodeInfo> getNodeListByLabel(Map<String, String> labels) {
+        NodeList nodeList = getNodeListByLabels(labels);
+        if (nodeList != null && nodeList.getItems() != null) {
+            List<NodeInfo> nodeInfos = new ArrayList<>(nodeList.getItems().size());
+            for (Node node : nodeList.getItems()) {
+                NodeInfo nodeInfo = null;
+                try {
+                    nodeInfo = generateNodeInfo(node);
+                } catch (ParseException e) {
+                    logger.error("parse node info error: " + e.getMessage());
+                }
+                nodeInfos.add(nodeInfo);
+            }
+            return nodeInfos;
+        }
+        return null;
+    }
 
 //    public List<NamespaceInfo> getAllNamespaces() {
 //        try {
@@ -473,17 +473,17 @@ public class NodeWrapper {
         }
     }
 
-//    private NodeList getNodeListByLabels(Map<String, String> labels) {
-//        try {
-//            if (labels == null) {
-//                return null;
-//            }
-//            return client.listNode(labels);
-//        } catch (K8sDriverException e) {
-//            logger.warn("get node list by labels error, message is " + e.getMessage());
-//            return null;
-//        }
-//    }
+    private NodeList getNodeListByLabels(Map<String, String> labels) {
+        try {
+            if (labels == null) {
+                return null;
+            }
+            return client.listNode(labels);
+        } catch (K8sDriverException e) {
+            logger.warn("get node list by labels error, message is " + e.getMessage());
+            return null;
+        }
+    }
 
     private List<Pod> getPodListByNode(String nodeName) {
         try {
