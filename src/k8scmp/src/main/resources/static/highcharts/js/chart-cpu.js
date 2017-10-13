@@ -35,14 +35,17 @@ $(function(){
         series:  []
     }
     chart = new Highcharts.Chart('chart-cpu',options)
-    $.getJSON("highcharts/jsonData/chart-cpu.json",function(data){//获取Json文件,并创建Json对象
-        $.each(data,function(i, field){     //遍历json数组
-            chart.addSeries({
-                type:field.type,
-                name:field.name,
-                data:field.data
-            });
-        })
+    $.getJSON("/overview/cpuinfo",function(data){//获取Json文件,并创建Json对象
+    	var arr = [];
+    	$.each(data.datalist,function(i, field){
+    		arr.push([i,   field]);
+    	});
+    	
+    	chart.addSeries({
+	        type:data.type,
+	        name:data.name,
+	        data:arr
+	    });
     })
 })
 

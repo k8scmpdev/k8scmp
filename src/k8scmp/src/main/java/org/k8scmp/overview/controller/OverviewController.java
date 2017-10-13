@@ -33,6 +33,7 @@ import org.k8scmp.operation.OperationLog;
 import org.k8scmp.operation.OperationRecord;
 import org.k8scmp.operation.OperationType;
 import org.k8scmp.overview.domain.OverviewCountInfo;
+import org.k8scmp.overview.domain.ResourceOverview;
 import org.k8scmp.overview.service.OverviewService;
 import org.k8scmp.util.AuthUtil;
 
@@ -54,6 +55,7 @@ public class OverviewController {
      	
      	//获取操作日志
      	List<OperationRecord> operecords = operationLog.listOperationRecord4Overview();
+     	
      	model.addAttribute("operecords", operecords);
         return "overview/index";
     }
@@ -129,6 +131,68 @@ public class OverviewController {
      	appinfo.put("name", "服务");
 		appinfo.put("datalist", overviewService.getServiceInfo());
 
+        try {
+			return obj.writeValueAsString(appinfo);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/overview/meminfo", method=RequestMethod.GET)
+    public String showMem() {
+     	
+    	ObjectMapper obj = new ObjectMapper();
+
+    	Map<String, Object> appinfo = new HashMap<>();
+     	appinfo.put("type", "pie");
+     	appinfo.put("name", "内存使用量");
+		appinfo.put("datalist", overviewService.getMemoryInfo());
+		
+        try {
+			return obj.writeValueAsString(appinfo);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
+
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/overview/cpuinfo", method=RequestMethod.GET)
+    public String showCpu() {
+     	
+    	ObjectMapper obj = new ObjectMapper();
+
+    	Map<String, Object> appinfo = new HashMap<>();
+     	appinfo.put("type", "pie");
+     	appinfo.put("name", "CPU使用量");
+		appinfo.put("datalist", overviewService.getCPUInfo());
+		
+        try {
+			return obj.writeValueAsString(appinfo);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
+
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/overview/nodeinfo", method=RequestMethod.GET)
+    public String showNode() {
+     	
+    	ObjectMapper obj = new ObjectMapper();
+
+    	Map<String, Object> appinfo = new HashMap<>();
+     	appinfo.put("type", "pie");
+     	appinfo.put("name", "主机使用量");
+		appinfo.put("datalist", overviewService.getNodeInfo());
+		
         try {
 			return obj.writeValueAsString(appinfo);
 		} catch (JsonProcessingException e) {

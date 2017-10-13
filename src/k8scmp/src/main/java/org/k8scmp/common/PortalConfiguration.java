@@ -38,7 +38,7 @@ public class PortalConfiguration {
         }
         String mysqlPassword = System.getenv(GlobalConstant.PORTAL_MYSQL_PASSWORD);
         if (StringUtils.isBlank(mysqlPassword)) {
-            mysqlPassword = "1234";
+            mysqlPassword = "123";
         }
         String mysqlDB = System.getenv(GlobalConstant.PORTAL_MYSQL_DB);
         if (StringUtils.isBlank(mysqlDB)) {
