@@ -209,7 +209,7 @@ public class GlobalController {
     		model.addAttribute("info",info);
     	}
     	operationLog.insertRecord(new OperationRecord(
-				monitorinfo.getTransfer(), 
+				"监控配置信息", 
 				ResourceType.CONFIGURATION,
 				OperationType.MODIFY, 
 				AuthUtil.getCurrentLoginName(), 
