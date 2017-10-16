@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 /**
  * Created by baokangwang on 2016/4/6.
  */
-@Service("monitorBiz")
+@Service("monitorDao")
 public class MonitorDaoImpl implements MonitorDao {
 
 
