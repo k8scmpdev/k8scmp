@@ -35,14 +35,17 @@ $(function(){
         series:  []
     }
     chart = new Highcharts.Chart('chart-disk',options)
-    $.getJSON("highcharts/jsonData/chart-disk.json",function(data){//获取Json文件,并创建Json对象
-        $.each(data,function(i, field){     //遍历json数组
-            chart.addSeries({
-                type:field.type,
-                name:field.name,
-                data:field.data
-            });
-        })
+    $.getJSON("/overview/diskinfo",function(data){//获取Json文件,并创建Json对象
+    	var arr = [];
+    	$.each(data.datalist,function(i, field){
+    		arr.push([i,   field]);
+    	});
+    	
+    	chart.addSeries({
+	        type:data.type,
+	        name:data.name,
+	        data:arr
+	    });
     })
 })
 

@@ -30,4 +30,6 @@ public interface OverviewService {
 
 	Map<String, Integer> getNodeInfo();
 
+	Map<String, Double> getDiskInfo();
+
 }

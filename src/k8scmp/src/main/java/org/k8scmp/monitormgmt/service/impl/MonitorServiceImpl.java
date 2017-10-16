@@ -160,6 +160,28 @@ public class MonitorServiceImpl implements MonitorService {
     }
     
     // create graphHistoryRequest for overview
+    private GraphHistoryRequest getGraphHistoryRequestForOverview(MonitorDataRequest monitorDataRequest) {
+
+        GraphHistoryRequest graphHistoryRequest = new GraphHistoryRequest();
+        graphHistoryRequest.setStart(monitorDataRequest.getStartTime() / 1000);
+        graphHistoryRequest.setEnd(monitorDataRequest.getEndTime() / 1000);
+        graphHistoryRequest.setCf(monitorDataRequest.getDataSpec());
+
+        List<String> counters = retrieveCountersByTargetInfoList(monitorDataRequest.getTargetType(), monitorDataRequest.getTargetInfos());
+        if (counters != null) {
+            for (String counter : counters) {
+                if (( counter.startsWith("df.bytes") && !counter.startsWith("df.bytes.used.percent") && !counter.contains("kubernetes"))
+                        || ( (counter.startsWith("cpu.busy") || counter.startsWith("mem.memtotal") || counter.startsWith("mem.memused")))) {
+                    for (TargetInfo targetInfo : monitorDataRequest.getTargetInfos()) {
+                        graphHistoryRequest.getEndpoint_counters().add(new EndpointCounter(targetInfo.getNode(), counter));
+                    }
+                }
+            }
+        }
+        return graphHistoryRequest;
+    }
+    
+    // create graphHistoryRequest for overview
     private GraphHistoryRequest getGraphHistoryRequestForOverview(MonitorDataRequest monitorDataRequest, boolean isDisk) {
 
         GraphHistoryRequest graphHistoryRequest = new GraphHistoryRequest();
@@ -170,8 +192,8 @@ public class MonitorServiceImpl implements MonitorService {
         List<String> counters = retrieveCountersByTargetInfoList(monitorDataRequest.getTargetType(), monitorDataRequest.getTargetInfos());
         if (counters != null) {
             for (String counter : counters) {
-                if ((isDisk && counter.startsWith("df.bytes") && !counter.startsWith("df.bytes.used.percent") && !counter.contains("kubernetes"))
-                        || (!isDisk && (counter.startsWith("cpu.busy") || counter.startsWith("mem.memtotal") || counter.startsWith("mem.memused")))) {
+                if (( isDisk && counter.startsWith("df.bytes") && !counter.startsWith("df.bytes.used.percent") && !counter.contains("kubernetes"))
+                        || (isDisk &&  (counter.startsWith("cpu.busy") || counter.startsWith("mem.memtotal") || counter.startsWith("mem.memused")))) {
                     for (TargetInfo targetInfo : monitorDataRequest.getTargetInfos()) {
                         graphHistoryRequest.getEndpoint_counters().add(new EndpointCounter(targetInfo.getNode(), counter));
                     }
@@ -216,6 +238,67 @@ public class MonitorServiceImpl implements MonitorService {
         }
 
         return result;
+    }
+    
+    @Override
+    public MonitorResult getMonitorDataForOverview(TargetRequest targetRequest, long startTime, long endTime, String dataSpec) {
+        if (targetRequest == null) {
+            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_REQUEST_NOT_LEGAL, "target request info not exists");
+        }
+        MonitorDataRequest monitorDataRequest = new MonitorDataRequest(
+                startTime,
+                endTime,
+                dataSpec,
+                targetRequest.getTargetType(),
+                targetRequest.getTargetInfos());
+
+        if (!StringUtils.isBlank(monitorDataRequest.checkLegality())) {
+            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_REQUEST_NOT_LEGAL, monitorDataRequest.checkLegality());
+        }
+
+        // preparation
+        GlobalInfo queryInfo = globalBiz.getGlobalInfoByType(GlobalType.MONITOR_QUERY);
+        if (queryInfo == null) {
+            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "query is null");
+        }
+        String queryUrl = "http://" + queryInfo.getValue() + "/graph/history";
+
+        MonitorResult monitorResult = new MonitorResult();
+        monitorResult.setTargetType(monitorDataRequest.getTargetType());
+        monitorResult.setDataSpec(monitorDataRequest.getDataSpec());
+
+        // fetch data from query api
+        // create graphHistoryRequest
+        GraphHistoryRequest graphHistoryRequest = getGraphHistoryRequestForOverview(monitorDataRequest);
+        List<EndpointCounter> endpointCounterList = graphHistoryRequest.getEndpoint_counters();
+        //Concurrent requests, sending 500 counters at a time
+        int max_size = 500;
+        int times = endpointCounterList.size() % max_size == 0 ? endpointCounterList.size() / max_size : endpointCounterList.size() / max_size + 1;
+        List<postJsonTask> tasks = new ArrayList<>(times);
+        for (int i = 0; i < times; i++) {
+            GraphHistoryRequest tmp = new GraphHistoryRequest();
+            tmp.setStart(graphHistoryRequest.getStart());
+            tmp.setEnd(graphHistoryRequest.getEnd());
+            tmp.setCf(graphHistoryRequest.getCf());
+            tmp.setEndpoint_counters(endpointCounterList.subList(i * max_size, Math.min((i + 1) * max_size, endpointCounterList.size())));
+            tasks.add(new postJsonTask(queryUrl, tmp));
+        }
+        List<List<GraphHistoryResponse>> taskResult = ClientConfigure.executeCompletionService(tasks);
+        List<GraphHistoryResponse> graphHistoryResponses = new ArrayList<>();
+        for (List<GraphHistoryResponse> result : taskResult) {
+            if (result != null && result.size() > 0) {
+                graphHistoryResponses.addAll(result);
+            }
+        }
+
+        // re-arrage GraphHistoryResponses
+        Map<String, List<GraphHistoryResponse>> graphHistoryResponseMap = arrangeGraphHistoryResponseList(graphHistoryResponses,
+                monitorDataRequest.getTargetType());
+
+        // create MonitorResult
+        createMonitorResult(monitorResult, graphHistoryResponseMap, monitorDataRequest);
+
+        return monitorResult;
     }
 
     @Override

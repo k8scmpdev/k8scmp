@@ -6,7 +6,10 @@ package org.k8scmp.overview.domain;
 public class ResourceOverview {
     private Double memoryTotal = null;
     private Double memoryUsed = null;
-    private Integer cpu0To25 = null;
+    private Double diskTotal = null;
+    private Double diskRemain = null;
+
+	private Integer cpu0To25 = null;
     private Integer cpu25To50 = null;
     private Integer cpu50To75 = null;
     private Integer cpu75To100 = null;
@@ -85,4 +88,19 @@ public class ResourceOverview {
     public void setNodeOffline(Integer nodeOffline) {
         this.nodeOffline = nodeOffline;
     }
+    public Double getDiskTotal() {
+		return diskTotal;
+	}
+
+	public void setDiskTotal(Double diskTotal) {
+		this.diskTotal = diskTotal;
+	}
+
+	public Double getDiskRemain() {
+		return diskRemain;
+	}
+
+	public void setDiskRemain(Double diskRemain) {
+		this.diskRemain = diskRemain;
+	}
 }

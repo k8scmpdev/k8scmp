@@ -78,8 +78,18 @@ public class OverviewServiceImpl implements OverviewService {
 		//获取cpu、memory、node概览数据
      	ResourceOverview resourceOverviewInfo = getResourceOverview();
      	Map<String, Double> data = new HashMap<>();
-     	data.put("已使用："+parseDouble2Str(resourceOverviewInfo.getMemoryUsed()/1024/1024/1024)+"G", resourceOverviewInfo.getMemoryUsed());
-     	data.put("总可用："+parseDouble2Str(resourceOverviewInfo.getMemoryTotal()/1024/1024/1024)+"G", resourceOverviewInfo.getMemoryTotal());
+     	data.put("使用："+parseDouble2Str(resourceOverviewInfo.getMemoryUsed()/1024/1024/1024)+"G", resourceOverviewInfo.getMemoryUsed());
+     	data.put("可用："+parseDouble2Str((resourceOverviewInfo.getMemoryTotal()-resourceOverviewInfo.getMemoryUsed())/1024/1024/1024)+"G", resourceOverviewInfo.getMemoryTotal()-resourceOverviewInfo.getMemoryUsed());
+     	return data;
+	}
+	
+	@Override
+	public Map<String, Double> getDiskInfo() {
+		//获取cpu、memory、node概览数据
+     	ResourceOverview resourceOverviewInfo = getResourceOverview();
+     	Map<String, Double> data = new HashMap<>();
+     	data.put("使用："+parseDouble2Str((resourceOverviewInfo.getDiskTotal()-resourceOverviewInfo.getDiskRemain())/1024/1024/1024)+"G", resourceOverviewInfo.getDiskTotal()-resourceOverviewInfo.getDiskRemain());
+     	data.put("可用："+parseDouble2Str(resourceOverviewInfo.getDiskRemain()/1024/1024/1024)+"G", resourceOverviewInfo.getDiskRemain());
      	return data;
 	}
 	
@@ -142,12 +152,16 @@ public class OverviewServiceImpl implements OverviewService {
                 long endTime = current.getTimeInMillis();
                 current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 1);
                 long startTime = current.getTimeInMillis();
-                MonitorResult monitorResult = monitorService.getMonitorDataForOverview(targetRequest, startTime, endTime, "AVERAGE", false);
+                MonitorResult monitorResult = monitorService.getMonitorDataForOverview(targetRequest, startTime, endTime, "AVERAGE");
                 if (null != monitorResult) {
                     Map<String, List<Map<String, Double>>> data = monitorResult.getCounterResults();
                     result.setMemoryTotal(getAverageSum(data, "mem.memtotal", null));
                     result.setMemoryUsed(getAverageSum(data, "mem.memused", null));
                     getAverageCpu(data, result);
+                    Double diskTotal = getAverageSum(data, "df.bytes.total/mount", null);
+                    Double diskUsed = getAverageSum(data, "df.bytes.used/mount", null);
+                    result.setDiskTotal(diskTotal);
+                    result.setDiskRemain(diskTotal - diskUsed);
                 }
 //            }
             int onlineNode = 0;

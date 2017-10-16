@@ -202,5 +202,26 @@ public class OverviewController {
 		}
 
     }
+    
+    @ResponseBody
+    @RequestMapping(value="/overview/diskinfo", method=RequestMethod.GET)
+    public String showDisk() {
+     	
+    	ObjectMapper obj = new ObjectMapper();
+
+    	Map<String, Object> appinfo = new HashMap<>();
+     	appinfo.put("type", "pie");
+     	appinfo.put("name", "磁盘使用量");
+		appinfo.put("datalist", overviewService.getDiskInfo());
+		
+        try {
+			return obj.writeValueAsString(appinfo);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
+
+    }
    
 }
