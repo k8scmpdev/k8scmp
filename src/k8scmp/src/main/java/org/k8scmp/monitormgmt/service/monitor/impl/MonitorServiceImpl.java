@@ -21,6 +21,7 @@ import org.k8scmp.exception.ApiException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
+import org.k8scmp.login.domain.User;
 import org.k8scmp.monitormgmt.dao.monitor.MonitorDao;
 import org.k8scmp.monitormgmt.domain.monitor.ContainerInfo;
 import org.k8scmp.monitormgmt.domain.monitor.InstenceInfoBack;
@@ -35,6 +36,7 @@ import org.k8scmp.monitormgmt.domain.monitor.falcon.EndpointCounter;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryRequest;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryResponse;
 import org.k8scmp.monitormgmt.service.monitor.MonitorService;
+import org.k8scmp.util.AuthUtil;
 import org.k8scmp.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +75,58 @@ public class MonitorServiceImpl implements MonitorService {
     
     @Override
     public List<NodeInfoBack> getNodeMonitorData(){
+    	List<NodeInfoBack> nodeInfoBackList = new ArrayList<>();
+    	User user = AuthUtil.getUser();
+        //insert all clusters' nodes' information to monitor_targets table
+        List<NodeInfo> nodeList = new ArrayList<>();
+//        List<CollectionAuthorityMap> clusterAuthorityMapList = AuthUtil.getCollectionList(user.getId(), ResourceType.CLUSTER);
+//        if (!clusterAuthorityMapList.isEmpty()) {
+//            int tmpClusterId = clusterAuthorityMapList.get(0).getCollectionId();
+            List<TargetInfo> targetInfos = new ArrayList<>();
+//            for (CollectionAuthorityMap authorityMap : clusterAuthorityMapList) {
+                try {
+                    NodeWrapper nodeWrapper = new NodeWrapper().init("default");
+                    List<NodeInfo> nodeInfoInCluster = nodeWrapper.getNodeInfoListWithoutPods();
+                    nodeList.addAll(nodeInfoInCluster);
+                    for (NodeInfo nodeInfo : nodeInfoInCluster) {
+                        targetInfos.add(new TargetInfo(nodeInfo.getName(), null, null));
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
+                }
+//            }
+            TargetRequest targetRequest = new TargetRequest(2, "node", targetInfos);
+//            monitorService.insertTargets(targetRequest);
+
+            //use the existing function to get monitor data
+            Calendar current = Calendar.getInstance();
+            long endTime = current.getTimeInMillis();
+            current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 1);
+            long startTime = current.getTimeInMillis();
+            MonitorResult result = getMonitorDataForOverview(targetRequest, startTime, endTime, "AVERAGE");
+    	NodeWrapper nodeWrapper;
+		try {
+			nodeWrapper = new NodeWrapper().init("default");
+			List<NodeInfo> nodeInfoList = nodeWrapper.getNodeInfoListWithoutPods();
+	    	for (NodeInfo nodeInfo : nodeInfoList) {
+	    		NodeInfoBack nodeInfoBack = new NodeInfoBack();
+	    		nodeInfoBack.setHostName(nodeInfo.getName());
+	    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
+	    		nodeInfoBack.setCPUPercent(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())+"");
+	    		nodeInfoBack.setMemoryPercent(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())+"");
+//	    		nodeInfoBack.setDiskPercent(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())+"");
+//	    		nodeInfoBack.setNetin(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())+"");
+//	    		nodeInfoBack.setNetout(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())+"");
+	    		nodeInfoBack.setState(nodeInfo.getStatus());
+	    		nodeInfoBackList.add(nodeInfoBack);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return nodeInfoBackList;
+    }
+    
+    public List<NodeInfoBack> getNodeMonitorData2(){
     	//选取当前时间1秒内的值
     	long endTime = System.currentTimeMillis();
     	long startTime = endTime - 1000;
