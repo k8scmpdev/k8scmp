@@ -44,8 +44,9 @@ public class NodeWrapper {
     	//cluster 需要自定义
 //        Cluster cluster = KubeServiceInfo.getClusterBasicById(clusterId);
     	Cluster cluster = new Cluster();
-    	GlobalInfo globalInfo = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
-    	cluster.setApi(globalInfo.getValue());
+//    	GlobalInfo globalInfo = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
+//    	cluster.setApi(globalInfo.getValue());
+    	cluster.setApi("192.168.80.137:8080");
         this.init(cluster, namespace);
 
         return this;
