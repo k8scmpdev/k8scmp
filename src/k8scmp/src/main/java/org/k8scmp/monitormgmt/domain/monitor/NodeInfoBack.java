@@ -3,85 +3,76 @@ package org.k8scmp.monitormgmt.domain.monitor;
 public class NodeInfoBack {
 //	private String phyCluster;
 	private String logicCluster;
-	private String hostIP;
+	private String hostName;
 	private String state;
-	private String CPUTotal;
-	private String memoryTotal;
-	private String diskTotal;
-	private String ioinput;
-	private String iooutput;
+	private String CPUPercent;
+	private String memoryPercent;
+	private String diskPercent;
+	private String netin;
+	private String netout;
 	
-//	public String getPhyCluster() {
-//		return phyCluster;
-//	}
-//	
-//	public void setPhyCluster(String phyCluster) {
-//		this.phyCluster = phyCluster;
-//	}
+	public NodeInfoBack(){
+		
+	}
+	public NodeInfoBack(String logicCluster, String hostName, String state, String cPUPercent, String memoryPercent,
+			String diskPercent, String netin, String netout) {
+		this.logicCluster = logicCluster;
+		this.hostName = hostName;
+		this.state = state;
+		this.CPUPercent = cPUPercent;
+		this.memoryPercent = memoryPercent;
+		this.diskPercent = diskPercent;
+		this.netin = netin;
+		this.netout = netout;
+	}
 	
 	public String getLogicCluster() {
 		return logicCluster;
 	}
-	
 	public void setLogicCluster(String logicCluster) {
 		this.logicCluster = logicCluster;
 	}
-	
-	public String getHostIP() {
-		return hostIP;
+	public String getHostName() {
+		return hostName;
 	}
-	
-	public void setHostIP(String hostIP) {
-		this.hostIP = hostIP;
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
 	}
-	
 	public String getState() {
 		return state;
 	}
-	
 	public void setState(String state) {
 		this.state = state;
 	}
-	
-	public String getCPUTotal() {
-		return CPUTotal;
+	public String getCPUPercent() {
+		return CPUPercent;
 	}
-	
-	public void setCPUTotal(String cPUTotal) {
-		CPUTotal = cPUTotal;
+	public void setCPUPercent(String cPUPercent) {
+		CPUPercent = cPUPercent;
 	}
-	
-	public String getMemoryTotal() {
-		return memoryTotal;
+	public String getMemoryPercent() {
+		return memoryPercent;
 	}
-	
-	public void setMemoryTotal(String memoryTotal) {
-		this.memoryTotal = memoryTotal;
+	public void setMemoryPercent(String memoryPercent) {
+		this.memoryPercent = memoryPercent;
 	}
-	
-	public String getDiskTotal() {
-		return diskTotal;
+	public String getDiskPercent() {
+		return diskPercent;
 	}
-	
-	public void setDiskTotal(String diskTotal) {
-		this.diskTotal = diskTotal;
+	public void setDiskPercent(String diskPercent) {
+		this.diskPercent = diskPercent;
 	}
-	
-	public String getIoinput() {
-		return ioinput;
+	public String getNetin() {
+		return netin;
 	}
-	
-	public void setIoinput(String ioinput) {
-		this.ioinput = ioinput;
+	public void setNetin(String netin) {
+		this.netin = netin;
 	}
-	
-	public String getIooutput() {
-		return iooutput;
+	public String getNetout() {
+		return netout;
 	}
-	
-	public void setIooutput(String iooutput) {
-		this.iooutput = iooutput;
+	public void setNetout(String netout) {
+		this.netout = netout;
 	}
-	
 	
 }

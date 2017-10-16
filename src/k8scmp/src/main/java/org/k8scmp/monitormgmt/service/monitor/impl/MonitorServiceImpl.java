@@ -1,25 +1,40 @@
-package org.k8scmp.monitormgmt.service.impl;
+package org.k8scmp.monitormgmt.service.monitor.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodList;
+
+import org.k8scmp.appmgmt.dao.AppDao;
+import org.k8scmp.appmgmt.dao.ServiceDao;
+import org.k8scmp.appmgmt.domain.AppInfo;
+import org.k8scmp.appmgmt.domain.ServiceInfo;
+import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ClientConfigure;
+import org.k8scmp.common.GlobalConstant;
+import org.k8scmp.engine.k8s.util.NodeWrapper;
 import org.k8scmp.engine.model.CustomObjectMapper;
 import org.k8scmp.exception.ApiException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
-import org.k8scmp.monitormgmt.dao.MonitorBiz;
+import org.k8scmp.monitormgmt.dao.monitor.MonitorDao;
 import org.k8scmp.monitormgmt.domain.monitor.ContainerInfo;
+import org.k8scmp.monitormgmt.domain.monitor.InstenceInfoBack;
 import org.k8scmp.monitormgmt.domain.monitor.MonitorDataRequest;
 import org.k8scmp.monitormgmt.domain.monitor.MonitorResult;
+import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
+import org.k8scmp.monitormgmt.domain.monitor.NodeInfoBack;
+import org.k8scmp.monitormgmt.domain.monitor.PodInfo;
 import org.k8scmp.monitormgmt.domain.monitor.TargetInfo;
 import org.k8scmp.monitormgmt.domain.monitor.TargetRequest;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.EndpointCounter;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryRequest;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryResponse;
-import org.k8scmp.monitormgmt.service.MonitorService;
+import org.k8scmp.monitormgmt.service.monitor.MonitorService;
 import org.k8scmp.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,14 +57,323 @@ public class MonitorServiceImpl implements MonitorService {
     private static Logger logger = LoggerFactory.getLogger(MonitorServiceImpl.class);
 
     @Autowired
-    MonitorBiz monitorBiz;
+    MonitorDao monitorBiz;
 
     @Autowired
     GlobalBiz globalBiz;
 
     @Autowired
     CustomObjectMapper mapper;
+    
+    @Autowired
+    ServiceDao serviceDao;
+    
+    @Autowired
+    AppDao appDao;
+    
+    @Override
+    public List<NodeInfoBack> getNodeMonitorData(){
+    	//选取当前时间1秒内的值
+    	long endTime = System.currentTimeMillis();
+    	long startTime = endTime - 1000;
+    	String dataSpec = "AVERAGE";
+    	String type = "node";
+    	List<NodeInfoBack> nodeInfoBackList = new ArrayList<>();
+    	MonitorResult result = (MonitorResult)getMonitorData(type,startTime,endTime,dataSpec).getResult();
+    	NodeWrapper nodeWrapper;
+		try {
+			nodeWrapper = new NodeWrapper().init("default");
+			List<NodeInfo> nodeInfoList = nodeWrapper.getNodeInfoListWithoutPods();
+	    	for (NodeInfo nodeInfo : nodeInfoList) {
+	    		NodeInfoBack nodeInfoBack = new NodeInfoBack();
+	    		nodeInfoBack.setHostName(nodeInfo.getName());
+	    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
+	    		nodeInfoBack.setCPUPercent(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName()).toString());
+	    		nodeInfoBack.setMemoryPercent(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName()).toString());
+	    		nodeInfoBack.setDiskPercent(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName()).toString());
+	    		nodeInfoBack.setNetin(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName()).toString());
+	    		nodeInfoBack.setNetout(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName()).toString());
+	    		nodeInfoBack.setState(nodeInfo.getStatus());
+	    		nodeInfoBackList.add(nodeInfoBack);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return nodeInfoBackList;
+    }
+    
+    @Override
+    public List<InstenceInfoBack> getInstenceMonitorData(String serviceName){
+    	long endTime = System.currentTimeMillis();
+    	long startTime = endTime - 1000;
+    	String dataSpec = "AVERAGE";
+    	String type = "pod";
+    	List<InstenceInfoBack> instenceList = new ArrayList<>();
+    	MonitorResult result = (MonitorResult)getMonitorData(type,startTime,endTime,dataSpec).getResult();
+    	NodeWrapper nodeWrapper;
+    	try {
+			nodeWrapper = new NodeWrapper().init("default");
+			List<Pod> podList = nodeWrapper.getAllPods().getItems();
+			//通过服务名搜索和获取所有的实例
+	    	for (Pod pod : podList) {
+	    		InstenceInfoBack instenceInfoBack = new InstenceInfoBack();
+	    		if(serviceName != null){
+	    			String serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
+	    			if(serviceId != null){
+	    				ServiceInfo service = serviceDao.getService(serviceId);
+	    				if(service.getServiceCode().contains(serviceName)){
+	    					instenceInfoBack.setServiceName(service.getServiceCode());
+	    					AppInfo app = appDao.getApp(service.getAppId());
+	    					instenceInfoBack.setAppName(app.getAppCode());
+	    					instenceInfoBack.setInstanceName(pod.getMetadata().getName());
+	    					instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName()).toString());
+	    					instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName()).toString());
+	    					instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName()).toString());
+	    					instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName()).toString());
+	    				}
+	    			}/*else{
+	    				instenceInfoBack.setAppName(null);
+	    				instenceInfoBack.setServiceName(null);
+	    				instenceInfoBack.setInstanceName(pod.getMetadata().getName());
+	    				instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName()).toString());
+    					instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName()).toString());
+    					instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName()).toString());
+    					instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName()).toString());
+	    			}*/
+				}else{
+					String serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
+					ServiceInfo service = serviceDao.getService(serviceId);
+					AppInfo app = appDao.getApp(service.getAppId());
+					instenceInfoBack.setAppName(app.getAppCode());
+					instenceInfoBack.setServiceName(service.getServiceCode());
+					instenceInfoBack.setInstanceName(pod.getMetadata().getName());
+					instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName()).toString());
+					instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName()).toString());
+					instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName()).toString());
+					instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName()).toString());
+					
+				}
+	    		instenceList.add(instenceInfoBack);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return instenceList;
+    }
+    
+    @Override
+    public HttpResponseTemp<?> getMonitorData(String type, long startTime, long endTime, String dataSpec) {
 
+       // AuthUtil.verify(CurrentThreadInfo.getUserId(), cid, ResourceType.CLUSTER, OperationType.GET);
+        
+    	//根据type实时查询node\pod\container
+    	List<TargetInfo> targetInfos = getTargetInfos(type);
+    	
+       //TargetRequest targetRequest = fetchTargetRequest(targetId);
+       // if (targetRequest == null) {
+       //    throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_REQUEST_NOT_LEGAL, "target request info not exists");
+       // }
+        MonitorDataRequest monitorDataRequest = new MonitorDataRequest(
+                startTime,
+                endTime,
+                dataSpec,
+                type,
+                targetInfos);
+
+        if (!StringUtils.isBlank(monitorDataRequest.checkLegality())) {
+            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_REQUEST_NOT_LEGAL, monitorDataRequest.checkLegality());
+        }
+
+        // preparation
+        GlobalInfo queryInfo = globalBiz.getGlobalInfoByType(GlobalType.MONITOR_QUERY);
+        if (queryInfo == null) {
+            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "query is null");
+        }
+        String queryUrl = "http://" + queryInfo.getValue() + "/graph/history";
+
+        MonitorResult monitorResult = new MonitorResult();
+        monitorResult.setTargetType(monitorDataRequest.getTargetType());
+        monitorResult.setDataSpec(monitorDataRequest.getDataSpec());
+
+        // fetch data from query api
+        List<GraphHistoryResponse> graphHistoryResponses = new ArrayList<>();
+        // create graphHistoryRequest
+        GraphHistoryRequest graphHistoryRequest = getGraphHistoryRequest(monitorDataRequest);
+        List<EndpointCounter> endpointCounterList = graphHistoryRequest.getEndpoint_counters();
+        //Concurrent requests, sending 500 counters at a time
+        int max_size = 500;
+        int times = endpointCounterList.size() % max_size == 0 ? endpointCounterList.size() / max_size : endpointCounterList.size() / max_size + 1;
+        List<postJsonTask> tasks = new ArrayList<>(times);
+        for (int i = 0; i < times; i++) {
+            GraphHistoryRequest tmp = new GraphHistoryRequest();
+            tmp.setStart(graphHistoryRequest.getStart());
+            tmp.setEnd(graphHistoryRequest.getEnd());
+            tmp.setCf(graphHistoryRequest.getCf());
+            tmp.setEndpoint_counters(endpointCounterList.subList(i * max_size, Math.min((i + 1) * max_size, endpointCounterList.size())));
+            tasks.add(new postJsonTask(queryUrl, tmp));
+        }
+        List<List<GraphHistoryResponse>> taskResult = ClientConfigure.executeCompletionService(tasks);
+        for (List<GraphHistoryResponse> result : taskResult) {
+            if (result != null && result.size() > 0) {
+                graphHistoryResponses.addAll(result);
+            }
+        }
+//        try {
+//            graphHistoryResponses = postJson(queryUrl, graphHistoryRequest);
+//        } catch (JsonProcessingException e) {
+//            logger.error("error processing json!", e);
+//            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "error processing json : " + e.getMessage());
+//        } catch (IOException e) {
+//            logger.error("io exception!", e);
+//            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "io exception : " + e.getMessage());
+//        }
+//        if (graphHistoryResponses == null) {
+//            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "query response is null");
+//        }
+        // re-arrage GraphHistoryResponses
+        Map<String, List<GraphHistoryResponse>> graphHistoryResponseMap = arrangeGraphHistoryResponseList(graphHistoryResponses,
+                monitorDataRequest.getTargetType());
+
+        // create MonitorResult
+        createMonitorResult(monitorResult, graphHistoryResponseMap, monitorDataRequest);
+
+        return ResultStat.OK.wrap(monitorResult);
+    }
+   
+    private List<TargetInfo> getTargetInfos(String type) {
+    	
+		//获取node/pod/container
+    	try {
+			List<TargetInfo> targetInfoList = new ArrayList<>();
+			NodeWrapper nodeWrapper = new NodeWrapper().init("default");
+			if(type.equals("node")){
+				List<NodeInfo> nodeInfoList = nodeWrapper.getNodeListByClusterId();
+				for (NodeInfo nodeInfo : nodeInfoList) {
+					TargetInfo targetInfo = new TargetInfo();
+					targetInfo.setNode(nodeInfo.getName());
+					targetInfoList.add(targetInfo);
+				}
+			}else if(type.equals("pod") || type.equals("container")){
+				
+				PodList podList = nodeWrapper.getAllPods();
+				for (Pod pod : podList.getItems()) {
+					TargetInfo targetInfo = new TargetInfo();
+					PodInfo podInfo = new PodInfo();
+					podInfo.setPodName(pod.getMetadata().getName());
+					List<ContainerInfo> containers = new ArrayList<>();
+					for (Container container : pod.getSpec().getContainers()) {
+						ContainerInfo containerInfo = new ContainerInfo();
+						containerInfo.setHostname(container.getName());
+//						containerInfo.setContainerId();
+						containers.add(containerInfo);
+					}
+					podInfo.setContainers(containers);
+					targetInfoList.add(targetInfo);
+				}
+			}
+			return targetInfoList;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+    // create graphHistoryRequest
+    private GraphHistoryRequest getGraphHistoryRequest(MonitorDataRequest monitorDataRequest) {
+
+        GraphHistoryRequest graphHistoryRequest = new GraphHistoryRequest();
+        graphHistoryRequest.setStart(monitorDataRequest.getStartTime() / 1000);
+        graphHistoryRequest.setEnd(monitorDataRequest.getEndTime() / 1000);
+        graphHistoryRequest.setCf(monitorDataRequest.getDataSpec());
+
+        List<String> counters = retrieveCountersByTargetInfoList(monitorDataRequest.getTargetType(), monitorDataRequest.getTargetInfos());
+
+        switch (monitorDataRequest.getTargetType()) {
+            case "node":
+                for (String counter : counters) {
+                    for (TargetInfo targetInfo : monitorDataRequest.getTargetInfos()) {
+                        graphHistoryRequest.getEndpoint_counters().add(new EndpointCounter(targetInfo.getNode(), counter));
+                    }
+                }
+                break;
+            case "pod":
+                for (String counter : counters) {
+                    for (TargetInfo targetInfo : monitorDataRequest.getTargetInfos()) {
+                        for (ContainerInfo containerInfo : targetInfo.getPod().getContainers()) {
+                            if (counter.contains(containerInfo.getContainerId())) {
+                                graphHistoryRequest.getEndpoint_counters().add(new EndpointCounter(containerInfo.getHostname(), counter));
+                            }
+                        }
+                    }
+                }
+                break;
+            case "container":
+                for (String counter : counters) {
+                    for (TargetInfo targetInfo : monitorDataRequest.getTargetInfos()) {
+                        if (counter.contains(targetInfo.getContainer().getContainerId())) {
+                            graphHistoryRequest.getEndpoint_counters().add(new EndpointCounter(targetInfo.getContainer().getHostname(), counter));
+                        }
+                    }
+                }
+        }
+
+        return graphHistoryRequest;
+    }
+
+    // retrieve sorted counters
+    private List<String> retrieveCountersByTargetInfoList(String targetType, List<TargetInfo> targetInfos) {
+
+        if (targetInfos == null || targetInfos.size() == 0) {
+            return null;
+        }
+
+        Set<String> endpoints = new HashSet<>();
+//        List<String> endpoints = new ArrayList<>();
+        Set<String> containers = new HashSet<>();
+
+        // collect endpoints and containers
+        switch (targetType) {
+            case "node":
+                for (TargetInfo targetInfo : targetInfos) {
+                    endpoints.add(targetInfo.getNode());
+                }
+                break;
+            case "pod":
+                for (TargetInfo targetInfo : targetInfos) {
+                    for (ContainerInfo containerInfo : targetInfo.getPod().getContainers()) {
+                        endpoints.add(containerInfo.getHostname());
+                        containers.add(containerInfo.getContainerId());
+                    }
+                }
+                break;
+            case "container":
+                for (TargetInfo targetInfo : targetInfos) {
+                    endpoints.add(targetInfo.getContainer().getHostname());
+                    containers.add(targetInfo.getContainer().getContainerId());
+                }
+        }
+
+        // fetch counters from database
+        switch (targetType) {
+            case "node":
+//            	List<String> countsback = new ArrayList<>();
+//            	List<String> counts = new ArrayList<>();
+//            	for (String endpoint : endpoints) {
+//            		int id = monitorBiz.getEndpointId(endpoint);
+//            		countsback = monitorBiz.getNodeCounterByEndpointId(id);
+//            		counts.addAll(countsback);
+//				}
+                return monitorBiz.getNodeCountersByEndpoints(endpoints);
+//            	return counts;
+            case "pod":
+            case "container":
+//                return monitorBiz.getContainerCountersByEndpoints(joinStringSet(endpoints, ","), joinStringSet(containers, ","));
+            default:
+                return new ArrayList<>(1);
+        }
+    }
+    
+    
     
     @Override
     public List<GraphHistoryResponse> postJson(String requestUrl, GraphHistoryRequest graphHistoryRequest) throws IOException {
@@ -103,49 +427,7 @@ public class MonitorServiceImpl implements MonitorService {
         }
     }
     
-    // retrieve sorted counters
-    private List<String> retrieveCountersByTargetInfoList(String targetType, List<TargetInfo> targetInfos) {
-
-        if (targetInfos == null || targetInfos.size() == 0) {
-            return null;
-        }
-
-        Set<String> endpoints = new HashSet<>();
-        Set<String> containers = new HashSet<>();
-
-        // collect endpoints and containers
-        switch (targetType) {
-            case "node":
-                for (TargetInfo targetInfo : targetInfos) {
-                    endpoints.add(targetInfo.getNode());
-                }
-                break;
-            case "pod":
-                for (TargetInfo targetInfo : targetInfos) {
-                    for (ContainerInfo containerInfo : targetInfo.getPod().getContainers()) {
-                        endpoints.add(containerInfo.getHostname());
-                        containers.add(containerInfo.getContainerId());
-                    }
-                }
-                break;
-            case "container":
-                for (TargetInfo targetInfo : targetInfos) {
-                    endpoints.add(targetInfo.getContainer().getHostname());
-                    containers.add(targetInfo.getContainer().getContainerId());
-                }
-        }
-
-        // fetch counters from database
-        switch (targetType) {
-            case "node":
-                return monitorBiz.getNodeCountersByEndpoints(endpoints);
-            case "pod":
-            case "container":
-                return monitorBiz.getContainerCountersByEndpoints(joinStringSet(endpoints, ","), joinStringSet(containers, ","));
-            default:
-                return new ArrayList<>(1);
-        }
-    }
+    
     
     private String joinStringSet(Set<String> stringSet, String delimiter) {
 
