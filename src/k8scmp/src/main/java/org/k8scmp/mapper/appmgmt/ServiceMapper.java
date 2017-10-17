@@ -41,7 +41,7 @@ public interface ServiceMapper {
 	ServiceInfo getService(@Param("id") String id);
 	
     @Insert("INSERT INTO service(" + BASIC_COLUMN + " ) values (" +
-            " #{item.id}, #{item.serviceCode}, #{item.appId}, #{item.startSeq}, #{item.description}, #{item.state}, #{item.data}," +
+            " #{item.id}, #{item.serviceCode}, #{item.appId}, #{item.startSeq}, #{item.description}, #{item.state}, #{data}," +
             " #{item.createTime},#{item.creatorId},#{item.lastModifiedTime},#{item.lastModifierId})")
     int createService(@Param("item") ServiceConfigInfo item,@Param("data") String data);
 
@@ -55,7 +55,7 @@ public interface ServiceMapper {
             "where id = #{item.id}")
     int updateService(@Param("item") ServiceInfo item);
     
-    @Delete("delete from service where id in(${id})")
+    @Delete("delete from service where id=#{id}")
 	int deleteService(@Param("id") String id);
     
     @Update("update service set startSeq=#{startSeq} where id=#{id}")

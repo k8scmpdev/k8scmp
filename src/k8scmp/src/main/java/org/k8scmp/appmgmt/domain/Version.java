@@ -27,19 +27,18 @@ public class Version extends VersionBase {
     private VersionType versionType;
     private boolean deprecate = false;
     private List<String> hostList;
-    private List<NodePortDraft> nodePorts;
     
     public List<ContainerDraft> getContainerDrafts() {
         return containerDrafts;
     }
 
-    public List<LabelSelector> getLabelSelectors() {
-        return labelSelectors;
-    }
-
-    public void setLabelSelectors(List<LabelSelector> labelSelectors) {
-        this.labelSelectors = labelSelectors;
-    }
+//    public List<LabelSelector> getLabelSelectors() {
+//        return labelSelectors;
+//    }
+//
+//    public void setLabelSelectors(List<LabelSelector> labelSelectors) {
+//        this.labelSelectors = labelSelectors;
+//    }
 
     public void setContainerDrafts(List<ContainerDraft> containerDrafts) {
         this.containerDrafts = containerDrafts;
@@ -173,11 +172,4 @@ public class Version extends VersionBase {
 		this.logDraft = logDraft;
 	}
 
-	public List<NodePortDraft> getNodePorts() {
-		return nodePorts;
-	}
-
-	public void setNodePorts(List<NodePortDraft> nodePorts) {
-		this.nodePorts = nodePorts;
-	}
 }

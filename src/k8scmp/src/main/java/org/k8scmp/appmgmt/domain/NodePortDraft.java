@@ -1,17 +1,20 @@
 package org.k8scmp.appmgmt.domain;
 
+import org.k8scmp.model.LoadBalancerProtocol;
+
 public class NodePortDraft {
 	private int nodePort;
-	private int containerPort;
-	private String protocol;
+	private int targetPort;
+	private String context;
+	private LoadBalancerProtocol protocol = LoadBalancerProtocol.TCP;
 	private String description;
 	
 	public NodePortDraft() {
 	}
 	
-	public NodePortDraft(int nodePort, int containerPort) {
+	public NodePortDraft(int nodePort, int targetPort) {
 	    this.setNodePort(nodePort);
-	    this.setContainerPort(containerPort);
+	    this.setTargetPort(targetPort);
 	}
 
 	public int getNodePort() {
@@ -22,14 +25,6 @@ public class NodePortDraft {
 		this.nodePort = nodePort;
 	}
 
-	public int getContainerPort() {
-		return containerPort;
-	}
-
-	public void setContainerPort(int containerPort) {
-		this.containerPort = containerPort;
-	}
-
 	public String getDescription() {
 		return description;
 	}
@@ -38,12 +33,28 @@ public class NodePortDraft {
 		this.description = description;
 	}
 
-	public String getProtocol() {
+	public LoadBalancerProtocol getProtocol() {
 		return protocol;
 	}
 
-	public void setProtocol(String protocol) {
+	public void setProtocol(LoadBalancerProtocol protocol) {
 		this.protocol = protocol;
+	}
+
+	public String getContext() {
+		return context;
+	}
+
+	public void setContext(String context) {
+		this.context = context;
+	}
+
+	public int getTargetPort() {
+		return targetPort;
+	}
+
+	public void setTargetPort(int targetPort) {
+		this.targetPort = targetPort;
 	}
 	   
 }

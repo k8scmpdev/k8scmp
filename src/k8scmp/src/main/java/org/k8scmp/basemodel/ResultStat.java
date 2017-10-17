@@ -132,7 +132,8 @@ public enum ResultStat {
 
     // service update related
     SERVICE_UPDATE_FAILED(2100),
-
+    SERVICE_ROLLBACK_FAILED(2101),
+    
     // service scale related
     SERVICE_SCALE_NO_RC_FOUND(2200),
     SERVICE_SCALE_BAD_RC_FOUND(2201),

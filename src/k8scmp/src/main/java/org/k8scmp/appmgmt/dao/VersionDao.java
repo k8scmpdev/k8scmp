@@ -11,11 +11,13 @@ public interface VersionDao{
 
     void deleteAllVersion(String serviceId);
 
-    void updateLabelSelector(String id,String data);
-
     Integer getMaxVersion(String serviceId);
     
     VersionBase getVersion(String serviceId,int version);
 
     List<VersionBase> getAllVersionByServiceId(String serviceId);
+
+	void deleteVersionById(String id);
+
+	void updateVersion(Version version);
 }

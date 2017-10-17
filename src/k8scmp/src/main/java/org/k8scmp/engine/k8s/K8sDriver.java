@@ -14,8 +14,10 @@ import org.k8scmp.appmgmt.domain.Cluster;
 import org.k8scmp.appmgmt.domain.DeployEvent;
 import org.k8scmp.appmgmt.domain.DeploymentSnapshot;
 import org.k8scmp.appmgmt.domain.Env;
+import org.k8scmp.appmgmt.domain.NodePortDraft;
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
 import org.k8scmp.appmgmt.domain.Version;
+import org.k8scmp.appmgmt.domain.VersionBase;
 import org.k8scmp.appmgmt.service.ServiceStatusManager;
 import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.engine.RuntimeDriver;
@@ -27,6 +29,7 @@ import org.k8scmp.engine.k8s.util.KubeUtils;
 import org.k8scmp.engine.k8s.util.PodUtils;
 import org.k8scmp.engine.k8s.util.SecretUtils;
 import org.k8scmp.exception.DeploymentEventException;
+import org.k8scmp.exception.DeploymentTerminatedException;
 import org.k8scmp.exception.K8sDriverException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.login.domain.User;
@@ -112,7 +115,7 @@ public class K8sDriver implements RuntimeDriver {
             //loadBalancer
 //            if (serviceConfigInfo.getNetworkMode() != NetworkMode.HOST  && serviceConfigInfo.getUsedLoadBalancer() == 0) {
 //                List<LoadBalancer> lbs = loadBalancerBiz.getInnerAndExternalLoadBalancerByDeployId(serviceConfigInfo.getId());
-//                checkLoadBalancer(client, lbs);
+                checkLoadBalancer(client, serviceConfigInfo,appInfo);
 //            }
             // create secret before the create of rc
             // judge the registry is belong to domeos or not
@@ -125,6 +128,42 @@ public class K8sDriver implements RuntimeDriver {
         }
     }
 
+    @Override
+    public void createLoadBalancer(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws K8sDriverException, DriverException {
+    	 KubeUtils client;
+         try {
+             client = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+             Service service = new K8sServiceBuilder(serviceConfigInfo,appInfo).build();
+         	if(service != null){
+         		Service oldService = client.serviceInfo(service.getMetadata().getName());
+				if (oldService != null) {
+					client.deleteService(service.getMetadata().getName());
+				} 
+         		client.createService(service);
+         		logger.info("Service:" + service.getMetadata().getName() + " created successfully");
+         	}else{
+         		logger.error("Failed to create service!");
+         	}
+         } catch (K8sDriverException e) {
+             throw new DriverException(e.getMessage());
+         }
+    	
+    }
+    
+    @Override
+    public void stopLoadBalancer(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws DriverException {
+    	 KubeUtils client;
+         try {
+             client = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+             if(serviceConfigInfo.isExternal()){
+            	 client.deleteService(GlobalConstant.RC_NAME_PREFIX + serviceConfigInfo.getServiceCode());
+             }
+         } catch (K8sDriverException e) {
+             throw new DriverException(e.getMessage());
+         }
+    	
+    }
+    
 //    @Override
 //    public void abortDeployOperation(ServiceConfigInfo serviceConfigInfo, User user)
 //            throws IOException{
@@ -192,224 +231,201 @@ public class K8sDriver implements RuntimeDriver {
 //        }
 //    }
 //
-//    @Override
-//    public void stopDeploy(ServiceConfigInfo serviceConfigInfo, User user)
-//            throws DeploymentEventException, IOException {
-//        KubeUtils kubeUtils;
-//        DeployResourceHandler deployResourceHandler;
-//        try {
-//            kubeUtils = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//            deployResourceHandler = getDeployResourceHandler(serviceConfigInfo, kubeUtils);
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo);
-//        List<DeploymentSnapshot> currentSnapshot = queryCurrentSnapshotWithPodRunning(podList);
-//        long eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
-//                DeployOperation.STOP,
-//                user,
-//                currentSnapshot,
-//                currentSnapshot,
-//                null);
-//        serviceStatusManager.freshEvent(eventId, currentSnapshot);
-//        //loadBalancer
-//        try {
-//            if (serviceConfigInfo.getNetworkMode() != NetworkMode.HOST  && serviceConfigInfo.getUsedLoadBalancer() == 0) {
-//                List<LoadBalancer> lbs = loadBalancerBiz.getInnerAndExternalLoadBalancerByDeployId(serviceConfigInfo.getId());
-//                if (lbs != null) {
-//                    for (LoadBalancer lb  : lbs) {
-//                        if (lb.getName().equals(serviceConfigInfo.getName())) {
-//                            kubeUtils.deleteService(GlobalConstant.RC_NAME_PREFIX + serviceConfigInfo.getName());
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//            deployResourceHandler.delete();
-//        } catch (Exception e) {
-//            throw new DeploymentEventException(e.getMessage());
-//        }
-//
-//    }
-//
-//    @Override
-//    public void rollbackDeploy(ServiceConfigInfo serviceConfigInfo, int versionId, List<Env> allExtraEnvs, User user, Policy policy)
-//            throws IOException, DeploymentTerminatedException {
-//        KubeUtils kubeUtils;
-//        DeployResourceHandler deployResourceHandler;
-//        try {
-//            kubeUtils = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//            deployResourceHandler = getDeployResourceHandler(serviceConfigInfo, kubeUtils);
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        Version version = versionDao.getVersion(serviceConfigInfo.getId(), versionId);
-//        // check status
-//        PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo);
-//        List<DeploymentSnapshot> currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
-//        int totalReplicas = getTotalReplicas(currentRunningSnapshot);
-//        if (serviceConfigInfo.getDefaultReplicas() != -1) {
-//            totalReplicas = serviceConfigInfo.getDefaultReplicas();
-//        }
-//        long eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
-//                DeployOperation.ROLLBACK,
-//                user,
-//                currentRunningSnapshot,
-//                currentRunningSnapshot,
-//                buildSingleDeploymentSnapshot(versionId, totalReplicas));
-//        serviceStatusManager.freshEvent(eventId, currentRunningSnapshot);
-//
-//        // create secret before the create of rc
-//        // judge the registry is belong to domeos or not
-//        checkSecret(kubeUtils, version, serviceConfigInfo);
-//        DeployEvent event = deployEventBiz.getEvent(eventId);
-//        List<LoadBalancer> lbs = null;
-//        try {
-//            //loadBalancer
-//            if (serviceConfigInfo.getNetworkMode() != NetworkMode.HOST && serviceConfigInfo.getUsedLoadBalancer() == 0) {
-//                lbs = loadBalancerBiz.getInnerAndExternalLoadBalancerByDeployId(serviceConfigInfo.getId());
-//                checkLoadBalancer(kubeUtils, lbs);
-//            }
-//            deployResourceHandler.rollback(version, lbs, allExtraEnvs, policy, eventId, versionId);
-//        } catch (K8sDriverException | DriverException e) {
-//            serviceDao.setDeploymentStatus(serviceConfigInfo.getId(), DeploymentStatus.ERROR);
-//            event.setLastModify(System.currentTimeMillis());
-//            event.setState(DeployEventStatus.FAILED);
-//            event.setCurrentSnapshot(new ArrayList<DeploymentSnapshot>());
-//            event.setMessage(e.getMessage());
-//            deployEventBiz.updateEvent(event);
-//        }
-//    }
-//
-//    @Override
-//    public void startUpdate(ServiceConfigInfo serviceConfigInfo, int versionId, List<Env> allExtraEnvs, User user, Policy policy)
-//            throws IOException, DeploymentTerminatedException {
-//        // ** create KubernetesClient
-//        KubeUtils kubeUtils;
-//        DeployResourceHandler deployResourceHandler;
-//        try {
-//            kubeUtils = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//            deployResourceHandler = getDeployResourceHandler(serviceConfigInfo, kubeUtils);
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        Version dstVersion = versionDao.getVersion(serviceConfigInfo.getId(), versionId);
-//        // ** check status
-//        PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo);
-//        List<DeploymentSnapshot> currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
-//        int totalReplicas = getTotalReplicas(currentRunningSnapshot);
-//        if (serviceConfigInfo.getDefaultReplicas() != -1) {
-//            totalReplicas = serviceConfigInfo.getDefaultReplicas();
-//        }
-////        if (serviceConfigInfo.isStateful()) {
-////            totalReplicas = dstVersion.getHostList().size();
-////        }
-//        long eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
-//                DeployOperation.UPDATE,
-//                user,
-//                currentRunningSnapshot,
-//                currentRunningSnapshot,
-//                buildSingleDeploymentSnapshot(versionId, totalReplicas));
-//        serviceStatusManager.freshEvent(eventId, currentRunningSnapshot);
-//
-//        checkSecret(kubeUtils, dstVersion, serviceConfigInfo);
-//        Version version = versionDao.getVersion(serviceConfigInfo.getId(), versionId);
-//        DeployEvent event = deployEventBiz.getEvent(eventId);
-//        List<LoadBalancer> lbs = null;
-//        try {
-//            //loadBalancer
-//            if (serviceConfigInfo.getNetworkMode() != NetworkMode.HOST  && serviceConfigInfo.getUsedLoadBalancer() == 0) {
-//                lbs = loadBalancerBiz.getInnerAndExternalLoadBalancerByDeployId(serviceConfigInfo.getId());
-//                checkLoadBalancer(kubeUtils, lbs);
-//            }
-//            deployResourceHandler.update(version, lbs, allExtraEnvs, policy, event.getEid(), versionId);
-//        } catch (K8sDriverException | DriverException e) {
-//            failedDeployment(serviceConfigInfo.getId(), event, e);
-//        }
-//    }
-//
-//    @Override
-//    public void scaleUpDeployment(ServiceConfigInfo serviceConfigInfo, int versionId, int replicas, List<Env> allExtraEnvs, User user)
-//            throws DeploymentEventException, IOException, DeploymentTerminatedException {
-//        KubeUtils client;
-//        DeployResourceHandler deployResourceHandler;
-//        try {
-//            client = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//            deployResourceHandler = getDeployResourceHandler(serviceConfigInfo, client);
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        List<DeploymentSnapshot> currentRunningSnapshot = null;
-//        try {
-//            // ** find rc
-//            PodList podList = getPodListByDeployment(client, serviceConfigInfo);
-//            currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
-//            List<DeploymentSnapshot> dstSnapshot = buildDeploymentSnapshotWith(currentRunningSnapshot, versionId, replicas);
-//            long eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
-//                    DeployOperation.SCALE_UP,
-//                    user,
-//                    currentRunningSnapshot,
-//                    currentRunningSnapshot,
-//                    dstSnapshot);
-//            serviceStatusManager.freshEvent(eventId, currentRunningSnapshot);
-//            Version version = versionDao.getVersion(serviceConfigInfo.getId(), versionId);
-//            checkSecret(client, version, serviceConfigInfo);
-//            //loadBalancer
-//            if (serviceConfigInfo.getNetworkMode() != NetworkMode.HOST  && serviceConfigInfo.getUsedLoadBalancer() == 0) {
-//                List<LoadBalancer> lbs = loadBalancerBiz.getInnerAndExternalLoadBalancerByDeployId(serviceConfigInfo.getId());
-//                checkLoadBalancer(client, lbs);
-//            }
-//            if (serviceConfigInfo.getUsedLoadBalancer() == 0) {
-//                deployResourceHandler.scaleUp(version, replicas);
-//                deployResourceHandler.removeOtherDeploy(versionId);
-//            }
-//        } catch (IOException | K8sDriverException | DriverException e) {
-//            serviceStatusManager.failedEventForDeployment(serviceConfigInfo.getId(), currentRunningSnapshot, e.getMessage());
-//            throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
-//        }
-//    }
-//
-//    @Override
-//    public void scaleDownDeployment(ServiceConfigInfo serviceConfigInfo, int versionId, int replicas, List<Env> allExtraEnvs, User user)
-//            throws DeploymentEventException, IOException, DeploymentTerminatedException {
-//        KubeUtils client;
-//        DeployResourceHandler deployResourceHandler;
-//        try {
-//            client = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//            deployResourceHandler = getDeployResourceHandler(serviceConfigInfo, client);
-//
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        List<DeploymentSnapshot> currentRunningSnapshot = null;
-//        try {
-//            PodList podList = getPodListByDeployment(client, serviceConfigInfo);
-//            currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
-//            List<DeploymentSnapshot> dstSnapshot = buildDeploymentSnapshotWith(currentRunningSnapshot, versionId, replicas);
-//            long eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
-//                    DeployOperation.SCALE_DOWN,
-//                    user,
-//                    currentRunningSnapshot,
-//                    currentRunningSnapshot,
-//                    dstSnapshot);
-//            serviceStatusManager.freshEvent(eventId, currentRunningSnapshot);
-//            Version version = versionDao.getVersion(serviceConfigInfo.getId(), versionId);
-//            checkSecret(client, version, serviceConfigInfo);
-//            //loadBalancer
-//            if (serviceConfigInfo.getNetworkMode() != NetworkMode.HOST  && serviceConfigInfo.getUsedLoadBalancer() == 0) {
-//                List<LoadBalancer> lbs = loadBalancerBiz.getInnerAndExternalLoadBalancerByDeployId(serviceConfigInfo.getId());
-//                checkLoadBalancer(client, lbs);
-//            }
-//            if (serviceConfigInfo.getUsedLoadBalancer() == 0) {
-//                deployResourceHandler.scaleDown(version, replicas);
-//                deployResourceHandler.removeOtherDeploy(versionId);
-//            }
-//        } catch (IOException | K8sDriverException | DriverException e) {
-//            serviceStatusManager.failedEventForDeployment(serviceConfigInfo.getId(), currentRunningSnapshot, e.getMessage());
-//            throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
-//        }
-//    }
-//
+    @Override
+    public void stopDeploy(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, User user)
+            throws DeploymentEventException, IOException {
+        KubeUtils kubeUtils;
+        DeployResourceHandler deployResourceHandler;
+        try {
+            kubeUtils = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+            deployResourceHandler = getDeployResourceHandler(appInfo,serviceConfigInfo, kubeUtils);
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException(e);
+        }
+        PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo);
+        List<DeploymentSnapshot> currentSnapshot = queryCurrentSnapshotWithPodRunning(podList);
+        String eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
+                DeployOperation.STOP,
+                user,
+                currentSnapshot,
+                currentSnapshot,
+                null);
+        serviceStatusManager.freshEvent(eventId, currentSnapshot);
+        
+        //loadBalancer
+        try {
+        	if(serviceConfigInfo.isExternal())
+        		kubeUtils.deleteService(GlobalConstant.RC_NAME_PREFIX + serviceConfigInfo.getServiceCode());
+        	
+            deployResourceHandler.delete();
+        } catch (Exception e) {
+            throw new DeploymentEventException(e.getMessage());
+        }
+
+    }
+
+    @Override
+    public void rollbackDeploy(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, int ver, List<Env> allExtraEnvs, User user)
+            throws IOException, DeploymentTerminatedException, DeploymentEventException {
+        KubeUtils kubeUtils;
+        DeployResourceHandler deployResourceHandler;
+        try {
+        	kubeUtils = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+            deployResourceHandler = getDeployResourceHandler(appInfo,serviceConfigInfo, kubeUtils);
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException(e);
+        }
+        VersionBase versionBase = versionDao.getVersion(serviceConfigInfo.getId(), ver);
+        Version version = versionBase.toModel(Version.class);
+        // check status
+        PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo);
+        List<DeploymentSnapshot> currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
+        int totalReplicas = getTotalReplicas(currentRunningSnapshot);
+        if (serviceConfigInfo.getDefaultReplicas() != -1) {
+            totalReplicas = serviceConfigInfo.getDefaultReplicas();
+        }
+        
+        String eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
+                DeployOperation.ROLLBACK,
+                user,
+                currentRunningSnapshot,
+                currentRunningSnapshot,
+                buildSingleDeploymentSnapshot(ver, totalReplicas));
+        serviceStatusManager.freshEvent(eventId, currentRunningSnapshot);
+        
+        // create secret before the create of rc
+        // judge the registry is belong to domeos or not
+        checkSecret(kubeUtils, version, appInfo, serviceConfigInfo);
+        DeployEvent event = serviceEventDao.getEvent(eventId);
+        try {
+        	checkLoadBalancer(kubeUtils, serviceConfigInfo,appInfo);
+           
+            deployResourceHandler.rollback(version, allExtraEnvs);
+        } catch (K8sDriverException | DriverException e) {
+        	failedDeployment(serviceConfigInfo.getId(),event,e);
+        }
+    }
+
+    @Override
+    public void startUpdate(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, int ver, List<Env> allExtraEnvs, User user)
+            throws IOException, DeploymentTerminatedException, DeploymentEventException {
+        // ** create KubernetesClient
+    	 KubeUtils kubeUtils;
+         DeployResourceHandler deployResourceHandler;
+         try {
+         	kubeUtils = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+             deployResourceHandler = getDeployResourceHandler(appInfo,serviceConfigInfo, kubeUtils);
+         } catch (K8sDriverException e) {
+             throw new DeploymentEventException(e);
+         }
+         VersionBase versionBase = versionDao.getVersion(serviceConfigInfo.getId(), ver);
+         Version version = versionBase.toModel(Version.class);
+         // check status
+         PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo);
+         List<DeploymentSnapshot> currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
+         int totalReplicas = getTotalReplicas(currentRunningSnapshot);
+         if (serviceConfigInfo.getDefaultReplicas() != -1) {
+             totalReplicas = serviceConfigInfo.getDefaultReplicas();
+         }
+         
+         String eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
+                 DeployOperation.UPDATE,
+                 user,
+                 currentRunningSnapshot,
+                 currentRunningSnapshot,
+                 buildSingleDeploymentSnapshot(ver, totalReplicas));
+         serviceStatusManager.freshEvent(eventId, currentRunningSnapshot);
+         
+         // create secret before the create of rc
+         // judge the registry is belong to domeos or not
+         checkSecret(kubeUtils, version, appInfo, serviceConfigInfo);
+         DeployEvent event = serviceEventDao.getEvent(eventId);
+         try {
+         	 checkLoadBalancer(kubeUtils, serviceConfigInfo,appInfo);
+            
+             deployResourceHandler.update(version, allExtraEnvs);
+         } catch (K8sDriverException | DriverException e) {
+         	failedDeployment(serviceConfigInfo.getId(),event,e);
+         }
+         
+    }
+
+    @Override
+    public void scaleUpDeployment(AppInfo appInfo,ServiceConfigInfo serviceConfigInfo, int ver, int replicas, List<Env> allExtraEnvs, User user)
+            throws DeploymentEventException, IOException, DeploymentTerminatedException {
+    	KubeUtils client;
+        DeployResourceHandler deployResourceHandler;
+        try {
+        	client = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+            deployResourceHandler = getDeployResourceHandler(appInfo,serviceConfigInfo, client);
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException(e);
+        }
+        VersionBase versionBase = versionDao.getVersion(serviceConfigInfo.getId(), ver);
+        Version version = versionBase.toModel(Version.class);
+        List<DeploymentSnapshot> currentRunningSnapshot = null;
+        try {
+            // ** find rc
+        	PodList podList = getPodListByDeployment(client, serviceConfigInfo);
+            currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
+            List<DeploymentSnapshot> dstSnapshot = buildDeploymentSnapshotWith(currentRunningSnapshot, ver, replicas);
+            String eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
+                    DeployOperation.SCALE_UP,
+                    user,
+                    currentRunningSnapshot,
+                    currentRunningSnapshot,
+                    dstSnapshot);
+            serviceStatusManager.freshEvent(eventId, currentRunningSnapshot);
+            
+            checkSecret(client, version, appInfo, serviceConfigInfo);
+            //loadBalancer
+            checkLoadBalancer(client, serviceConfigInfo,appInfo);
+            deployResourceHandler.scaleUp(version, replicas);
+            //deployResourceHandler.removeOtherDeploy(ver);
+        } catch (IOException | K8sDriverException | DriverException e) {
+            serviceStatusManager.failedEventForDeployment(serviceConfigInfo.getId(), currentRunningSnapshot, e.getMessage());
+            throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
+        }
+    }
+
+    @Override
+    public void scaleDownDeployment(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, int ver, int replicas, List<Env> allExtraEnvs, User user)
+            throws DeploymentEventException, IOException, DeploymentTerminatedException {
+    	KubeUtils client;
+        DeployResourceHandler deployResourceHandler;
+        try {
+        	client = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+            deployResourceHandler = getDeployResourceHandler(appInfo,serviceConfigInfo, client);
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException(e);
+        }
+        VersionBase versionBase = versionDao.getVersion(serviceConfigInfo.getId(), ver);
+        Version version = versionBase.toModel(Version.class);
+        List<DeploymentSnapshot> currentRunningSnapshot = null;
+        try {
+            // ** find rc
+        	PodList podList = getPodListByDeployment(client, serviceConfigInfo);
+            currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
+            List<DeploymentSnapshot> dstSnapshot = buildDeploymentSnapshotWith(currentRunningSnapshot, ver, replicas);
+            String eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
+                    DeployOperation.SCALE_DOWN,
+                    user,
+                    currentRunningSnapshot,
+                    currentRunningSnapshot,
+                    dstSnapshot);
+            serviceStatusManager.freshEvent(eventId, currentRunningSnapshot);
+            
+            checkSecret(client, version, appInfo, serviceConfigInfo);
+            //loadBalancer
+            checkLoadBalancer(client, serviceConfigInfo,appInfo);
+            deployResourceHandler.scaleDown(version, replicas);
+            //deployResourceHandler.removeOtherDeploy(ver);
+        } catch (IOException | K8sDriverException | DriverException e) {
+            serviceStatusManager.failedEventForDeployment(serviceConfigInfo.getId(), currentRunningSnapshot, e.getMessage());
+            throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
+        }
+    }
+
     private DeployResourceHandler getDeployResourceHandler(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, KubeUtils kubeUtils) throws K8sDriverException {
 //        String deployClass = serviceConfigInfo.getDeploymentType().getDeployClassName();
 //        if (deployClass == null) {
@@ -432,14 +448,14 @@ public class K8sDriver implements RuntimeDriver {
         return selector;
     }
 
-//    private PodList getPodListByDeployment(KubeUtils kubeUtils, ServiceConfigInfo serviceConfigInfo)
-//            throws DeploymentEventException {
-//        try {
-//            return kubeUtils.listPod(buildDeploySelector(serviceConfigInfo));
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
-//        }
-//    }
+    private PodList getPodListByDeployment(KubeUtils kubeUtils, ServiceConfigInfo serviceConfigInfo)
+            throws DeploymentEventException {
+        try {
+            return kubeUtils.listPod(buildDeploySelector(serviceConfigInfo));
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
+        }
+    }
 
     private List<DeploymentSnapshot> queryCurrentSnapshot(PodList podList) {
         if (podList == null || podList.getItems() == null || podList.getItems().size() == 0) {
@@ -651,39 +667,39 @@ public class K8sDriver implements RuntimeDriver {
 //        serviceStatusManager.failedEvent(event.getEid(), queryCurrentSnapshotWithPodRunning(podList), "Operation expired. " + event.getMessage());
 //    }
 //
-//    @Override
-//    public List<Version> getCurrnetVersionsByDeployment(ServiceConfigInfo serviceConfigInfo) throws DeploymentEventException {
-//        if (serviceConfigInfo == null) {
-//            return null;
-//        }
-//        KubeUtils client = null;
-//        DeployResourceHandler deployResourceHandler;
-//        try {
-//            client = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//            deployResourceHandler = getDeployResourceHandler(serviceConfigInfo, client);
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        // get current versions
-//        PodList podList = getPodListByDeployment(client, serviceConfigInfo);
-//        List<DeploymentSnapshot> deploymentSnapshots = queryCurrentSnapshot(podList);
-//        if (deploymentSnapshots != null && deploymentSnapshots.isEmpty()) {
-//            try {
-//                deploymentSnapshots = deployResourceHandler.queryDesiredSnapshot();
-//            } catch (K8sDriverException e) {
-//                throw new DeploymentEventException(e);
-//            }
-//        }
-//        List<Version> versions = null;
-//        if (deploymentSnapshots != null) {
-//            versions = new ArrayList<>(deploymentSnapshots.size());
-//            for (DeploymentSnapshot deploymentSnapshot : deploymentSnapshots) {
-//                Version version = versionDao.getVersion(serviceConfigInfo.getId(), (int) deploymentSnapshot.getVersion());
-//                versions.add(version);
-//            }
-//        }
-//        return versions;
-//    }
+    @Override
+    public List<VersionBase> getCurrnetVersionsByService(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws DeploymentEventException {
+        if (serviceConfigInfo == null) {
+            return null;
+        }
+        KubeUtils client = null;
+        DeployResourceHandler deployResourceHandler;
+        try {
+        	client = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+            deployResourceHandler = getDeployResourceHandler(appInfo,serviceConfigInfo, client);
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException(e);
+        }
+        // get current versions
+        PodList podList = getPodListByDeployment(client, serviceConfigInfo);
+        List<DeploymentSnapshot> deploymentSnapshots = queryCurrentSnapshot(podList);
+        if (deploymentSnapshots != null && deploymentSnapshots.isEmpty()) {
+            try {
+                deploymentSnapshots = deployResourceHandler.queryDesiredSnapshot();
+            } catch (K8sDriverException e) {
+                throw new DeploymentEventException(e);
+            }
+        }
+        List<VersionBase> versions = null;
+        if (deploymentSnapshots != null) {
+            versions = new ArrayList<>(deploymentSnapshots.size());
+            for (DeploymentSnapshot deploymentSnapshot : deploymentSnapshots) {
+                VersionBase verBase = versionDao.getVersion(serviceConfigInfo.getId(), (int) deploymentSnapshot.getVersion());
+                versions.add(verBase);
+            }
+        }
+        return versions;
+    }
 //
 //    @Override
 //    public long getTotalReplicasByDeployment(ServiceConfigInfo serviceConfigInfo) throws DeploymentEventException {
@@ -766,7 +782,7 @@ public class K8sDriver implements RuntimeDriver {
         return versionCount.isEmpty();
     }
 
-    private void checkSecret(KubeUtils client, Version version, AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws Exception{
+    private void checkSecret(KubeUtils client, Version version, AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws DeploymentEventException{
         if (version != null && SecretUtils.haveRegistry(version.getContainerDrafts())) {
             try {
                 if (client.secretInfo(GlobalConstant.SECRET_NAME_PREFIX + appInfo.getNamespace()) == null) {
@@ -776,7 +792,7 @@ public class K8sDriver implements RuntimeDriver {
                             GlobalConstant.SECRET_DOCKERCFG_TYPE, dataMap);
                 }
             } catch (K8sDriverException | JSONException e) {
-                throw new Exception("kubernetes exception with message=" + e.getMessage());
+                throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
             }
         }
     }
@@ -794,20 +810,21 @@ public class K8sDriver implements RuntimeDriver {
         }
     }
     
-//    private void checkLoadBalancer(KubeUtils client, List<LoadBalancer> lbs) throws K8sDriverException, DriverException {
-//        if (lbs != null && lbs.size() > 0) {
-//            for (LoadBalancer lb : lbs) {
-//                Service service = new K8sServiceBuilder(lb).build();
-//                Service oldService = client.serviceInfo(service.getMetadata().getName());
-//                if (oldService == null) {
-//                    client.createService(service);
-//                    logger.info("Service:" + service.getMetadata().getName() + " created successfully");
-//                } else {
-//                    logger.info("Service:" + service.getMetadata().getName() + " exists, do not need to create");
-//                }
-//            }
-//        }
-//    }
+    private void checkLoadBalancer(KubeUtils client,  ServiceConfigInfo serviceConfigInfo, AppInfo appInfo) throws K8sDriverException, DriverException {
+        Service service = new K8sServiceBuilder(serviceConfigInfo,appInfo).build();
+    	if(service != null){
+    		Service oldService = client.serviceInfo(service.getMetadata().getName());
+			if (oldService == null) {
+                client.createService(service);
+                logger.info("Service:" + service.getMetadata().getName() + " created successfully");
+            } else {
+                logger.info("Service:" + service.getMetadata().getName() + " exists, do not need to create");
+            }
+    	}else{
+    		logger.error("Failed to create service!");
+    	}
+        
+    }
 //    
 //    @Override
 //    public void deletePodByDeployIdAndInsName(ServiceConfigInfo serviceConfigInfo, String insName)

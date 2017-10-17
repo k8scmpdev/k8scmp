@@ -20,6 +20,7 @@ public enum OperationType {
     SCALEUP,
     SCALEDOWN,
     START,
+    STARTLOADBALANCER,
     STOP,
     UPDATE,
     ROLLBACK,

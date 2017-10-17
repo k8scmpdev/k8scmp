@@ -6,7 +6,7 @@ import java.util.List;
 import org.k8scmp.appmgmt.dao.ServiceEventDao;
 import org.k8scmp.appmgmt.domain.DeployEvent;
 import org.k8scmp.mapper.appmgmt.ServiceEventMapper;
-import org.k8scmp.model.DeployEventStatus;
+import org.k8scmp.util.UUIDUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class ServiceEventDaoImpl implements ServiceEventDao{
 	
 	@Override
 	public String createEvent(DeployEvent deployEvent) {
-		
+		deployEvent.setId(UUIDUtil.generateUUID());
 		mapper.createEvent(deployEvent, deployEvent.toString());
 		return deployEvent.getId();
 	}

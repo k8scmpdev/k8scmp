@@ -20,7 +20,7 @@ public interface ServiceEventMapper {
     @Select("SELECT "+ BASIC_COLUMNS +" FROM serviceEvent WHERE id=#{id}")
     DeployEvent getEvent(@Param("id") String id);
 
-    @Select("SELECT "+ BASIC_COLUMNS +" FROM serviceEvent WHERE serviceId=#{serviceId} order by createTime desc limit 1")
+    @Select("SELECT "+ BASIC_COLUMNS +" FROM serviceEvent WHERE serviceId=#{serviceId} order by startTime desc limit 1")
     DeployEvent getNewestEvent(@Param("serviceId") String serviceId);
 
     @Select("SELECT "+ BASIC_COLUMNS +" FROM serviceEvent WHERE serviceId=#{serviceId}")

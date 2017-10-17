@@ -27,6 +27,34 @@ public class DateUtil {
 		SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");   
 	    return sDateFormat.format(date);   
 	}
+	
+	public static String stringToMillis(String timeString, TimeZone timeZone) throws ParseException {
+		 if (timeString == null) {
+	            return null;
+	        }
+	        int decimalIndex = timeString.indexOf(".") + 1;
+	        String formatString;
+	        if (decimalIndex > 0) {
+	            formatString = timeString.substring(0, decimalIndex);
+	            int cnt = 0;
+	            while (decimalIndex < timeString.length() - 1 && cnt < 3) {
+	                formatString += timeString.substring(decimalIndex, decimalIndex + 1);
+	                decimalIndex++;
+	                cnt++;
+	            }
+	            while (cnt < 3) {
+	                formatString += "0";
+	                cnt++;
+	            }
+	            formatString += "Z";
+	        } else {
+	            formatString = timeString.substring(0, timeString.length() - 1) + ".000Z";
+	        }
+	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+	        sdf.setTimeZone(timeZone);
+	        Date date = sdf.parse(formatString);
+	       return dateFormatToMillis(date);
+	}
 //	public static void main(String[] args) {
 //		System.out.println(dateFormat(new Date()));
 //	}

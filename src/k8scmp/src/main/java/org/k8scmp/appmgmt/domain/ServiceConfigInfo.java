@@ -11,6 +11,8 @@ public class ServiceConfigInfo extends ServiceInfo{
 	private List<String> externalIPs;
 	private String yamlPodSpec;
 	private VersionType versionType;
+	private boolean isExternal = false;
+	private List<NodePortDraft> nodePorts;
 	 
 	public int getDefaultReplicas() {
 		return defaultReplicas;
@@ -35,5 +37,17 @@ public class ServiceConfigInfo extends ServiceInfo{
 	}
 	public void setVersionType(VersionType versionType) {
 		this.versionType = versionType;
+	}
+	public List<NodePortDraft> getNodePorts() {
+		return nodePorts;
+	}
+	public void setNodePorts(List<NodePortDraft> nodePorts) {
+		this.nodePorts = nodePorts;
+	}
+	public boolean isExternal() {
+		return isExternal;
+	}
+	public void setExternal(boolean isExternal) {
+		this.isExternal = isExternal;
 	}
 }

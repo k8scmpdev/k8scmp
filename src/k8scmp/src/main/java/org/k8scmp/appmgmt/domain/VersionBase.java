@@ -115,20 +115,25 @@ public class VersionBase extends DataModelBase{
 	}
 	
 	
-	public <T extends VersionBase> T toModel(Class<T> clazz) throws Exception{
-        T result = clazz.newInstance();
-        if (data != null && data.length() != 0) {
-            result = result.fromString(data);
-        }
-        
-        result.setId(id);
-        result.setVersionName(versionName);
-        result.setDescription(description);
-        result.setState(state);
-        result.setCreateTime(createTime);
-        result.setCreatorId(creatorId);
-        result.setLastModifiedTime(lastModifiedTime);
-        result.setLastModifierId(lastModifierId);
-        return result;
+	public <T extends VersionBase> T toModel(Class<T> clazz){
+		try{
+			T result = clazz.newInstance();
+	        if (data != null && data.length() != 0) {
+	            result = result.fromString(data);
+	        }
+	        
+	        result.setId(id);
+	        result.setVersionName(versionName);
+	        result.setDescription(description);
+	        result.setState(state);
+	        result.setCreateTime(createTime);
+	        result.setCreatorId(creatorId);
+	        result.setLastModifiedTime(lastModifiedTime);
+	        result.setLastModifierId(lastModifierId);
+	        return result;
+		}catch(Exception e){
+			
+		}
+		return null;
     }
 }

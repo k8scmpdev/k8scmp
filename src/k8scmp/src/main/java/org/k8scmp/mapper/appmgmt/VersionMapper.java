@@ -19,8 +19,11 @@ public interface VersionMapper {
             "  #{item.id}, #{item.versionName}, #{item.version}, #{item.serviceId}, #{item.description}, #{item.state}, #{data}, #{item.createTime}, #{item.creatorId}, #{item.lastModifiedTime}, #{item.lastModifierId})")
     int insertVersion(@Param("item") Version item, @Param("data") String data);
 
-    @Delete("delete from serviceversion serviceId = #{serviceId}")
+    @Delete("delete from serviceversion where serviceId = #{serviceId}")
     int deleteAllVersion(@Param("serviceId") String serviceId);
+    
+    @Delete("delete from serviceversion where id = #{id}")
+    int deleteVersionById(@Param("id") String id);
 
     @Select("select " + BASIC_COLUMNS + " from serviceversion where serviceId = #{serviceId} and version=#{version}")
     VersionBase getVersion(@Param("serviceId") String serviceId, @Param("version") int version);
@@ -31,7 +34,7 @@ public interface VersionMapper {
     @Select("SELECT MAX(version) FROM serviceversion WHERE serviceId = #{serviceId}")
     Integer getMaxVersion(@Param("serviceId") String serviceId);
 
-    @Update("update serviceversion set data = #{data} where id = #{id}")
-    int updateLabelSelector(@Param("id") String id, @Param("data") String data);
+    @Update("update serviceversion set data = #{data},lastModifierId=#{item.lastModifierId},lastModifiedTime=#{item.lastModifiedTime} where id = #{item.id}")
+    int updateVersion(@Param("item") Version item, @Param("data") String data);
 }
 //

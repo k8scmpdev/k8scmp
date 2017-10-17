@@ -6,6 +6,7 @@ import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.extensions.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,15 +15,23 @@ import java.util.Map;
 import org.k8scmp.appmgmt.domain.AppInfo;
 import org.k8scmp.appmgmt.domain.DeploymentSnapshot;
 import org.k8scmp.appmgmt.domain.Env;
-import org.k8scmp.appmgmt.domain.Policy;
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
 import org.k8scmp.appmgmt.domain.Version;
+import org.k8scmp.appmgmt.domain.VersionString;
 import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.engine.k8s.K8sPodSpecBuilder;
 import org.k8scmp.engine.k8s.handler.DeployResourceHandler;
 import org.k8scmp.engine.k8s.util.KubeUtils;
+import org.k8scmp.engine.k8s.util.ModelFormatUtils;
 import org.k8scmp.engine.k8s.util.PodUtils;
+import org.k8scmp.engine.model.CustomObjectMapper;
+import org.k8scmp.engine.model.CustomYamlObjectMapper;
 import org.k8scmp.exception.K8sDriverException;
+import org.k8scmp.model.VersionType;
+import org.k8scmp.util.StringUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 
 /**
@@ -120,8 +129,7 @@ public class DeploymentDeployHandler implements DeployResourceHandler<Deployment
     }
 
     @Override
-    public Deployment update(Version version,List<Env> extraEnvs, 
-                             Policy policy, long eventId, int targetVersion) throws K8sDriverException {
+    public Deployment update(Version version,List<Env> extraEnvs) throws K8sDriverException {
         Deployment newDeployment = build(version, extraEnvs);
         if (newDeployment != null) {
             newDeployment.getSpec().setPaused(false);
@@ -133,8 +141,7 @@ public class DeploymentDeployHandler implements DeployResourceHandler<Deployment
     }
 
     @Override
-    public Deployment rollback(Version version, List<Env> extraEnvs,
-                               Policy policy, long eventId, int targetVersion) throws K8sDriverException {
+    public Deployment rollback(Version version, List<Env> extraEnvs) throws K8sDriverException {
         Deployment newDeployment = build(version, extraEnvs);
         if (newDeployment != null) {
             newDeployment.getSpec().setPaused(false);
@@ -192,78 +199,78 @@ public class DeploymentDeployHandler implements DeployResourceHandler<Deployment
         return snapshotList;
     }
 
-//    @Override
-//    public VersionString getVersionString(DeploymentDraft deploymentDraft) {
-//        String rcName = GlobalConstant.RC_NAME_PREFIX + deploymentDraft.getDeployName() + "-deploy";
-//        Map<String, String> annotations = new HashMap<>();
-//        annotations.put("deployName", deploymentDraft.getDeployName());
-//        Deployment k8sDeployment = new DeploymentBuilder()
-//                .withNewMetadata()
-//                .withName(rcName.toLowerCase())
-//                .withNamespace(deploymentDraft.getNamespace())
-//                .endMetadata()
-//                .withNewSpec()
-//                .withNewTemplate()
-//                .withNewMetadata()
-//                .withAnnotations(annotations)
-//                .withDeletionGracePeriodSeconds(0L)
-//                .endMetadata()
-//                .withNewSpec()
-//                .endSpec()
-//                .endTemplate()
-//                .withReplicas(deploymentDraft.getReplicas())
-//                .endSpec()
-//                .build();
-//        return getDeploymentStr(k8sDeployment, deploymentDraft.getVersionType());
-//    }
+    @Override
+    public VersionString getVersionString(AppInfo appInfo,ServiceConfigInfo serviceConfigInfo) {
+        String rcName = GlobalConstant.RC_NAME_PREFIX + serviceConfigInfo.getServiceCode() + GlobalConstant.DEPLOYMENT_NAME_SUFFIX;
+        Map<String, String> annotations = new HashMap<>();
+        annotations.put("deployName", serviceConfigInfo.getServiceCode());
+        Deployment k8sDeployment = new DeploymentBuilder()
+                .withNewMetadata()
+                .withName(rcName.toLowerCase())
+                .withNamespace(appInfo.getNamespace())
+                .endMetadata()
+                .withNewSpec()
+                .withNewTemplate()
+                .withNewMetadata()
+                .withAnnotations(annotations)
+                .withDeletionGracePeriodSeconds(0L)
+                .endMetadata()
+                .withNewSpec()
+                .endSpec()
+                .endTemplate()
+                .withReplicas(serviceConfigInfo.getDefaultReplicas())
+                .endSpec()
+                .build();
+        return getDeploymentStr(k8sDeployment, serviceConfigInfo.getVersionType());
+    }
 
-//    @Override
-//    public VersionString getVersionString(Version version, List<Env> extraEnvs) {
-//        Deployment k8sDeployment = build(version, extraEnvs);
-//        return getDeploymentStr(k8sDeployment, seviceConfigInfo.getVersionType());
-//
-//    }
-//
-//    private VersionString getDeploymentStr(Deployment k8sDeployment, VersionType versionType) {
-//        VersionString versionString = new VersionString();
-//        ModelFormatUtils.format(k8sDeployment);
-//        try {
-//            if (versionType == VersionType.YAML) {
-//                ObjectMapper objectMapper = new CustomYamlObjectMapper();
-//                String deploymentStr = objectMapper.writeValueAsString(k8sDeployment);
-//                versionString.setDeploymentStr(deploymentStr);
-//                k8sDeployment.getSpec().getTemplate().setSpec(null);
-//                String deploymentStrHead = objectMapper.writeValueAsString(k8sDeployment) + "\n    spec:\n";
-//                versionString.setDeploymentStrHead(deploymentStrHead);
-//                versionString.setDeploymentStrTail("");
-//                versionString.setIndent(4);
-//                return versionString;
-//            } else if (versionType == VersionType.JSON) {
-//                ObjectMapper objectMapper = new CustomObjectMapper();
-//                objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-//                String deploymentStr = objectMapper.writerFor(k8sDeployment.getClass()).writeValueAsString(k8sDeployment);
-//                versionString.setDeploymentStr(deploymentStr);
-//                k8sDeployment.getSpec().getTemplate().setSpec(null);
-//                deploymentStr = objectMapper.writerFor(k8sDeployment.getClass()).writeValueAsString(k8sDeployment);
-//                String str[] = deploymentStr.split("\n");
-//                String headStr[] = new String[str.length - 3];
-//                String tailStr[] = new String[3];
-//                System.arraycopy(str, 0, headStr, 0, headStr.length);
-//                System.arraycopy(str, str.length-3, tailStr, 0, tailStr.length);
-//                String deploymentStrHeader = StringUtils.join(headStr, "\n") + "\n      \"spec\" : ";
-//                String deploymentStrtail = StringUtils.join(tailStr, "\n");
-//                versionString.setDeploymentStrHead(deploymentStrHeader);
-//                versionString.setDeploymentStrTail(deploymentStrtail);
-//                versionString.setIndent(6);
-//                return versionString;
-//
-//            } else {
-//                return null;
-//            }
-//        } catch (IOException e) {
-//            return null;
-//        }
-//    }
+    @Override
+    public VersionString getVersionString(Version version, List<Env> extraEnvs) {
+        Deployment k8sDeployment = build(version, extraEnvs);
+        return getDeploymentStr(k8sDeployment, seviceConfigInfo.getVersionType());
+
+    }
+
+    private VersionString getDeploymentStr(Deployment k8sDeployment, VersionType versionType) {
+        VersionString versionString = new VersionString();
+        ModelFormatUtils.format(k8sDeployment);
+        try {
+            if (versionType == VersionType.YAML) {
+                ObjectMapper objectMapper = new CustomYamlObjectMapper();
+                String deploymentStr = objectMapper.writeValueAsString(k8sDeployment);
+                versionString.setDeploymentStr(deploymentStr);
+                k8sDeployment.getSpec().getTemplate().setSpec(null);
+                String deploymentStrHead = objectMapper.writeValueAsString(k8sDeployment) + "\n    spec:\n";
+                versionString.setDeploymentStrHead(deploymentStrHead);
+                versionString.setDeploymentStrTail("");
+                versionString.setIndent(4);
+                return versionString;
+            } else if (versionType == VersionType.JSON) {
+                ObjectMapper objectMapper = new CustomObjectMapper();
+                objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+                String deploymentStr = objectMapper.writerFor(k8sDeployment.getClass()).writeValueAsString(k8sDeployment);
+                versionString.setDeploymentStr(deploymentStr);
+                k8sDeployment.getSpec().getTemplate().setSpec(null);
+                deploymentStr = objectMapper.writerFor(k8sDeployment.getClass()).writeValueAsString(k8sDeployment);
+                String str[] = deploymentStr.split("\n");
+                String headStr[] = new String[str.length - 3];
+                String tailStr[] = new String[3];
+                System.arraycopy(str, 0, headStr, 0, headStr.length);
+                System.arraycopy(str, str.length-3, tailStr, 0, tailStr.length);
+                String deploymentStrHeader = StringUtils.join(headStr, "\n") + "\n      \"spec\" : ";
+                String deploymentStrtail = StringUtils.join(tailStr, "\n");
+                versionString.setDeploymentStrHead(deploymentStrHeader);
+                versionString.setDeploymentStrTail(deploymentStrtail);
+                versionString.setIndent(6);
+                return versionString;
+
+            } else {
+                return null;
+            }
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
     private int getCurrentPods() throws K8sDriverException  {
         PodList podList = kubeUtils.listPod(buildDeploymentLabel());

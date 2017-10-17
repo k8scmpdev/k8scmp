@@ -28,7 +28,8 @@ public class AuthUtil {
     }
 
     public static String getCurrentLoginName() {
-        return (String) SecurityUtils.getSubject().getPrincipal();
+    	return "admin";
+//        return (String) SecurityUtils.getSubject().getPrincipal();
     }
 
     /**
@@ -47,8 +48,9 @@ public class AuthUtil {
     }
     
     public static String getUserName() {
-    	String loginName = getCurrentLoginName();
-        return authBiz.getUserName(loginName);
+    	return "管理员";
+//    	String loginName = getCurrentLoginName();
+//        return authBiz.getUserName(loginName);
     }
     
     public static String getUserNameById (int id) {

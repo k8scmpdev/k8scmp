@@ -1,13 +1,8 @@
 package org.k8scmp.appmgmt.dao.impl;
 
-import org.k8scmp.appmgmt.dao.ServiceDao;
 import org.k8scmp.appmgmt.dao.VersionDao;
-import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
-import org.k8scmp.appmgmt.domain.ServiceDetail;
-import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.appmgmt.domain.Version;
 import org.k8scmp.appmgmt.domain.VersionBase;
-import org.k8scmp.mapper.appmgmt.ServiceMapper;
 import org.k8scmp.mapper.appmgmt.VersionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +17,13 @@ public class VersionDaoImpl implements VersionDao {
 
 	@Override
 	public long insertVersion(Version version) {
+		Integer verNow = mapper.getMaxVersion(version.getServiceId());
+        if (verNow == null) {
+            verNow = 0;
+        }
+        verNow++;
+        version.setVersion(verNow);
+        version.setVersionName("version" + verNow);
 		return mapper.insertVersion(version, version.toString());
 	}
 
@@ -29,10 +31,15 @@ public class VersionDaoImpl implements VersionDao {
 	public void deleteAllVersion(String serviceId) {
 		mapper.deleteAllVersion(serviceId);
 	}
+	
+	@Override
+	public void deleteVersionById(String id) {
+		mapper.deleteVersionById(id);
+	}
 
 	@Override
-	public void updateLabelSelector(String id, String data) {
-		mapper.updateLabelSelector(id, data);
+	public void updateVersion(Version version) {
+		mapper.updateVersion(version, version.toString());
 	}
 
 	@Override

@@ -54,17 +54,20 @@ public class K8sPodSpecBuilder {
             } else {
                 nodeSelector = podSpec.getNodeSelector();
             }
-            List<LabelSelector> selectors = version.getLabelSelectors();
-            if (selectors != null) {
-                for (LabelSelector selector : version.getLabelSelectors()) {
-                    if (selector.getName() == null) {
-                        continue;
-                    }
-                    if (selector.getContent() == null) {
-                        selector.setContent("");
-                    }
-                    nodeSelector.put(selector.getName(), selector.getContent());
-                }
+//            List<LabelSelector> selectors = version.getLabelSelectors();
+//            if (selectors != null) {
+//                for (LabelSelector selector : version.getLabelSelectors()) {
+//                    if (selector.getName() == null) {
+//                        continue;
+//                    }
+//                    if (selector.getContent() == null) {
+//                        selector.setContent("");
+//                    }
+//                    nodeSelector.put(selector.getName(), selector.getContent());
+//                }
+//            }
+            if(!StringUtils.isEmpty(appInfo.getHostLabel())){
+            	nodeSelector.put(appInfo.getHostLabel(), GlobalConstant.LABEL_VALUE);
             }
             podSpec.setNodeSelector(nodeSelector);
         } else {
@@ -76,17 +79,20 @@ public class K8sPodSpecBuilder {
             }
 //            podSpec.setHostNetwork(serviceConfigInfo.getNetworkMode() == NetworkMode.HOST);
             Map<String, String> nodeSelector = new HashMap<>();
-            List<LabelSelector> selectors = version.getLabelSelectors();
-            if (selectors != null) {
-                for (LabelSelector selector : version.getLabelSelectors()) {
-                    if (selector.getName() == null) {
-                        continue;
-                    }
-                    if (selector.getContent() == null) {
-                        selector.setContent("");
-                    }
-                    nodeSelector.put(selector.getName(), selector.getContent());
-                }
+//            List<LabelSelector> selectors = version.getLabelSelectors();
+//            if (selectors != null) {
+//                for (LabelSelector selector : version.getLabelSelectors()) {
+//                    if (selector.getName() == null) {
+//                        continue;
+//                    }
+//                    if (selector.getContent() == null) {
+//                        selector.setContent("");
+//                    }
+//                    nodeSelector.put(selector.getName(), selector.getContent());
+//                }
+//            }
+            if(!StringUtils.isEmpty(appInfo.getHostLabel())){
+            	nodeSelector.put(appInfo.getHostLabel(), GlobalConstant.LABEL_VALUE);
             }
             podSpec.setNodeSelector(nodeSelector);
             List<Container> containers = buildContainer(serviceConfigInfo, version, extraEnvs);
@@ -192,10 +198,10 @@ public class K8sPodSpecBuilder {
             List<EnvVar> envVarList = formatEnv(containerEnvs);
             envVarList.addAll(DownwardAPIUtil.generateDownwardEnvs());
 
-            List<ContainerPort> containerPorts = buildContainerPort(version.getNodePorts());
-            if(containerPorts!=null){
-            	container.setPorts(containerPorts);
-            }
+   //         List<ContainerPort> containerPorts = buildContainerPort(version.getNodePorts());
+//            if(containerPorts!=null){
+//            	container.setPorts(containerPorts);
+//            }
             container.setEnv(envVarList);
 
             container.setArgs(containerDraft.getArgs());
@@ -290,22 +296,22 @@ public class K8sPodSpecBuilder {
         return containers;
     }
     
-    private List<ContainerPort> buildContainerPort(List<NodePortDraft> nodePorts){
-    	if(nodePorts == null || nodePorts.size()==0){
-    		return null;
-    	}
-    	int size = nodePorts.size();
-    	List<ContainerPort> containerPorts = new ArrayList<>(size);
-    	
-    	for(NodePortDraft nodePort : nodePorts){
-    		ContainerPort containerPort = new ContainerPortBuilder()
-    				.withContainerPort(nodePort.getContainerPort())
-    				.withProtocol(nodePort.getProtocol())
-    				.build();
-    		containerPorts.add(containerPort);
-    	}
-    	return containerPorts;
-    }
+//    private List<ContainerPort> buildContainerPort(List<NodePortDraft> nodePorts){
+//    	if(nodePorts == null || nodePorts.size()==0){
+//    		return null;
+//    	}
+//    	int size = nodePorts.size();
+//    	List<ContainerPort> containerPorts = new ArrayList<>(size);
+//    	
+//    	for(NodePortDraft nodePort : nodePorts){
+//    		ContainerPort containerPort = new ContainerPortBuilder()
+//    				.withContainerPort(nodePort.getContainerPort())
+//    				.withProtocol(nodePort.getProtocol())
+//    				.build();
+//    		containerPorts.add(containerPort);
+//    	}
+//    	return containerPorts;
+//    }
 
 //    private Probe buildProbe(HealthChecker healthChecker) {
 //        if (healthChecker == null || healthChecker.getType().equals(HealthCheckerType.NONE)) {
