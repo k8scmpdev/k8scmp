@@ -73,63 +73,12 @@ public class MonitorServiceImpl implements MonitorService {
     @Autowired
     AppDao appDao;
     
-    @Override
-    public List<NodeInfoBack> getNodeMonitorData(){
-    	List<NodeInfoBack> nodeInfoBackList = new ArrayList<>();
-    	User user = AuthUtil.getUser();
-        //insert all clusters' nodes' information to monitor_targets table
-        List<NodeInfo> nodeList = new ArrayList<>();
-//        List<CollectionAuthorityMap> clusterAuthorityMapList = AuthUtil.getCollectionList(user.getId(), ResourceType.CLUSTER);
-//        if (!clusterAuthorityMapList.isEmpty()) {
-//            int tmpClusterId = clusterAuthorityMapList.get(0).getCollectionId();
-            List<TargetInfo> targetInfos = new ArrayList<>();
-//            for (CollectionAuthorityMap authorityMap : clusterAuthorityMapList) {
-                try {
-                    NodeWrapper nodeWrapper = new NodeWrapper().init("default");
-                    List<NodeInfo> nodeInfoInCluster = nodeWrapper.getNodeInfoListWithoutPods();
-                    nodeList.addAll(nodeInfoInCluster);
-                    for (NodeInfo nodeInfo : nodeInfoInCluster) {
-                        targetInfos.add(new TargetInfo(nodeInfo.getName(), null, null));
-                    }
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                }
-//            }
-            TargetRequest targetRequest = new TargetRequest(2, "node", targetInfos);
-//            monitorService.insertTargets(targetRequest);
-
-            //use the existing function to get monitor data
-            Calendar current = Calendar.getInstance();
-            long endTime = current.getTimeInMillis();
-            current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 1);
-            long startTime = current.getTimeInMillis();
-            MonitorResult result = getMonitorDataForOverview(targetRequest, startTime, endTime, "AVERAGE");
-    	NodeWrapper nodeWrapper;
-		try {
-			nodeWrapper = new NodeWrapper().init("default");
-			List<NodeInfo> nodeInfoList = nodeWrapper.getNodeInfoListWithoutPods();
-	    	for (NodeInfo nodeInfo : nodeInfoList) {
-	    		NodeInfoBack nodeInfoBack = new NodeInfoBack();
-	    		nodeInfoBack.setHostName(nodeInfo.getName());
-	    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
-	    		nodeInfoBack.setCPUPercent(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())+"");
-	    		nodeInfoBack.setMemoryPercent(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())+"");
-//	    		nodeInfoBack.setDiskPercent(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())+"");
-//	    		nodeInfoBack.setNetin(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())+"");
-//	    		nodeInfoBack.setNetout(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())+"");
-	    		nodeInfoBack.setState(nodeInfo.getStatus());
-	    		nodeInfoBackList.add(nodeInfoBack);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    	return nodeInfoBackList;
-    }
-    
-    public List<NodeInfoBack> getNodeMonitorData2(){
+    public List<NodeInfoBack> getNodeMonitorData(String hostName){
     	//选取当前时间1秒内的值
-    	long endTime = System.currentTimeMillis();
-    	long startTime = endTime - 1000;
+    	Calendar current = Calendar.getInstance();
+        long endTime = current.getTimeInMillis();
+        current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 1);
+        long startTime = current.getTimeInMillis();
     	String dataSpec = "AVERAGE";
     	String type = "node";
     	List<NodeInfoBack> nodeInfoBackList = new ArrayList<>();
@@ -139,16 +88,32 @@ public class MonitorServiceImpl implements MonitorService {
 			nodeWrapper = new NodeWrapper().init("default");
 			List<NodeInfo> nodeInfoList = nodeWrapper.getNodeInfoListWithoutPods();
 	    	for (NodeInfo nodeInfo : nodeInfoList) {
-	    		NodeInfoBack nodeInfoBack = new NodeInfoBack();
-	    		nodeInfoBack.setHostName(nodeInfo.getName());
-	    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
-	    		nodeInfoBack.setCPUPercent(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName()).toString());
-	    		nodeInfoBack.setMemoryPercent(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName()).toString());
-	    		nodeInfoBack.setDiskPercent(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName()).toString());
-	    		nodeInfoBack.setNetin(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName()).toString());
-	    		nodeInfoBack.setNetout(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName()).toString());
-	    		nodeInfoBack.setState(nodeInfo.getStatus());
-	    		nodeInfoBackList.add(nodeInfoBack);
+	    		if(hostName != null && !hostName.equals("") && nodeInfo.getName().indexOf(hostName) >= 0){
+	    			NodeInfoBack nodeInfoBack = new NodeInfoBack();
+	    	
+		    		nodeInfoBack.setHostName(nodeInfo.getName());
+		    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
+		    		nodeInfoBack.setCPUPercent(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())+"");
+		    		nodeInfoBack.setMemoryPercent(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())+"");
+		    		nodeInfoBack.setDiskPercent(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())+"");
+//		    		nodeInfoBack.setNetin(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())+"");
+//		    		nodeInfoBack.setNetout(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())+"");
+		    		nodeInfoBack.setState(nodeInfo.getStatus());
+		    		nodeInfoBackList.add(nodeInfoBack);
+	    		}else if(hostName != null && !hostName.equals("") && nodeInfo.getName().indexOf(hostName) < 0){
+	    			return null;
+	    		}else{
+	    			NodeInfoBack nodeInfoBack = new NodeInfoBack();
+		    		nodeInfoBack.setHostName(nodeInfo.getName());
+		    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
+		    		nodeInfoBack.setCPUPercent(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())+"");
+		    		nodeInfoBack.setMemoryPercent(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())+"");
+		    		nodeInfoBack.setDiskPercent(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())+"");
+//		    		nodeInfoBack.setNetin(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())+"");
+//		    		nodeInfoBack.setNetout(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())+"");
+		    		nodeInfoBack.setState(nodeInfo.getStatus());
+		    		nodeInfoBackList.add(nodeInfoBack);
+	    		}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -158,8 +123,10 @@ public class MonitorServiceImpl implements MonitorService {
     
     @Override
     public List<InstenceInfoBack> getInstenceMonitorData(String serviceName){
-    	long endTime = System.currentTimeMillis();
-    	long startTime = endTime - 1000;
+    	Calendar current = Calendar.getInstance();
+        long endTime = current.getTimeInMillis();
+        current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 1);
+        long startTime = current.getTimeInMillis();
     	String dataSpec = "AVERAGE";
     	String type = "pod";
     	List<InstenceInfoBack> instenceList = new ArrayList<>();
@@ -171,42 +138,34 @@ public class MonitorServiceImpl implements MonitorService {
 			//通过服务名搜索和获取所有的实例
 	    	for (Pod pod : podList) {
 	    		InstenceInfoBack instenceInfoBack = new InstenceInfoBack();
-	    		if(serviceName != null){
-	    			String serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
-	    			if(serviceId != null){
-	    				ServiceInfo service = serviceDao.getService(serviceId);
-	    				if(service.getServiceCode().contains(serviceName)){
-	    					instenceInfoBack.setServiceName(service.getServiceCode());
-	    					AppInfo app = appDao.getApp(service.getAppId());
-	    					instenceInfoBack.setAppName(app.getAppCode());
-	    					instenceInfoBack.setInstanceName(pod.getMetadata().getName());
-	    					instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName()).toString());
-	    					instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName()).toString());
-	    					instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName()).toString());
-	    					instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName()).toString());
-	    				}
-	    			}/*else{
-	    				instenceInfoBack.setAppName(null);
-	    				instenceInfoBack.setServiceName(null);
-	    				instenceInfoBack.setInstanceName(pod.getMetadata().getName());
-	    				instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName()).toString());
-    					instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName()).toString());
-    					instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName()).toString());
-    					instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName()).toString());
-	    			}*/
-				}else{
-					String serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
-					ServiceInfo service = serviceDao.getService(serviceId);
-					AppInfo app = appDao.getApp(service.getAppId());
-					instenceInfoBack.setAppName(app.getAppCode());
-					instenceInfoBack.setServiceName(service.getServiceCode());
-					instenceInfoBack.setInstanceName(pod.getMetadata().getName());
-					instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName()).toString());
-					instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName()).toString());
-					instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName()).toString());
-					instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName()).toString());
-					
-				}
+	    		String serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
+	    		if(serviceId != null && !serviceId.equals("")){
+		    		ServiceInfo service = serviceDao.getService(serviceId);
+		    		if(serviceName != null && !serviceName.equals("") && service.getServiceCode().indexOf(serviceName)>=0 ){
+		    					instenceInfoBack.setServiceName(service.getServiceCode());
+		    					AppInfo app = appDao.getApp(service.getAppId());
+		    					instenceInfoBack.setAppName(app.getAppCode());
+		    					instenceInfoBack.setInstanceName(pod.getMetadata().getName());
+		    					instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName()).toString());
+		    					instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName()).toString());
+		    					instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName()).toString());
+		    					instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName()).toString());
+					}else if(serviceName != null && !serviceName.equals("") && service.getServiceCode().indexOf(serviceName)<0){
+						return null;
+					}else{
+						serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
+						service = serviceDao.getService(serviceId);
+						AppInfo app = appDao.getApp(service.getAppId());
+						instenceInfoBack.setAppName(app.getAppCode());
+						instenceInfoBack.setServiceName(service.getServiceCode());
+						instenceInfoBack.setInstanceName(pod.getMetadata().getName());
+						instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName())+"");
+						instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName())+"");
+						instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName())+"");
+						instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName())+"");
+						
+					}
+	    		}
 	    		instenceList.add(instenceInfoBack);
 			}
 		} catch (Exception e) {
@@ -272,18 +231,7 @@ public class MonitorServiceImpl implements MonitorService {
                 graphHistoryResponses.addAll(result);
             }
         }
-//        try {
-//            graphHistoryResponses = postJson(queryUrl, graphHistoryRequest);
-//        } catch (JsonProcessingException e) {
-//            logger.error("error processing json!", e);
-//            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "error processing json : " + e.getMessage());
-//        } catch (IOException e) {
-//            logger.error("io exception!", e);
-//            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "io exception : " + e.getMessage());
-//        }
-//        if (graphHistoryResponses == null) {
-//            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "query response is null");
-//        }
+
         // re-arrage GraphHistoryResponses
         Map<String, List<GraphHistoryResponse>> graphHistoryResponseMap = arrangeGraphHistoryResponseList(graphHistoryResponses,
                 monitorDataRequest.getTargetType());
@@ -315,13 +263,16 @@ public class MonitorServiceImpl implements MonitorService {
 					PodInfo podInfo = new PodInfo();
 					podInfo.setPodName(pod.getMetadata().getName());
 					List<ContainerInfo> containers = new ArrayList<>();
-					for (Container container : pod.getSpec().getContainers()) {
-						ContainerInfo containerInfo = new ContainerInfo();
-						containerInfo.setHostname(container.getName());
-//						containerInfo.setContainerId();
-						containers.add(containerInfo);
-					}
+					ContainerInfo containerInfo = new ContainerInfo();
+//					containerInfo.setHostname("192.168.80.137");
+					containerInfo.setHostname(pod.getSpec().getNodeName());
+					String containerID = pod.getStatus().getContainerStatuses().get(0).getContainerID();
+					String containerid = containerID.substring(9);
+//					containerInfo.setContainerId("5255d4080a48c6748353793b5a6fa0180105b5049e67387dfab2f2ed5715f755");
+					containerInfo.setContainerId(containerid);
+					containers.add(containerInfo);
 					podInfo.setContainers(containers);
+					targetInfo.setPod(podInfo);
 					targetInfoList.add(targetInfo);
 				}
 			}
@@ -329,6 +280,9 @@ public class MonitorServiceImpl implements MonitorService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+    	
+    	
+    	
 		return null;
 	}
 
@@ -421,7 +375,7 @@ public class MonitorServiceImpl implements MonitorService {
 //            	return counts;
             case "pod":
             case "container":
-//                return monitorBiz.getContainerCountersByEndpoints(joinStringSet(endpoints, ","), joinStringSet(containers, ","));
+                return monitorBiz.getContainerCountersByEndpoints(joinStringSet(endpoints, ","), joinStringSet(containers, ","));
             default:
                 return new ArrayList<>(1);
         }
@@ -492,6 +446,7 @@ public class MonitorServiceImpl implements MonitorService {
         for (String item : stringSet) {
             result += "\"" + item + "\"" + delimiter;
         }
+//        String substring = result.substring(0, result.length() - delimiter.length());
         return result.substring(0, result.length() - delimiter.length());
     }
     

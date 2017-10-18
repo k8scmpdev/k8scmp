@@ -13,7 +13,7 @@ import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryResponse;
 
 public interface MonitorService {
 
-	List<NodeInfoBack> getNodeMonitorData();
+	List<NodeInfoBack> getNodeMonitorData(String hostName);
 
 	List<InstenceInfoBack> getInstenceMonitorData(String serviceName);
 
