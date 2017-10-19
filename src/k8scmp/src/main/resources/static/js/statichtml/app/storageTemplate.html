@@ -1,0 +1,15 @@
+<div id="storageTemplate">
+	<select name="dirs" class="fontSizeControl" style="width: 18%">
+		<option value="HOSTPATH">主机目录</option>
+		<option value="EMPTYDIR">实例内目录</option>
+	</select>
+	<select name="writeOrRead" class="fontSizeControl" style="width: 12%">
+		<option>只读</option>
+		<option>读写</option>
+	</select>
+	<input name="volumeName" type="text" class="tip-top fontSizeControl" title="挂载的目录名称" style="width: 14%"/>
+	<input name="conPath" type="text" class="tip-top fontSizeControl" title="容器路径" style="width: 14%"/>
+	<input name="hostPath" type="text" class="tip-top fontSizeControl" title="主机路径" style="width: 14%"/>
+	<input name="insPath" type="text" class="tip-top fontSizeControl" title="实例内路径" style="width: 28%;display:none"/>
+	<a title="删除" class="tip-bottom" href="javascript:void(0);" onclick="$(this).parent().parent().remove();"><i class="icon-trash"></i></a>
+</div>

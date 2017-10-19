@@ -1,10 +1,31 @@
-
+/**
+ * Unicorn Admin Template
+ * Diablo9983 -> diablo9983@gmail.com
+**/
 $(document).ready(function(){
-
+	/**dynamic add a class named active**/
+	//when the page is initialized
+	var menuId = $("#commonScript").attr("menu");
+	var submenu = $(this).siblings('ul');
+	var levelActive = menuId.substr(0,1);
+	$("a[id="+levelActive+"]").parent().addClass("active");
+	if($("a[id="+levelActive+"]").parent().hasClass("submenu")){
+		$("a[id="+menuId+"]").css("color","#ffffff");
+		var currentSubmenu = $("a[id="+levelActive+"]").siblings('ul');
+		var li = $("a[id="+levelActive+"]").parent("li");
+		li.addClass("open");
+		var submenus = $('#sidebar li.submenu ul');
+		currentSubmenu.slideDown();
+		submenu.slideUp();
+	}
 	
+	//when click level menu
+	$('.levelmenu').click(function(){
+		$(this).parent().find('li.active').removeClass('active'); 
+		$(this).addClass("active");
+	});
 	
 	// === Sidebar navigation === //
-	
 	$('.submenu > a').click(function(e)
 	{
 		e.preventDefault();
@@ -76,7 +97,6 @@ $(document).ready(function(){
 		ul.css({'display':'none'});
 		fix_position();
 	}
-	
 	if($(window).width() > 479)
 	{
 	   $('#content-header .btn-group').css({width:'auto'});
@@ -125,41 +145,8 @@ $(document).ready(function(){
 	$('#style-switcher a').click(function()
 	{
 		var style = $(this).attr('href').replace('#','');
-		$('.skin-color').attr('href','css/maruti.'+style+'.css');
+		$('.skin-color').attr('href','css/unicorn.'+style+'.css');
 		$(this).siblings('a').css({'border-color':'transparent'});
 		$(this).css({'border-color':'#aaaaaa'});
 	});
-	
-	$('.lightbox_trigger').click(function(e) {
-		
-		e.preventDefault();
-		
-		var image_href = $(this).attr("href");
-		
-		if ($('#lightbox').length > 0) {
-			
-			$('#imgbox').html('<img src="' + image_href + '" /><p><i class="icon-remove icon-white"></i></p>');
-		   	
-			$('#lightbox').slideDown(500);
-		}
-		
-		else { 
-			var lightbox = 
-			'<div id="lightbox" style="display:none;">' +
-				'<div id="imgbox"><img src="' + image_href +'" />' + 
-					'<p><i class="icon-remove icon-white"></i></p>' +
-				'</div>' +	
-			'</div>';
-				
-			$('body').append(lightbox);
-			$('#lightbox').slideDown(500);
-		}
-		
-	});
-	
-
-	$('#lightbox').live('click', function() { 
-		$('#lightbox').hide(200);
-	});
-	
 });

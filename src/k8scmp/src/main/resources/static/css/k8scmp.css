@@ -192,7 +192,8 @@
 	font-size:13px;
 	text-align:left;
 	border:1px solid #a1a1a1;
-	padding:4%; 
+	padding:2%; 
+	vertical-align:middle;
 	background:#dddddd;
 	border-radius:25px;
 	-moz-border-radius:25px; /* 老的 Firefox */
@@ -205,7 +206,7 @@
 }
 
 .secondFillet{
-	padding-bottom: 22%;
+	padding-bottom: 40%;
 }
 
 .thirdFillet{
@@ -240,3 +241,130 @@
 .textareaLineSpace{
 	list-style-type: none ;
 }
+
+.iconOperation{
+	font-size: 11px;
+	font-family: inherit;
+}
+
+.modalStyle{
+	float:left;
+	font-size:13px;
+}
+
+.t10{
+	/* width: 50px;
+    min-width:50px;
+    max-width:50px; */
+    
+    width: 10%;
+    min-width:10%;
+    max-width:10%;
+}
+.t20{
+   /*  width: 50px;
+    min-width:50px;
+    max-width:50px; */
+    
+    width: 10%;
+    min-width:10%;
+    max-width:10%;
+}
+.t30{
+   /*  width: 60px;
+    min-width:60px;
+    max-width:60px; */
+    
+    width: 10%;
+    min-width:10%;
+    max-width:10%;
+}
+.t40{
+    /* width: 60px;
+    min-width:60px;
+    max-width:60px; */
+    
+    width: 10%;
+    min-width:10%;
+    max-width:10%;
+}
+.t50{
+   	/* width: 158px;
+    min-width:158px;
+    max-width:158px;
+     */
+    width: 20%;
+    min-width:20%;
+    max-width:20%;
+}
+.t60{
+   	/* width: 30%;
+    min-width:30%;
+    max-width:30%; */
+    
+    
+    width: 20%;
+    min-width:20%;
+    max-width:20%;
+}
+
+.t70{
+   	width: 15%;
+    min-width:15%;
+    max-width:15%;
+}
+/* 
+.i10{
+	width: 30%;
+    min-width:30%;
+    max-width:30%;
+}
+.i20{
+	width: 30%;
+    min-width:30%;
+    max-width:30%;
+}
+.i30{
+	width: 10%;
+    min-width:10%;
+    max-width:10%;
+}
+.i40{
+	width: 30%;
+    min-width:30%;
+    max-width:30%;
+} */
+
+.s10{
+	width: 20%;
+    min-width:20%;
+    max-width:20%;	
+}
+.s20{
+	width: 10%;
+    min-width:10%;
+    max-width:10%;	
+}
+.s30 .s40 {
+	width: 10%;
+    min-width:10%;
+    max-width:10%;	
+}
+
+.s50{
+	width: 20%;
+    min-width:20%;
+    max-width:20%;	
+}
+
+.s60{
+	width: 20%;
+    min-width:20%;
+    max-width:20%;	
+}
+.s70{
+	width: 15%;
+    min-width:15%;
+    max-width:15%;	
+}
+

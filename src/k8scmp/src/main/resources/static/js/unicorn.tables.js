@@ -3,31 +3,89 @@
  * Diablo9983 -> diablo9983@gmail.com
 **/
 $(document).ready(function(){
-	$('.data-table').dataTable({
-		"bProcessing" : true,
-		"bFilter":false,
-		"bJQueryUI": true,
-		"sPaginationType": "full_numbers",
-		"bScrollCollapse" : true,
-		"bAutoWidth": false,
-		"sScrollY": ($(window).height() - 320),
-		"oLanguage": {
-						"sProcessing": "正在加载中......",
-                        "sLengthMenu": "每页显示 _MENU_ 条记录",
-                        "sZeroRecords": "正在加载中......",
-                        "sEmptyTable": "查询无数据！",
-                        "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录",
-                        "sInfoEmpty": "显示0到0条记录",
-                        "sInfoFiltered": "数据表中共为 _MAX_ 条记录",
-                        "sSearch": "当前数据搜索",
-                        "oPaginate": {
-                        	"sFirst": "首页",
-                            "sPrevious": "上一页",
-                            "sNext": "下一页",
-                            "sLast": "末页"
-                        }
-                   	},
-		"sDom": '<""l>t<"F"fp>'
+	var oxTable=$('.data-table').dataTable({
+		"scrollY": "200px",
+	    "scrollCollapse": true,
+		"pagingType":"full_numbers",
+	    "paging": true,
+		"language":	{
+			"search":"搜索",
+	        "lengthMenu": "每页 _MENU_ 条记录",
+	        "zeroRecords": "没有找到记录",
+	        "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 )",
+	        "infoEmpty": "无记录",
+	        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+	        "paginate": {
+	            "first": "首页",
+	            "previous": "上页",
+	            "next": "下页",
+	            "last": "末页"
+	        }
+	    },
+	    "fnDrawCallback":function(oSettings){
+	    	$(".dataTables_length").offset({top:$(".dataTables_info").offset().top+6});
+	    }
+	});
+	
+	var oxyTable=$('.scroll-table').dataTable({
+		"scrollY": "200px",
+		"scrollX":true,
+	    "scrollCollapse": true,
+		"pagingType":"full_numbers",
+	    "paging": true,
+		"sorting":false,
+		"searching":false,
+		"lengthChange":false,
+		"language":	{
+	        "lengthMenu": "每页 _MENU_ 条记录",
+	        "zeroRecords": "没有找到记录",
+	        "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 )",
+	        "infoEmpty": "无记录",
+	        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+	        "paginate": {
+	            "first": "首页",
+	            "previous": "上页",
+	            "next": "下页",
+	            "last": "末页"
+	        }
+	    },
+	    /*"columnDefs": [ {
+	        "targets": 0,
+	        "render": function(data,type,full,meta){
+	        	return '<label><input type="checkbox" name="id[]" value="'+$('<div/>').text(data).html()+'"></label>';
+	        }
+	      } ],*/
+	    "fnDrawCallback":function(oSettings){
+	    	$(".dataTables_length").offset({top:$(".dataTables_info").offset().top+6});
+	    }
+	});
+
+	var osTable=$('.nosearch-table').dataTable({
+		"scrollY": "100px",
+	    "scrollCollapse": false,
+		"pagingType":"full_numbers",
+	    "paging": true,
+		"sorting":false,
+		"searching":false,
+		"lengthChange":false,
+		"language":	{
+	        "lengthMenu": "每页 _MENU_ 条记录",
+	        "zeroRecords": "没有找到记录",
+	        "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 )",
+	        "infoEmpty": "无记录",
+	        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+	        "paginate": {
+	            "first": "首页",
+	            "previous": "上页",
+	            "next": "下页",
+	            "last": "末页"
+	        }
+	    },
+	    "fnDrawCallback":function(oSettings){
+/*	    	alert($(".dataTables_info").offset().top);
+	    	alert($(".dataTables_length").offset().top);*/
+	    	$(".dataTables_length").offset({top:$(".dataTables_info").offset().top});
+	    }
 	});
 	
 	$('input[type=checkbox],input[type=radio],input[type=file]').uniform();
@@ -47,4 +105,4 @@ $(document).ready(function(){
 			}
 		});
 	});	
-});
+}); 

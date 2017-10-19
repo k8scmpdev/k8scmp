@@ -1,19 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<title>Unicorn Admin</title>
-		<meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
-		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	</head>
+	<head th:include="/public/commonframe :: cssScript" />
 	<body>
 		<div id="common-header">
+			<div th:include="/public/commonframe :: app-header"></div>
 		</div>
 		<div id="content">
 			<div id="content-header">
@@ -34,43 +24,52 @@
 								<h5>创建应用</h5>
 							</div>
 							<div class="widget-content">
-								<form action="/app/new" method="get" class="form-horizontal">
+								<form method="POST" class="form-horizontal" id="createAppFrom">
 									<div class="control-group">
 	                                        <label class="control-label">应用名称</label>
 	                                        <div class="controls">
-	                                            <input class="normaltext" type="text" placeholder="输入应用名称（字母数字）..." style="font-style: italic;font-size: 12px"/>
+	                                            <input class="normaltext" name="appCode" 
+	                                            type="text" placeholder="输入应用名称（字母数字）..." 
+	                                            style="font-style: italic;font-size: 12px"
+	                                            th:value="${#httpServletRequest.getParameter('appCode')}"/>
 	                                        </div>
 		                            </div>
 		                            <div class="control-group">
                                         <label class="control-label">应用描述</label>
                                         <div class="controls">
-                                            <textarea rows="3" cols="5"></textarea>
+                                            <textarea rows="3" cols="5" name="description"
+                                            th:text="${#httpServletRequest.getParameter('description')}"></textarea>
                                         </div>
 	                                </div>
 	                                <div class="control-group">
                                         <label class="control-label">物理集群</label>
                                         <div class="controls">
-                                            <select>
-												<option>集群1</option>
-												<option>集群2</option>
-												<option>集群3</option>
+                                            <select name="clusterId">
+												<option 
+												th:selected="(${#httpServletRequest.getParameter('clusterId')} == cluster01)" value="cluster01">集群1</option>
+												<option
+												th:selected="(${#httpServletRequest.getParameter('clusterId')} == cluster02)" value="cluster02">集群2</option>
+												<option
+												th:selected="(${#httpServletRequest.getParameter('clusterId')} == cluster03)" value="cluster03">集群3</option>
 											</select>
                                         </div>
 	                                </div>
 	                                <div class="control-group">
                                         <label class="control-label">逻辑集群</label>
                                         <div class="controls">
-                                            <select>
-												<option>开发环境</option>
-												<option>测试环境</option>
+                                            <select name="hostLabel">
+												<option 
+												th:selected="(${#httpServletRequest.getParameter('hostLabel')} == devEnv)" value="devEnv">开发环境</option>
+												<option 
+												th:selected="(${#httpServletRequest.getParameter('hostLabel')} == testEnv)" value="testEnv">测试环境</option>
 											</select>
                                         </div>
 	                                </div>
 	                                <div class="control-group">
                                         <label class="control-label">namespace</label>
                                         <div class="controls">
-                                            <select>
-												<option>default</option>
+                                            <select name="namespace">
+												<option value="default" selected="selected">default</option>
 											</select>
                                         </div>
 	                                </div>
@@ -86,14 +85,11 @@
 				</div>
 
 				<div class="common-footer">
-					
+					<div th:include="/public/commonframe::app-footer"></div>
 				</div>
 			</div>
 		</div>
 	</body>
-	<script th:src="@{/js/jquery.min.js}"></script>
-    <script th:src="@{/js/jquery.ui.custom.js}"></script>
-    <script th:src="@{/js/bootstrap.min.js}"></script>
-    <script th:src="@{/js/unicorn.js}"></script>
-	<script th:src="@{/js/commonDisplay.js}"></script>
+	<div th:include="/public/commonframe::jsScript(activeMenuNumber=3)" ></div>
+	<script type="text/javascript" th:src="@{/js/app/app-new.js}"></script>
 </html>

@@ -1,20 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<title>Unicorn Admin</title>
-		<meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
-		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	</head>
+	<head th:include="/public/commonframe :: cssScript" />
 	<body>
 		<div id="common-header">
-			
+			<div th:include="/public/commonframe :: app-header"></div>
 		</div>
 		<div id="content">
 			<div id="content-header">
@@ -28,60 +17,55 @@
 					<div class="span12">
 						<div class="buttons">
 							<a title="创建应用" class="btn tip-bottom" href="/app/app-new"><i class="icon-plus"></i>创建应用</a>
-							<a title="删除应用" class="btn tip-bottom" href="#"><i class="icon-remove"></i>删除</a>
-							
-							<div class="input-append" style="float:right">
-			                	<input type="text" placeholder="请输入查询内容"/><button class="btn prepend"><i class="icon-search"></i> </button>
-			            	</div>
-						</div>	
+						</div>
 						<div class="widget-box">
 							<div class="widget-title">
 								<h5>应用列表</h5>
 							</div>
 							<div class="widget-content nopadding">
-								<table class="table table-bordered data-table with-check" style="table-layout: fixed;">
+								<table class="table table-bordered data-table display" style="width:100%">
 									<thead>
 										<tr>
-											<th><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></th>
-											<th>应用名称</th>
-											<th>状态</th>
-											<th>逻辑集群</th>
-											<th>物理集群</th>
-											<th>创建时间</th>
-											<th>应用描述</th>
-							
+											<th class="t10">应用名称</th>
+											<th class="t20">状态</th>
+											<th class="t30">逻辑集群</th>
+											<th class="t40">物理集群</th>
+											<th class="t50">创建时间</th>
+											<th class="t60">应用描述</th>
+											<th class="t70">操作</th>
 										</tr>
 									</thead>
 									<tbody id="tBody">
 									    <tr th:each="app,itState:${appList}">
-									    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
-									        <td><a title='单击查看服务列表' th:href="@{/app/service/service-mgmt(appCode=${app.appCode},hostLabel=${app.hostLabel},namespace=${app.namespace})}" th:text="${app.appCode}" class="tip-top"></a></td>
-									        <td th:text="${app.state}"></td>
-									        <td th:text="${app.hostLabel}"></td>
-									        <td th:text="${app.clusterId}"></td>
-									       <!-- <td><i class="icon-list-alt tip-top" title="点击查看地址"></i></td> --> 
-									        <td th:text="${app.createTime}"></td>
-									        <td th:text="${app.description}"></td>
+									        <td class="t10">
+									        	<a title='单击查看服务列表' id="appCode" th:href="@{'/app/service/'+${app.id}+'?1=1'(appCode=${app.appCode},hostLabel=${app.hostLabel},namespace=${app.namespace})}" th:text="${app.appCode}" class="tip-top" style="white-space:nowrap;"></a>
+									        </td>
+									        <td class="t20" th:text="${app.state}"></td>
+									        <td class="t30" th:text="${app.hostLabel}"></td>
+									        <td class="t40" th:text="${app.clusterId}"></td>
+									        <td class="t50" th:text="${app.createTime}"></td>
+									        <td class="t60" th:text="${app.description}"></td>
+									        <td class="operation t70">
+									        	<a class="iconOperation" 
+									        	th:href="@{/app/app-new(appCode=${app.appCode},hostLabel=${app.hostLabel},
+									        	namespace=${app.namespace},description=${app.description},
+									        	clusterId=${app.clusterId})}"><i class="icon-edit"></i><span>编辑</span></a>
+									        	<a class="iconOperation" href="javascript:void(0);" th:onclick="'deleteApp('+'\''+${app.id}+'\''+');'"><i class="icon-trash"></i><span>删除</span></a>
+									        </td>
 									    </tr>
 									</tbody>
-								</table>							
+								</table>
 							</div>
 						</div>				
 					</div>
+					</div>				
+					</div>
 				</div>
 				<div id="common-footer">
+					<div th:include="/public/commonframe::app-footer"></div>
 				</div>
-			</div>
-		</div>
-		
-		<script th:src="@{/js/jquery.min.js}"></script>
-        <script th:src="@{/js/jquery.ui.custom.js}"></script>
-        <script th:src="@{/js/bootstrap.min.js}"></script>
-        <script th:src="@{/js/jquery.uniform.js}"></script>
-        <script th:src="@{/js/select2.min.js}"></script>
-        <script th:src="@{/js/jquery.dataTables.min.js}"></script>
-        <script th:src="@{/js/commonDisplay.js}" id="commonScript" menu="3"></script>
-        <script th:src="@{/js/unicorn.js}"></script>
-        <script th:src="@{/js/unicorn.tables.js}"></script>
+	
 	</body>
+	<div th:include="/public/commonframe::jsScript(activeMenuNumber=3)" ></div>
+	<script th:src="@{/js/app/app-mgmt.js}"></script>
 </html>

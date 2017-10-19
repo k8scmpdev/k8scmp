@@ -1,0 +1,73 @@
+<head th:fragment="cssScript">
+	<meta charset="UTF-8" />
+	<title th:text="交行PaaS云管理控制台"></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="shortcut icon" th:href="@{/img/favicon.gif}" type="image/gif" />
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
+	<link rel="stylesheet" th:href="@{/css/fullcalendar.css}" />
+	<link rel="stylesheet" th:href="@{/css/k8scmp.css}" />
+	<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
+	<link rel="stylesheet" th:href="@{/css/uniform.css}" />
+	<link rel="stylesheet" th:href="@{/css/select2.css}" />	
+	<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
+	<link rel="stylesheet" th:href="@{/css/jquery-ui.10.css}" />
+	<link rel="stylesheet" th:href="@{/css/dataTables.jqueryui.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/timeline.css}" />
+</head>
+
+<div th:fragment="jsScript(activeMenuNumber)">
+	<script th:src="@{/js/jquery-1.8.3.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/jquery.uniform.js}"></script>
+    <!-- <script th:src="@{/js/jquery.dataTables.min.js}"></script> -->
+    <script th:src="@{/js/jquery.dataTables.min.10.js}"></script>
+    <script th:src="@{/js/select2.min.js}"></script>
+    <script th:src="@{/js/k8scmp-unicorn.js}" id="commonScript" th:attr="menu=${activeMenuNumber}"></script>
+    <script th:src="@{/js/unicorn.tables.js}"></script>     
+    <script th:src="@{/js/jquery.validate.js}"></script>
+    <script th:src="@{/js/unicorn.form_validation.js}"></script>          
+</div>
+
+
+<div th:fragment="app-header">
+	<div id="header">
+		<h1><a href="./dashboard.html">PaaS云管理控制台</a></h1>		
+	</div>
+	<div id="user-nav" class="navbar navbar-inverse">
+	     <ul class="nav btn-group">
+	         <li class="btn btn-inverse"><a title="" href="login.html"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
+	     </ul>
+	</div>
+	<div id="sidebar">
+	<ul>
+		<li class="levelmenu"><a href="/overview" id="1" ><i class="icon icon-home"></i> <span>总览</span></a></li>
+		<li class="submenu">
+			<a id="2"><i class="icon icon-tint"></i> <span>全局配置</span></a>
+			<ul>
+				<li><a href="/user/list" id="21">用户管理</a></li>
+				<li><a href="/cluster/edit" id="22">集群设置</a></li>
+				<li><a href="/registry/edit" id="23">镜像仓库设置</a></li>
+				<li><a href="/monitor/edit" id="24">监控报警设置</a></li>
+			</ul>
+		</li>
+		<li class="levelmenu"><a id="3" href="/app"><i class="icon icon-th-list"></i> <span>应用管理</span></a></li>
+		
+		<li class="submenu">
+			<a id="4"><i class="icon icon-file"></i> <span>报警监控</span></a>
+			<ul>
+				<li><a href="/monitor/monitor" id="41">用户操作日志</a></li>
+				<li><a href="/chat" id="42">监控管理</a></li>
+				<li><a href="/alarm" id="43">报警管理</a></li>
+			</ul>
+		</li>
+	</ul>
+</div>
+</div>
+<div th:fragment="app-footer">
+<div class="row-fluid">
+<div id="footer" class="span12">
+	
+</div>
+</div>
+</div>

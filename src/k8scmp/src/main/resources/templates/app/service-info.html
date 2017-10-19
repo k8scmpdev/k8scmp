@@ -1,21 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<title>Unicorn Admin</title>
-		<meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
-		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
-		<link rel="stylesheet" th:href="@{/css/k8scmp.css}" />
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	</head>
+	<head th:include="/public/commonframe :: cssScript" />
 	<body>
 		<div id="common-header">
-		
+			<div th:include="/public/commonframe :: app-header"></div>
 		</div>
 		<div id="content">
 			<div id="content-header">
@@ -49,6 +37,7 @@
 					<a title="升级/回滚" class="btn-mini tip-bottom" href="service-upordowngrade.html"><i class="icon-repeat"></i>升级/回滚</a>
 					<a title="扩容/缩容" class="btn-mini tip-bottom" href="service-capacity.html"><i class="icon-resize-small"></i>扩容/缩容</a>
 					<a title="停止" class="btn-mini tip-bottom"><i class="icon-remove"></i>删除</a>
+					
 				</div>
 				</div>
 			</div>
@@ -63,12 +52,13 @@
 							    </li>
 								<li><a href="#sExample" data-toggle="tab" class="fontSizeControl">服务实例</a></li>
 								<li><a href="#sUpgrade" data-toggle="tab" class="fontSizeControl">升级配置</a></li>
+								<li><a href="#sPort" data-toggle="tab" class="fontSizeControl">负载</a></li>
 							</ul> 
 						  
 						<div id="myTabContent" class="tab-content">  
 						    <div class="tab-pane fade in active" id="sInfo">
 						    	<div>
-						    	<div>
+						    	<div style="padding-bottom:4px;">
 						    		<span class="deploySpan">部署版本</span>
 						    		<span class="deploySpan">
 						    			<select style="width: 10%">
@@ -93,7 +83,7 @@
 											<li style="list-style-type: none">挂载存储</li>
 										</ul>
 										</div>
-										<div class="filletLi" style="float: left">
+										<div class="filletLi" style="float: left;width:70%;">
 											<ul>
 												<li style="list-style-type: none;padding-bottom: 3px;">test/java</li>
 												<li style="list-style-type: none;padding-bottom: 3px;">http://test.registry.com</li>
@@ -108,8 +98,8 @@
 															<div class="widget-title">
 																<h5>挂载列表</h5>
 															</div>
-															<div class="widget-content nopadding" style="height: 10%;">
-																<table class="table table-bordered">
+															<div class="widget-content nopadding">
+																<table class="table table-bordered storage-table">
 																	<thead>
 																		<tr>
 																			<th>名称</th>
@@ -163,11 +153,19 @@
 																	</tr>
 																	</thead>
 																	<tbody id="tBody">
-																	    <tr th:each="app,itState:${imageList}">
+																	   <!--  <tr th:each="app,itState:${imageList}">
 																	    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
 																	        <td><a title='单击查看服务列表' th:href="@{/app/service-mgmt(appId=${app.appId},logicClusterId=${app.logicClusterId},namespace=${app.namespace})}" th:text="${app.appId}" class="tip-top"></a></td>
 																	        <td th:text="${app.createTime}"></td>
 																	        <td th:text="${app.description}"></td>
+																	    </tr> -->
+																	    <tr>
+																	    <td>service01-instance01</td>
+																	    <td>运行中</td>
+																	    <td>dev-test/java</td>
+																	    <td>http://123:8080</td>
+																	     <td></td>
+																	      <td></td>
 																	    </tr>
 																	</tbody>
 																</table>							
@@ -180,12 +178,14 @@
 						     
 						    <div class="tab-pane fade" id="sUpgrade">  
 						    	<div>
-						    		<span class="deploySpan">选择镜像</span>
-						    		<span class="deploySpan">
-						    			 <input type="text" placeholder="输入服务名称（字母数字）..." style="font-style: italic;font-size: 13px;width: 40%"/>
-                                          &nbsp;&nbsp; &nbsp;&nbsp;<a title="停止" class="btn btn-primary btn-mini tip-bottom"><i class="icon-remove"></i>添加</a>
-										<i class="icon-question-sign"></i>
-						    		</span>
+						    		<div>
+							    		<span class="deploySpan">选择镜像</span>
+							    		<span class="deploySpan">
+							    			 <input type="text" placeholder="输入服务名称（字母数字）..." style="font-style: italic;font-size: 13px;width: 40%"/>
+	                                          &nbsp;&nbsp; &nbsp;&nbsp;<a title="停止" class="btn btn-primary btn-mini tip-bottom"><i class="icon-remove"></i>添加</a>
+											<i class="icon-question-sign"></i>
+							    		</span>
+						    		</div>
 						    	</div>
 						    	<div class="filletDiv">
 								<div class="thirdFillet">
@@ -198,6 +198,7 @@
 										<li class="larLineSpace">挂载存储</li>
 										<li class="middleLineSpace">启动命令</li>
 										<li class="middleLineSpace">容器大小</li>
+										<li class="middleLineSpace">端口映射</li>
 									</ul>
 									</div>
 									<div class="filletLi" style="float: left">
@@ -266,7 +267,16 @@
 												<span>内存(MB)</span><input type="text" class="combine tip-top"/>
 											</div>
 						    			</li>
-						    			
+						    			<li class="normalLineSpace">
+							    			<div class="controls">
+		                               			<input type="text" class="combine tip-top" title="对外访问服务端口"/>
+		                               			<input type="text" class="combine tip-top" title="容器端口"/>
+												<select class="combine">
+													<option>TCP</option>
+													<option>UDP</option>
+												</select>
+	                               			</div>
+						    			</li>
 										</ul>
 									</div>
 								</div>
@@ -274,24 +284,50 @@
 							</div>
 						    </div>  
 						
+							<div class="tab-pane fade" id="sPort"> 
+								
+								<a class="btn" href="#sPortMappedModel" data-toggle="modal"><span style="font-size: 13px;">创建负载均衡器</span></a>
+						    </div>
 						</div>				
 					</div>
 				</div>
-				
+				<div id="sPortMappedModel" class="modal hide">
+					<div class="modal-header">
+						<button data-dismiss="modal" class="close" type="button">×</button>
+						<h3>创建负载均衡器</h3>
+					</div>
+					<div class="modal-body">
+				    	<div>
+				    		<div style="padding-bottom: 6%;">
+				    			<label class="modalStyle" style="padding-right: 10px;">是否对外发布</label>
+	                           	<label class="modalStyle"><input class="radioItem" type="radio" name="publishRadios" value="1"/>是</label>
+								<label class="modalStyle"><input class="radioItem" type="radio" name="publishRadios" value="2" checked="checked"/>否</label>
+				    		</div>
+				    		<div class="portMappes" style="display: none">
+			    				<label style="float: left;padding-right: 10px;font-size: 13px;">端口映射</label>
+                           		<a title="添加端口映射" class="tip-bottom" href="javascript:void(0);" style="float: left;padding-left: 30px;" onclick="showPortMapped();">
+                           			<i class="icon-plus"></i>
+                           		</a>
+                           		<br/>
+                           		<br/>
+                           		<div id="portMapped">
+                           		
+                           		</div>
+			    			</div>
+				    		<div style="float: right">
+								<button class="btn-primary btn-mini" type="button" data-dismiss="modal">取消</button>&nbsp;&nbsp;&nbsp;
+								<button id="btnnew2pre" class="btn-primary btn-mini" type="button">确定</button>
+							</div>
+				    	</div>
+	               	</div>
+	               	</div>
+				</div>
 				<div id="common-footer">
-					
+					<div th:include="/public/commonframe::app-footer"></div>
 				</div>
 			</div>
 		</div>
-		</div>
 	</body>
-	<script th:src="@{/js/jquery.min.js}"></script>
-    <script th:src="@{/js/jquery.ui.custom.js}"></script>
-    <script th:src="@{/js/bootstrap.min.js}"></script>
-    <script th:src="@{/js/jquery.uniform.js}"></script>
-    <script th:src="@{/js/select2.min.js}"></script>
-    <script th:src="@{/js/jquery.dataTables.min.js}"></script>
-    <script th:src="@{/js/unicorn.js}"></script>
-    <script th:src="@{/js/unicorn.tables.js}"></script>
-    <script th:src="@{/js/commonDisplay.js}"></script>
+	<div th:include="/public/commonframe::jsScript(activeMenuNumber=3)" ></div>
+	<script th:src="@{/js/app/service-info.js}"></script>
 </html>
