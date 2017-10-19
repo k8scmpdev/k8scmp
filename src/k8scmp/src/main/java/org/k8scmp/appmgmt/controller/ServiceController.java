@@ -1,5 +1,6 @@
 package org.k8scmp.appmgmt.controller;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.k8scmp.appmgmt.domain.DeployEvent;
@@ -155,5 +156,16 @@ public class ServiceController {
         return ResultStat.OK.wrap(null);
     }
     
+    @ResponseBody
+    @RequestMapping(value = "/getServiceState")
+    public HttpResponseTemp<HashMap<String,String>> getServiceState(@RequestParam(value = "serviceId", required = true) String serviceId) throws Exception {
+    	return ResultStat.OK.wrap(serviceService.getServiceState(serviceId));
+    } 
+    
+    @ResponseBody
+    @RequestMapping(value = "/getServicesStateByAppId")
+    public HttpResponseTemp<HashMap<String,String>> getServicesStateByAppId(@RequestParam(value = "appId", required = true) String appId) throws Exception {
+    	return ResultStat.OK.wrap(serviceService.getServiceState(appId));
+    } 
     
 }

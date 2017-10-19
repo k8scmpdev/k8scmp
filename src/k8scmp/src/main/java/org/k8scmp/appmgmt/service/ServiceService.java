@@ -1,5 +1,6 @@
 package org.k8scmp.appmgmt.service;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.k8scmp.appmgmt.domain.DeployEvent;
@@ -45,4 +46,8 @@ public interface ServiceService {
 	List<Instance> listPodsByServiceId(String serviceId) throws Exception;
 
 	List<String> getServiceURLs(String serviceId) throws Exception;
+
+	HashMap<String, String> getServiceState(String serviceId) throws Exception;
+
+	HashMap<String, String> getServicesStateByAppId(String appId) throws Exception;
 }

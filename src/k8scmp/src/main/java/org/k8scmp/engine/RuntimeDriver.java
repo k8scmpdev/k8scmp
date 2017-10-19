@@ -1,10 +1,12 @@
 package org.k8scmp.engine;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 import org.k8scmp.appmgmt.domain.AppInfo;
 import org.k8scmp.appmgmt.domain.Cluster;
+import org.k8scmp.appmgmt.domain.DeployEvent;
 import org.k8scmp.appmgmt.domain.Env;
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
 import org.k8scmp.appmgmt.domain.Version;
@@ -49,6 +51,13 @@ public interface RuntimeDriver {
 
 	List<VersionBase> getCurrnetVersionsByService(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo)
 			throws DeploymentEventException;
+
+	void checkBasicEvent(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, DeployEvent event)
+			throws DeploymentEventException, IOException, ParseException,
+			DeploymentTerminatedException;
+
+	void checkStopEvent(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, DeployEvent event)
+			throws DeploymentEventException, IOException, DeploymentTerminatedException;
 
 //    void abortDeployOperation(ServiceConfigInfo serviceConfigInfo, User user)
 //            throws  IOException;

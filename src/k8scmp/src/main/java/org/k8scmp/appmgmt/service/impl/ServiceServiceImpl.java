@@ -46,6 +46,7 @@ import org.k8scmp.exception.DeploymentEventException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
+import org.k8scmp.model.DeployOperation;
 import org.k8scmp.model.LoadBalancerProtocol;
 import org.k8scmp.model.ServiceStatus;
 import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
@@ -825,4 +826,103 @@ public class ServiceServiceImpl implements ServiceService {
         
         return urls;
 	}
+
+
+	@Override
+	public HashMap<String, String> getServiceState(String serviceId)  throws Exception{
+		ServiceInfo serviceInfo = serviceDao.getService(serviceId);
+		if(serviceInfo == null){
+			return null;
+		}
+		
+		AppInfo appInfo = appDao.getApp(serviceInfo.getAppId());
+		if(appInfo==null){
+			return null;
+		}
+		
+		ServiceConfigInfo serviceConfigInfo = (ServiceConfigInfo) serviceInfo.toModel(ServiceConfigInfo.class);
+		
+		Cluster cluster = getCluster();
+		RuntimeDriver driver = ClusterRuntimeDriver.getClusterDriver(cluster.getId());
+		if (driver == null) {
+            throw ApiException.wrapMessage(ResultStat.CLUSTER_NOT_EXIST, "cluster: " + cluster.toString());
+        }
+		
+		return checkEvent(driver, appInfo, serviceConfigInfo);
+	}
+	
+	@Override
+	public HashMap<String, String> getServicesStateByAppId(String appId) throws Exception {
+		List<ServiceInfo>  serviceInfos = serviceDao.getServicesByAppId(appId);
+		if(serviceInfos == null || serviceInfos.size()==0){
+			return null;
+		}
+		
+		AppInfo appInfo = appDao.getApp(appId);
+		if(appInfo==null){
+			return null;
+		}
+		
+		Cluster cluster = getCluster();
+		RuntimeDriver driver = ClusterRuntimeDriver.getClusterDriver(cluster.getId());
+		if (driver == null) {
+            throw ApiException.wrapMessage(ResultStat.CLUSTER_NOT_EXIST, "cluster: " + cluster.toString());
+        }
+		
+		List<GetServiceStatusTask> serviceInfoTasks = new LinkedList<>();
+		for (ServiceInfo service : serviceInfos) {
+	        serviceInfoTasks.add(new GetServiceStatusTask(driver,appInfo,service));
+        }
+        
+		List<HashMap<String,String>> serviceStatuList = ClientConfigure.executeCompletionService(serviceInfoTasks);
+		
+		HashMap<String,String> map = new HashMap<String,String>();
+		
+		for(HashMap<String,String> idStatu:serviceStatuList){
+			map.putAll(idStatu);
+		}
+		
+		return map;
+	}
+	
+	 private class GetServiceStatusTask implements Callable<HashMap<String,String>> {
+		 RuntimeDriver driver;
+		 AppInfo appInfo;
+		 ServiceInfo service;
+
+        private GetServiceStatusTask(RuntimeDriver driver, AppInfo appInfo, ServiceInfo service) {
+        	this.driver = driver;
+        	this.appInfo = appInfo;
+            this.service = service;
+        }
+
+        @Override
+        public HashMap<String,String> call() throws Exception {
+        	if (service == null) {
+                return null;
+            }
+        	ServiceConfigInfo serviceConfigInfo = (ServiceConfigInfo) service.toModel(ServiceConfigInfo.class);
+        	
+        	return checkEvent(driver, appInfo, serviceConfigInfo);
+        }
+     }
+	 
+	 public HashMap<String, String> checkEvent(RuntimeDriver driver, AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws Exception {
+		 DeployEvent event = serviceEventDao.getNewestEvent(serviceConfigInfo.getId());
+		 if(event == null){
+			 return null;
+		 }
+		 
+		 if(DeployOperation.STOP.equals((event.getOperation()))){
+			 driver.checkStopEvent(appInfo, serviceConfigInfo, event);
+		 }else{
+			 driver.checkBasicEvent(appInfo, serviceConfigInfo, event);
+		 }
+		 
+		 
+		 HashMap<String,String> map = new HashMap<String,String>();
+		 map.put(serviceConfigInfo.getId(), serviceDao.getServiceStatu(serviceConfigInfo.getId()));
+		 return map;
+	 }
+	 
 }

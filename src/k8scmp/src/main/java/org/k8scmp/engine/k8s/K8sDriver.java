@@ -16,6 +16,7 @@ import org.k8scmp.appmgmt.domain.DeploymentSnapshot;
 import org.k8scmp.appmgmt.domain.Env;
 import org.k8scmp.appmgmt.domain.NodePortDraft;
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
+import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.appmgmt.domain.Version;
 import org.k8scmp.appmgmt.domain.VersionBase;
 import org.k8scmp.appmgmt.service.ServiceStatusManager;
@@ -242,7 +243,7 @@ public class K8sDriver implements RuntimeDriver {
         } catch (K8sDriverException e) {
             throw new DeploymentEventException(e);
         }
-        PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo);
+        PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo.getId());
         List<DeploymentSnapshot> currentSnapshot = queryCurrentSnapshotWithPodRunning(podList);
         String eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
                 DeployOperation.STOP,
@@ -278,7 +279,7 @@ public class K8sDriver implements RuntimeDriver {
         VersionBase versionBase = versionDao.getVersion(serviceConfigInfo.getId(), ver);
         Version version = versionBase.toModel(Version.class);
         // check status
-        PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo);
+        PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo.getId());
         List<DeploymentSnapshot> currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
         int totalReplicas = getTotalReplicas(currentRunningSnapshot);
         if (serviceConfigInfo.getDefaultReplicas() != -1) {
@@ -321,7 +322,7 @@ public class K8sDriver implements RuntimeDriver {
          VersionBase versionBase = versionDao.getVersion(serviceConfigInfo.getId(), ver);
          Version version = versionBase.toModel(Version.class);
          // check status
-         PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo);
+         PodList podList = getPodListByDeployment(kubeUtils, serviceConfigInfo.getId());
          List<DeploymentSnapshot> currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
          int totalReplicas = getTotalReplicas(currentRunningSnapshot);
          if (serviceConfigInfo.getDefaultReplicas() != -1) {
@@ -366,7 +367,7 @@ public class K8sDriver implements RuntimeDriver {
         List<DeploymentSnapshot> currentRunningSnapshot = null;
         try {
             // ** find rc
-        	PodList podList = getPodListByDeployment(client, serviceConfigInfo);
+        	PodList podList = getPodListByDeployment(client, serviceConfigInfo.getId());
             currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
             List<DeploymentSnapshot> dstSnapshot = buildDeploymentSnapshotWith(currentRunningSnapshot, ver, replicas);
             String eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
@@ -404,7 +405,7 @@ public class K8sDriver implements RuntimeDriver {
         List<DeploymentSnapshot> currentRunningSnapshot = null;
         try {
             // ** find rc
-        	PodList podList = getPodListByDeployment(client, serviceConfigInfo);
+        	PodList podList = getPodListByDeployment(client, serviceConfigInfo.getId());
             currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
             List<DeploymentSnapshot> dstSnapshot = buildDeploymentSnapshotWith(currentRunningSnapshot, ver, replicas);
             String eventId = serviceStatusManager.registerEvent(serviceConfigInfo.getId(),
@@ -442,16 +443,16 @@ public class K8sDriver implements RuntimeDriver {
         return deployResourceHandler;
     }
 
-    private Map<String, String> buildDeploySelector(ServiceConfigInfo serviceConfigInfo) {
+    private Map<String, String> buildDeploySelector(String serviceId) {
         Map<String, String> selector = new HashMap<>();
-        selector.put(GlobalConstant.DEPLOY_ID_STR, String.valueOf(serviceConfigInfo.getId()));
+        selector.put(GlobalConstant.DEPLOY_ID_STR, String.valueOf(serviceId));
         return selector;
     }
 
-    private PodList getPodListByDeployment(KubeUtils kubeUtils, ServiceConfigInfo serviceConfigInfo)
+    private PodList getPodListByDeployment(KubeUtils kubeUtils, String serviceId)
             throws DeploymentEventException {
         try {
-            return kubeUtils.listPod(buildDeploySelector(serviceConfigInfo));
+            return kubeUtils.listPod(buildDeploySelector(serviceId));
         } catch (K8sDriverException e) {
             throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
         }
@@ -526,59 +527,62 @@ public class K8sDriver implements RuntimeDriver {
         return replicas;
     }
 
-//    private boolean checkAnyInstanceFailed(int deploymentId, long versionId)
-//            throws ParseException, K8sDriverException {
-//        ServiceConfigInfo serviceConfigInfo = serviceDao.getDeployment(deploymentId);
-//        KubeUtils client = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//        Map<String, String> rcSelector = buildDeploySelectorWithSpecifyVersion(serviceConfigInfo, versionId);
-//        PodList podList = client.listPod(rcSelector);
-//        return PodUtils.isAnyFailed(podList);
-//    }
-//
-//    @Override
-//    public void checkBasicEvent(ServiceConfigInfo serviceConfigInfo, DeployEvent event)
-//            throws DeploymentEventException, IOException, DataBaseContentException, ParseException, DeploymentTerminatedException {
-//        KubeUtils client;
-//        try {
-//            client = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        try {
-//            PodList podList = getPodListByDeployment(client, serviceConfigInfo);
-//            List<DeploymentSnapshot> currentSnapshot = queryCurrentSnapshot(podList);
-//            List<DeploymentSnapshot> currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
-//            List<DeploymentSnapshot> desiredSnapshot = event.getTargetSnapshot();
-//            if (currentSnapshot == null && PodUtils.isExpireForEventNotReallyHappen(event.getStartTime())) {
+    private boolean checkAnyInstanceFailed(String namespace,String serviceId, long version)
+            throws Exception {
+    	ServiceInfo serviceInfo = serviceDao.getService(serviceId);
+    	ServiceConfigInfo serviceConfigInfo  = serviceInfo.toModel(ServiceConfigInfo.class);
+        KubeUtils client = Fabric8KubeUtils.buildKubeUtils(cluster, namespace);
+        Map<String, String> rcSelector = buildDeploySelectorWithSpecifyVersion(serviceConfigInfo, version);
+        PodList podList = client.listPod(rcSelector);
+        return PodUtils.isAnyFailed(podList);
+    }
+
+    @Override
+    public void checkBasicEvent(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, DeployEvent event)
+            throws DeploymentEventException, IOException, ParseException, DeploymentTerminatedException {
+        KubeUtils client;
+        try {
+            client = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException(e);
+        }
+        try {
+            PodList podList = getPodListByDeployment(client, serviceConfigInfo.getId());
+            List<DeploymentSnapshot> currentSnapshot = queryCurrentSnapshot(podList);
+            List<DeploymentSnapshot> currentRunningSnapshot = queryCurrentSnapshotWithPodRunning(podList);
+            List<DeploymentSnapshot> desiredSnapshot = event.getTargetSnapshot();
+            if (currentSnapshot == null && PodUtils.isExpireForEventNotReallyHappen(DateUtil.string2timestamp(event.getStartTime()))) {
 //                deleteUpdaterJob(client, serviceConfigInfo.getId());
-//                serviceStatusManager.failedEvent(event.getEid(), null, "no replication controller found for event(eid="
-//                        + event.getEid() + ")");
-//                return;
-//            }
-//            if (desiredSnapshot == null) {
+                serviceStatusManager.failedEvent(event.getId(), null, "no deployment found for event(id="
+                        + event.getId() + ")");
+                return;
+            }
+            if (desiredSnapshot == null) {
 //                deleteUpdaterJob(client, serviceConfigInfo.getId());
-//                serviceStatusManager.failedEvent(event.getEid(), currentRunningSnapshot, "null desired snapshot");
-//                return;
-//            }
-//
-//            for (DeploymentSnapshot deploymentSnapshot : desiredSnapshot) {
-//                if (checkAnyInstanceFailed(event.getDeployId(), deploymentSnapshot.getVersion())) {
+                serviceStatusManager.failedEvent(event.getId(), currentRunningSnapshot, "null desired snapshot");
+                return;
+            }
+
+            for (DeploymentSnapshot deploymentSnapshot : desiredSnapshot) {
+                if (checkAnyInstanceFailed(appInfo.getNamespace(), event.getServiceId(), deploymentSnapshot.getVersion())) {
 //                    deleteUpdaterJob(client, serviceConfigInfo.getId());
-//                    serviceStatusManager.failedEvent(event.getEid(), currentRunningSnapshot, "one of pod is start failed");
-//                    return;
-//                }
-//            }
-//            if (isSnapshotEquals(currentSnapshot, event.getTargetSnapshot()) && isSnapshotEquals(currentRunningSnapshot, event.getTargetSnapshot())) {
+                    serviceStatusManager.failedEvent(event.getId(), currentRunningSnapshot, "one of pod is start failed");
+                    return;
+                }
+            }
+            if (isSnapshotEquals(currentSnapshot, event.getTargetSnapshot()) && isSnapshotEquals(currentRunningSnapshot, event.getTargetSnapshot())) {
 //                deleteUpdaterJob(client, serviceConfigInfo.getId());
-//                serviceStatusManager.succeedEvent(event.getEid(), currentSnapshot);
-//            } else {
-//                serviceStatusManager.freshEvent(event.getEid(), currentRunningSnapshot);
-//            }
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
-//        }
-//    }
-//
+                serviceStatusManager.succeedEvent(event.getId(), currentSnapshot);
+            } else {
+                serviceStatusManager.freshEvent(event.getId(), currentRunningSnapshot);
+            }
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
+        } catch (Exception e) {
+        	throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
+		}
+    }
+
 //    @Override
 //    public void checkAbortEvent(ServiceConfigInfo serviceConfigInfo, DeployEvent event)
 //            throws DeploymentEventException, IOException, DeploymentTerminatedException {
@@ -596,32 +600,32 @@ public class K8sDriver implements RuntimeDriver {
 //        switch (event.getOperation()) {
 //            case ABORT_START:
 //                if (currentSnapshot == null || currentSnapshot.isEmpty()) {
-//                    serviceStatusManager.succeedEvent(event.getEid(), currentSnapshot);
+//                    serviceStatusManager.succeedEvent(event.getId(), currentSnapshot);
 //                } else {
 //                    try {
 //                        deployResourceHandler.delete();
 //                    } catch (K8sDriverException e) {
 //                        throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
 //                    }
-//                    serviceStatusManager.freshEvent(event.getEid(), currentRunningSnapshot);
+//                    serviceStatusManager.freshEvent(event.getId(), currentRunningSnapshot);
 //                }
 //                break;
 //            case ABORT_UPDATE:
 //            case ABORT_ROLLBACK:
 //                try {
 //                    deployResourceHandler.abortUpdateOrRollBack();
-//                    serviceStatusManager.succeedEvent(event.getEid(), currentRunningSnapshot);
+//                    serviceStatusManager.succeedEvent(event.getId(), currentRunningSnapshot);
 //                } catch (K8sDriverException e) {
-//                    serviceStatusManager.failedEvent(event.getEid(), currentRunningSnapshot, "Abort failed of rolling operation.");
+//                    serviceStatusManager.failedEvent(event.getId(), currentRunningSnapshot, "Abort failed of rolling operation.");
 //                }
 //                break;
 //            case ABORT_SCALE_UP:
 //            case ABORT_SCALE_DOWN:
 //                try {
 //                    deployResourceHandler.abortScales();
-//                    serviceStatusManager.succeedEvent(event.getEid(), currentRunningSnapshot);
+//                    serviceStatusManager.succeedEvent(event.getId(), currentRunningSnapshot);
 //                } catch (Exception e) {
-//                    serviceStatusManager.failedEvent(event.getEid(), currentRunningSnapshot,
+//                    serviceStatusManager.failedEvent(event.getId(), currentRunningSnapshot,
 //                            "Adjust serviceConfigInfo replicas failed when abort scale operation.");
 //                }
 //                break;
@@ -630,31 +634,31 @@ public class K8sDriver implements RuntimeDriver {
 //        }
 //    }
 //
-//    @Override
-//    public void checkStopEvent(ServiceConfigInfo serviceConfigInfo, DeployEvent event)
-//            throws DeploymentEventException, IOException, DeploymentTerminatedException {
-//        KubeUtils client;
-//        DeployResourceHandler deployResourceHandler;
-//        try {
-//            client = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//            deployResourceHandler = getDeployResourceHandler(serviceConfigInfo, client);
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        PodList podList = getPodListByDeployment(client, serviceConfigInfo);
-//        List<DeploymentSnapshot> currentSnapshot = queryCurrentSnapshot(podList);
-//        if (currentSnapshot == null || currentSnapshot.isEmpty()) {
-//            serviceStatusManager.succeedEvent(event.getEid(), currentSnapshot);
-//        } else {
-//            try {
-//                deployResourceHandler.delete();
-//            } catch (K8sDriverException e) {
-//                throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
-//            }
-//            serviceStatusManager.freshEvent(event.getEid(), currentSnapshot);
-//        }
-//    }
-//
+    @Override
+    public void checkStopEvent(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, DeployEvent event)
+            throws DeploymentEventException, IOException, DeploymentTerminatedException {
+        KubeUtils client;
+        DeployResourceHandler deployResourceHandler;
+        try {
+            client = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+            deployResourceHandler = getDeployResourceHandler(appInfo,serviceConfigInfo, client);
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException(e);
+        }
+        PodList podList = getPodListByDeployment(client, serviceConfigInfo.getId());
+        List<DeploymentSnapshot> currentSnapshot = queryCurrentSnapshot(podList);
+        if (currentSnapshot == null || currentSnapshot.isEmpty()) {
+            serviceStatusManager.succeedEvent(event.getId(), currentSnapshot);
+        } else {
+            try {
+                deployResourceHandler.delete();
+            } catch (K8sDriverException e) {
+                throw new DeploymentEventException("kubernetes exception with message=" + e.getMessage());
+            }
+            serviceStatusManager.freshEvent(event.getId(), currentSnapshot);
+        }
+    }
+
 //    @Override
 //    public void expiredEvent(ServiceConfigInfo serviceConfigInfo, DeployEvent event) throws DeploymentEventException, IOException, DeploymentTerminatedException {
 //        KubeUtils client;
@@ -664,7 +668,7 @@ public class K8sDriver implements RuntimeDriver {
 //            throw new DeploymentEventException(e);
 //        }
 //        PodList podList = getPodListByDeployment(client, serviceConfigInfo);
-//        serviceStatusManager.failedEvent(event.getEid(), queryCurrentSnapshotWithPodRunning(podList), "Operation expired. " + event.getMessage());
+//        serviceStatusManager.failedEvent(event.getId(), queryCurrentSnapshotWithPodRunning(podList), "Operation expired. " + event.getMessage());
 //    }
 //
     @Override
@@ -681,7 +685,7 @@ public class K8sDriver implements RuntimeDriver {
             throw new DeploymentEventException(e);
         }
         // get current versions
-        PodList podList = getPodListByDeployment(client, serviceConfigInfo);
+        PodList podList = getPodListByDeployment(client, serviceConfigInfo.getId());
         List<DeploymentSnapshot> deploymentSnapshots = queryCurrentSnapshot(podList);
         if (deploymentSnapshots != null && deploymentSnapshots.isEmpty()) {
             try {
@@ -719,7 +723,7 @@ public class K8sDriver implements RuntimeDriver {
 //    }
 //    
     private Map<String, String> buildDeploySelectorWithSpecifyVersion(ServiceConfigInfo serviceConfigInfo, long versionV) {
-        Map<String, String> selector = buildDeploySelector(serviceConfigInfo);
+        Map<String, String> selector = buildDeploySelector(serviceConfigInfo.getId());
         selector.put(GlobalConstant.VERSION_STR, String.valueOf(versionV));
         return selector;
     }

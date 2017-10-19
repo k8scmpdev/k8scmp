@@ -47,7 +47,7 @@ public class GlobalConstant {
     public static String VERSION_STR = "version";
     public static String JOB_DEPLOY_ID_STR = "jobDeployId";
     public static String JOB_STR = "jobTime";
-    public static String RC_NAME_PREFIX = "dmo-";
+    public static String RC_NAME_PREFIX = "cmp-";
     public static String RC_NAME_SUFFIX = "-rc";
     public static String CONFIG_MAP_SUFFIX = "-cp";
     public static String CONFIG_MAP_ID_STR = "configurationId";
