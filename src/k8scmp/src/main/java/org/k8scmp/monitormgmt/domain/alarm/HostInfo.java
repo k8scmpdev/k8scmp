@@ -71,9 +71,9 @@ public class HostInfo {
         if (StringUtils.isBlank(ip)) {
             return "ip is blank";
         }
-        if (StringUtils.isBlank(cluster)) {
+        /*if (StringUtils.isBlank(cluster)) {
             return "cluster is blank";
-        }
+        }*/
         return null;
     }
 }

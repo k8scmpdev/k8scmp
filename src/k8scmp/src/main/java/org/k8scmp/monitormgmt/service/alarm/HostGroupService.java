@@ -66,5 +66,7 @@ public interface HostGroupService {
 
 	HttpResponseTemp<?> searchHostGroupInfo(String hostGroupName);
 
-	List<NodeInfo> getNodeList();
+	List<HostInfo> getHostList();
+
+	List<HostInfo> getHostBindList(int hostGroupId);
 }

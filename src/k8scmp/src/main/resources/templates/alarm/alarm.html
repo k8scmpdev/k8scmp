@@ -99,18 +99,16 @@
 						//alert(templateList);
 						$("#hostTbody").empty();
 						$.each(templateList,function(k,v){
-							
-						var tr = '<tr>'
-							+'<td>'+v.id+'</td>'
-							+'<td>'+v.templateName+'</td>'
-							+'<td>'+v.creatorName+'</td>'
-							+'<td>'+v.templateType+'</td>'
-							+'<td>'+v.createTime+'</td>	'
-							+'<td><a title="单击查看规则" th:href="@{/alarm/edit(templateType='+v.templateType+',templateId='+v.id+')}" class="tip-top">编辑</a>&nbsp;&nbsp;'
-							+'<a title="单击删除规则" onclick="deleteTemplate('+v.id+')" class="tip-top">删除</a></td>'
-							+'</tr>';
+							var tr = '<tr>'
+								+'<td>'+v.id+'</td>'
+								+'<td>'+v.templateName+'</td>'
+								+'<td>'+v.creatorName+'</td>'
+								+'<td>'+v.templateType+'</td>'
+								+'<td>'+v.createTime+'</td>	'
+								+'<td><a title="单击查看规则" th:href="@{/alarm/edit(templateType='+v.templateType+',templateId='+v.id+')}" class="tip-top">编辑</a>&nbsp;&nbsp;'
+								+'<a title="单击删除规则" onclick="deleteTemplate('+v.id+')" class="tip-top">删除</a></td>'
+								+'</tr>';
 							$("#hostTbody").append(tr);	
-							
 						})
 				 	 }
 				})  

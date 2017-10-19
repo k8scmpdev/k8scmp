@@ -1,5 +1,6 @@
 package org.k8scmp.monitormgmt.service.alarm.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -274,15 +275,27 @@ public class HostGroupServiceImpl implements HostGroupService {
     }
     
     @Override
-    public List<NodeInfo> getNodeList(){
+    public List<HostInfo> getHostList(){
     	try {
 			NodeWrapper nodeWrapper = new NodeWrapper().init("default");
-			return nodeWrapper.getNodeInfoListWithoutPods();
+			List<HostInfo> hostInfoList = new ArrayList<>();
+			List<NodeInfo> nodeInfoList = nodeWrapper.getNodeInfoListWithoutPods();
+			for (NodeInfo nodeInfo : nodeInfoList) {
+				HostInfo hostInfo = new HostInfo();
+				hostInfo.setHostname(nodeInfo.getName());
+				hostInfo.setIp(nodeInfo.getIp());
+				hostInfoList.add(hostInfo);
+			}
+			return hostInfoList;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
     }
     
+    @Override
+    public List<HostInfo> getHostBindList(int hostGroupId){
+    	return alarmBiz.getHostInfoByHostGroupId(hostGroupId);
+    }
     
 }
