@@ -20,4 +20,6 @@ public interface VersionDao{
 	void deleteVersionById(String id);
 
 	void updateVersion(Version version);
+
+	List<Version> getVersionNames(String serviceId);
 }

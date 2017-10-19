@@ -56,4 +56,15 @@ public class VersionController {
     	return ResultStat.OK.wrap(null);
     }
     
+    @ResponseBody
+    @RequestMapping(value = "/getMaxVersion")
+    public HttpResponseTemp<Version> getMaxVersion(@RequestParam(value = "serviceId", required = true) String serviceId) throws Exception {
+    	return ResultStat.OK.wrap(versionService.getMaxVersion(serviceId));
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/getVersionNames")
+    public HttpResponseTemp<List<Version>> getVersionNames(@RequestParam(value = "serviceId", required = true) String serviceId) throws Exception {
+    	return ResultStat.OK.wrap(versionService.getVersionNames(serviceId));
+    }
 }

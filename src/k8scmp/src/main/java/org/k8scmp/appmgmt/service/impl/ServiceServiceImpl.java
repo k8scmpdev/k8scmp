@@ -642,6 +642,107 @@ public class ServiceServiceImpl implements ServiceService {
 	}
 	
 	@Override
+    public List<Long> getCurrentVersionNum(String serviceId) throws Exception {
+		ServiceInfo serviceInfo = serviceDao.getService(serviceId);
+		if(serviceInfo == null){
+			throw ApiException.wrapMessage(ResultStat.PARAM_ERROR, "no such service:" + serviceId);
+		}
+		
+		ServiceConfigInfo serviceConfigInfo = serviceInfo.toModel(ServiceConfigInfo.class);
+		
+		Cluster cluster = getCluster();
+		RuntimeDriver driver = ClusterRuntimeDriver.getClusterDriver(cluster.getId());
+		if (driver == null) {
+            throw ApiException.wrapMessage(ResultStat.CLUSTER_NOT_EXIST, "cluster: " + cluster.toString());
+        }
+		
+		AppInfo appInfo = appDao.getApp(serviceInfo.getAppId());
+		
+		List<VersionBase> versions;
+        try {
+            versions = driver.getCurrnetVersionsByService(appInfo,serviceConfigInfo);
+        } catch (DeploymentEventException e) {
+            return null;
+        }
+        List<Long> vers = null;
+        
+        if(versions != null && versions.size()>0){
+        	vers = new ArrayList<>();
+        	for(VersionBase vb:versions){
+        		Version version = vb.toModel(Version.class);
+        		vers.add((long) version.getVersion());
+        	}
+        }
+        
+        return vers;
+	}
+	
+	@Override
+    public Version getCurrentVersion(String serviceId) throws Exception {
+		ServiceInfo serviceInfo = serviceDao.getService(serviceId);
+		if(serviceInfo == null){
+			throw ApiException.wrapMessage(ResultStat.PARAM_ERROR, "no such service:" + serviceId);
+		}
+		
+		ServiceConfigInfo serviceConfigInfo = serviceInfo.toModel(ServiceConfigInfo.class);
+		
+		Cluster cluster = getCluster();
+		RuntimeDriver driver = ClusterRuntimeDriver.getClusterDriver(cluster.getId());
+		if (driver == null) {
+            throw ApiException.wrapMessage(ResultStat.CLUSTER_NOT_EXIST, "cluster: " + cluster.toString());
+        }
+		
+		AppInfo appInfo = appDao.getApp(serviceInfo.getAppId());
+		
+		List<VersionBase> versions;
+		Version version;
+        try {
+            versions = driver.getCurrnetVersionsByService(appInfo,serviceConfigInfo);
+        } catch (DeploymentEventException e) {
+        	VersionBase versionBase = versionDao.getVersion(serviceId, versionDao.getMaxVersion(serviceId));
+        	version = versionBase.toModel(Version.class);
+            return version;
+        }
+        
+        if(versions == null || versions.size()==0){
+        	VersionBase versionBase = versionDao.getVersion(serviceId, versionDao.getMaxVersion(serviceId));
+        	version = versionBase.toModel(Version.class);
+        }else{
+        	VersionBase versionBase = versions.get(0);
+        	version = versionBase.toModel(Version.class);
+        }
+        
+        return version;
+	}
+	
+	@Override
+    public long getReplicasByServiceId(String serviceId) throws Exception {
+		ServiceInfo serviceInfo = serviceDao.getService(serviceId);
+		if(serviceInfo == null){
+			throw ApiException.wrapMessage(ResultStat.PARAM_ERROR, "no such service:" + serviceId);
+		}
+		
+		ServiceConfigInfo serviceConfigInfo = serviceInfo.toModel(ServiceConfigInfo.class);
+		
+		Cluster cluster = getCluster();
+		RuntimeDriver driver = ClusterRuntimeDriver.getClusterDriver(cluster.getId());
+		if (driver == null) {
+            throw ApiException.wrapMessage(ResultStat.CLUSTER_NOT_EXIST, "cluster: " + cluster.toString());
+        }
+		
+		AppInfo appInfo = appDao.getApp(serviceInfo.getAppId());
+		
+		long num = 0;
+        try {
+            num = driver.getTotalReplicasByDeployment(appInfo, serviceConfigInfo);
+        } catch (DeploymentEventException e) {
+            return 0;
+        }
+        
+        return num;
+	}
+	
+	@Override
     public List<DeployEvent> listDeployEvent(String serviceId) throws Exception {
 		ServiceInfo serviceInfo = serviceDao.getService(serviceId);
 		if(serviceInfo == null){

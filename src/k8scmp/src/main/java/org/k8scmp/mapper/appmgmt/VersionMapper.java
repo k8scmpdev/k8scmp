@@ -33,6 +33,9 @@ public interface VersionMapper {
 
     @Select("SELECT MAX(version) FROM serviceversion WHERE serviceId = #{serviceId}")
     Integer getMaxVersion(@Param("serviceId") String serviceId);
+    
+    @Select("SELECT versionName,version FROM serviceversion WHERE serviceId = #{serviceId}")
+    List<Version> getVersionNames(@Param("serviceId") String serviceId);
 
     @Update("update serviceversion set data = #{data},lastModifierId=#{item.lastModifierId},lastModifiedTime=#{item.lastModifiedTime} where id = #{item.id}")
     int updateVersion(@Param("item") Version item, @Param("data") String data);

@@ -704,24 +704,24 @@ public class K8sDriver implements RuntimeDriver {
         }
         return versions;
     }
-//
-//    @Override
-//    public long getTotalReplicasByDeployment(ServiceConfigInfo serviceConfigInfo) throws DeploymentEventException {
-//        if (serviceConfigInfo == null) {
-//            return 0;
-//        }
-//        KubeUtils client = null;
-//        try {
-//            client = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        // get current versions
-//        PodList podList = getPodListByDeployment(client, serviceConfigInfo);
-//        List<DeploymentSnapshot> deploymentSnapshots = queryCurrentSnapshot(podList);
-//        return getTotalReplicas(deploymentSnapshots);
-//    }
-//    
+
+    @Override
+    public long getTotalReplicasByDeployment(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws DeploymentEventException {
+        if (serviceConfigInfo == null) {
+            return 0;
+        }
+        KubeUtils client = null;
+        try {
+            client = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException(e);
+        }
+        // get current versions
+        PodList podList = getPodListByDeployment(client, serviceConfigInfo.getId());
+        List<DeploymentSnapshot> deploymentSnapshots = queryCurrentSnapshot(podList);
+        return getTotalReplicas(deploymentSnapshots);
+    }
+    
     private Map<String, String> buildDeploySelectorWithSpecifyVersion(ServiceConfigInfo serviceConfigInfo, long versionV) {
         Map<String, String> selector = buildDeploySelector(serviceConfigInfo.getId());
         selector.put(GlobalConstant.VERSION_STR, String.valueOf(versionV));

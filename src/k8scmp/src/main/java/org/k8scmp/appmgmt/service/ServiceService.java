@@ -9,6 +9,7 @@ import org.k8scmp.appmgmt.domain.NodePortDraft;
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
 import org.k8scmp.appmgmt.domain.ServiceDetail;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
+import org.k8scmp.appmgmt.domain.Version;
 import org.k8scmp.appmgmt.domain.VersionString;
 
 /**
@@ -50,4 +51,10 @@ public interface ServiceService {
 	HashMap<String, String> getServiceState(String serviceId) throws Exception;
 
 	HashMap<String, String> getServicesStateByAppId(String appId) throws Exception;
+
+	Version getCurrentVersion(String serviceId) throws Exception;
+
+	List<Long> getCurrentVersionNum(String serviceId) throws Exception;
+
+	long getReplicasByServiceId(String serviceId) throws Exception;
 }

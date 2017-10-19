@@ -17,4 +17,8 @@ public interface VersionService {
     
     void enableVersion(String serviceId, int ver);
 
+	Version getMaxVersion(String serviceId);
+
+	List<Version> getVersionNames(String serviceId);
+
 }

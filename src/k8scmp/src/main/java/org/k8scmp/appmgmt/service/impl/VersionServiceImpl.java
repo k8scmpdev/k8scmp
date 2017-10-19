@@ -109,6 +109,22 @@ public class VersionServiceImpl implements VersionService {
 	}
 
 	@Override
+	public Version getMaxVersion(String serviceId) {
+		int ver = versionDao.getMaxVersion(serviceId);
+		VersionBase verBase = versionDao.getVersion(serviceId, ver);
+		if(verBase == null){
+			throw ApiException.wrapMessage(ResultStat.PARAM_ERROR, "no such service version:" + serviceId);
+		}
+		
+		return verBase.toModel(Version.class);
+	}
+	
+	@Override
+	public List<Version> getVersionNames(String serviceId) {
+		return versionDao.getVersionNames(serviceId);
+	}
+	
+	@Override
 	public List<Version> listVersion(String serviceId) {
 		List<VersionBase> versionBases = versionDao.getAllVersionByServiceId(serviceId);
 		if(versionBases == null || versionBases.size()==0){

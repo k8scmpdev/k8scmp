@@ -59,6 +59,9 @@ public interface RuntimeDriver {
 	void checkStopEvent(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, DeployEvent event)
 			throws DeploymentEventException, IOException, DeploymentTerminatedException;
 
+	long getTotalReplicasByDeployment(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo)
+			throws DeploymentEventException;
+
 //    void abortDeployOperation(ServiceConfigInfo serviceConfigInfo, User user)
 //            throws  IOException;
 //

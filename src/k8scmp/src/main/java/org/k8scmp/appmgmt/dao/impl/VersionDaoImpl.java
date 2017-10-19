@@ -57,5 +57,8 @@ public class VersionDaoImpl implements VersionDao {
 		return mapper.getAllVersionByServiceId(serviceId);
 	}
 
-	
+	@Override
+	public List<Version> getVersionNames(String serviceId) {
+		return mapper.getVersionNames(serviceId);
+	}
 }

@@ -9,6 +9,7 @@ import org.k8scmp.appmgmt.domain.NodePortDraft;
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
 import org.k8scmp.appmgmt.domain.ServiceDetail;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
+import org.k8scmp.appmgmt.domain.Version;
 import org.k8scmp.appmgmt.domain.VersionString;
 import org.k8scmp.appmgmt.service.ServiceService;
 import org.k8scmp.basemodel.HttpResponseTemp;
@@ -168,4 +169,21 @@ public class ServiceController {
     	return ResultStat.OK.wrap(serviceService.getServiceState(appId));
     } 
     
+    @ResponseBody
+    @RequestMapping(value = "/getCurrentVersion")
+    public HttpResponseTemp<Version> getCurrentVersion(@RequestParam(value = "serviceId", required = true) String serviceId) throws Exception {
+    	return ResultStat.OK.wrap(serviceService.getCurrentVersion(serviceId));
+    } 
+    
+    @ResponseBody
+    @RequestMapping(value = "/getCurrentVersionNum")
+    public HttpResponseTemp<List<Long>> getCurrentVersionNum(@RequestParam(value = "serviceId", required = true) String serviceId) throws Exception {
+    	return ResultStat.OK.wrap(serviceService.getCurrentVersionNum(serviceId));
+    } 
+    
+    @ResponseBody
+    @RequestMapping(value = "/getReplicasByServiceId")
+    public HttpResponseTemp<Long> getReplicasByServiceId(@RequestParam(value = "serviceId", required = true) String serviceId) throws Exception {
+    	return ResultStat.OK.wrap(serviceService.getReplicasByServiceId(serviceId));
+    } 
 }
