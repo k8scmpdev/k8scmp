@@ -3,7 +3,7 @@
 		<div class="span12">
 			共<strong><span id="total" class="text" th:text="${total}"></span></strong>台主机&nbsp;&nbsp;
 			<div class="input-append" style="float:right">
-              	<input type="text" placeholder="请输入查询内容"/><button class="btn prepend"><i class="icon-search"></i> </button>
+              	<input id="monitorhostname" type="text" placeholder="请输入主机名查询内容"/><button class="btn prepend" onclick="getHostbyHostname();"><i class="icon-search"></i> </button>
           	</div>
 		<br/>
 			<div class="widget-box">
@@ -19,16 +19,16 @@
 								<th data-field="hostName">主机名</th>
 								<th data-field="logicCluster">所属逻辑集群</th>
 								<th data-field="state">状态</th>
-								<th data-field="CPUPercent">CPU占用率</th>
-								<th data-field="memoryPercent">内存占用率</th>
-								<th data-field="diskPercent">磁盘占用率</th>
+								<th data-field="CPUPercent">CPU占用率(%)</th>
+								<th data-field="memoryPercent">内存占用率(%)</th>
+								<th data-field="diskPercent">磁盘占用率(%)</th>
 								<th data-field="netin">网络流入总量(KB/s)</th>
 								<th data-field="netout">网络流出总量(KB/s)</th>
 								<th>操作</th>
 							</tr>
 						</thead>
-						<tbody id="hostTbody">
-							<tr th:each="node : $(nodeInfoList)">
+						<tbody id="monitorhostTbody">
+							<tr th:each="node,nodeStat:${nodeInfoList}">
 								<td></td>
 								<td th:text="${node.hostName}"></td>
 								<td th:text="${node.logicCluster}"></td>
@@ -38,23 +38,9 @@
 								<td th:text="${node.diskPercent}"></td>
 								<td th:text="${node.netin}"></td>
 								<td th:text="${node.netout}"></td>
-								<td><a title='单击查看主机详情' th:href="@{monitor/monitor-host}" th:text="${node.hostName}" class="tip-top"></a></td>
+								<td><a title='单击查看主机详情' th:href="@{monitor/host}" class="tip-top">查看</a></td>
 							</tr>
 						</tbody>
-						<!-- <tbody id="hostTbody">
-							<tr>
-								<td></td>
-								<td><a title='单击查看主机详情' href="/monitor/host" class="tip-top">test-node-001</a></td>
-								<td>182.11980.140</td>
-								<td>test</td>
-								<td>在线</td>
-								<td>30</td>
-								<td>15</td>
-								<td>40</td>
-								<td>1024</td>
-								<td>512.04</td>
-							</tr>
-						</tbody> -->
 					</table>  
 				</div>
 			</div>

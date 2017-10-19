@@ -1,27 +1,27 @@
 package org.k8scmp.monitormgmt.service.monitor.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
 
 import org.k8scmp.appmgmt.dao.AppDao;
 import org.k8scmp.appmgmt.dao.ServiceDao;
 import org.k8scmp.appmgmt.domain.AppInfo;
+import org.k8scmp.appmgmt.domain.Cluster;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ClientConfigure;
 import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.engine.k8s.util.NodeWrapper;
+import org.k8scmp.engine.k8s.util.NodeWrapperNew;
 import org.k8scmp.engine.model.CustomObjectMapper;
 import org.k8scmp.exception.ApiException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
-import org.k8scmp.login.domain.User;
 import org.k8scmp.monitormgmt.dao.monitor.MonitorDao;
 import org.k8scmp.monitormgmt.domain.monitor.ContainerInfo;
 import org.k8scmp.monitormgmt.domain.monitor.InstenceInfoBack;
@@ -36,7 +36,6 @@ import org.k8scmp.monitormgmt.domain.monitor.falcon.EndpointCounter;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryRequest;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryResponse;
 import org.k8scmp.monitormgmt.service.monitor.MonitorService;
-import org.k8scmp.util.AuthUtil;
 import org.k8scmp.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -93,24 +93,24 @@ public class MonitorServiceImpl implements MonitorService {
 	    	
 		    		nodeInfoBack.setHostName(nodeInfo.getName());
 		    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
-		    		nodeInfoBack.setCPUPercent(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())+"");
-		    		nodeInfoBack.setMemoryPercent(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())+"");
-		    		nodeInfoBack.setDiskPercent(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())+"");
-//		    		nodeInfoBack.setNetin(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())+"");
-//		    		nodeInfoBack.setNetout(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())+"");
+		    		nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
+		    		nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
+		    		nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
+//		    		nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
+//		    		nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
 		    		nodeInfoBack.setState(nodeInfo.getStatus());
 		    		nodeInfoBackList.add(nodeInfoBack);
 	    		}else if(hostName != null && !hostName.equals("") && nodeInfo.getName().indexOf(hostName) < 0){
-	    			return null;
+	    			continue;
 	    		}else{
 	    			NodeInfoBack nodeInfoBack = new NodeInfoBack();
 		    		nodeInfoBack.setHostName(nodeInfo.getName());
 		    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
-		    		nodeInfoBack.setCPUPercent(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())+"");
-		    		nodeInfoBack.setMemoryPercent(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())+"");
-		    		nodeInfoBack.setDiskPercent(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())+"");
-//		    		nodeInfoBack.setNetin(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())+"");
-//		    		nodeInfoBack.setNetout(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())+"");
+		    		nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
+		    		nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
+		    		nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
+//		    		nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
+//		    		nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
 		    		nodeInfoBack.setState(nodeInfo.getStatus());
 		    		nodeInfoBackList.add(nodeInfoBack);
 	    		}
@@ -120,6 +120,13 @@ public class MonitorServiceImpl implements MonitorService {
 		}
     	return nodeInfoBackList;
     }
+    
+    public String formatDouble(Double d){
+    	DecimalFormat df = new DecimalFormat("0.00"); 
+    	String str = df.format(d);
+    	return str;
+    }
+    
     
     @Override
     public List<InstenceInfoBack> getInstenceMonitorData(String serviceName){
@@ -141,17 +148,17 @@ public class MonitorServiceImpl implements MonitorService {
 	    		String serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
 	    		if(serviceId != null && !serviceId.equals("")){
 		    		ServiceInfo service = serviceDao.getService(serviceId);
-		    		if(serviceName != null && !serviceName.equals("") && service.getServiceCode().indexOf(serviceName)>=0 ){
+		    		if(serviceName != null && !serviceName.equals("") && pod.getMetadata().getName().indexOf(serviceName)>=0 ){
 		    					instenceInfoBack.setServiceName(service.getServiceCode());
 		    					AppInfo app = appDao.getApp(service.getAppId());
 		    					instenceInfoBack.setAppName(app.getAppCode());
 		    					instenceInfoBack.setInstanceName(pod.getMetadata().getName());
-		    					instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName()).toString());
-		    					instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName()).toString());
-		    					instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName()).toString());
-		    					instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName()).toString());
-					}else if(serviceName != null && !serviceName.equals("") && service.getServiceCode().indexOf(serviceName)<0){
-						return null;
+		    					instenceInfoBack.setCPUUsed(formatDouble(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName())));
+		    					instenceInfoBack.setMemoryUsed(formatDouble(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName())));
+		    					instenceInfoBack.setNetInput(formatDouble(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName())));
+		    					instenceInfoBack.setNetOutput(formatDouble(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName())));
+					}else if(serviceName != null && !serviceName.equals("") && pod.getMetadata().getName().indexOf(serviceName)<0){
+						continue;
 					}else{
 						serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
 						service = serviceDao.getService(serviceId);
@@ -159,10 +166,10 @@ public class MonitorServiceImpl implements MonitorService {
 						instenceInfoBack.setAppName(app.getAppCode());
 						instenceInfoBack.setServiceName(service.getServiceCode());
 						instenceInfoBack.setInstanceName(pod.getMetadata().getName());
-						instenceInfoBack.setCPUUsed(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName())+"");
-						instenceInfoBack.setMemoryUsed(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName())+"");
-						instenceInfoBack.setNetInput(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName())+"");
-						instenceInfoBack.setNetOutput(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName())+"");
+						instenceInfoBack.setCPUUsed(formatDouble(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName())));
+						instenceInfoBack.setMemoryUsed(formatDouble(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName())));
+						instenceInfoBack.setNetInput(formatDouble(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(pod.getMetadata().getName())));
+						instenceInfoBack.setNetOutput(formatDouble(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(pod.getMetadata().getName())));
 						
 					}
 	    		}
@@ -247,6 +254,17 @@ public class MonitorServiceImpl implements MonitorService {
 		//获取node/pod/container
     	try {
 			List<TargetInfo> targetInfoList = new ArrayList<>();
+			
+//			Cluster clusters = new Cluster();
+//			clusters.setApi("192.168.80.137:8080");
+//			List<String> namespaces = new ArrayList<>();
+//			namespaces.add("default");
+//			namespaces.add("kube-system");
+//			List<Map<String,String>> labels = new ArrayList<>();
+//			Map<String,String> label = new HashMap<>();			
+			
+//			List<Map<String, List<NodeInfo>>> nodewapp = new NodeWrapperNew().getNodeListByClusterNamespaceLabels(clusters, null, null);
+			
 			NodeWrapper nodeWrapper = new NodeWrapper().init("default");
 			if(type.equals("node")){
 				List<NodeInfo> nodeInfoList = nodeWrapper.getNodeListByClusterId();
@@ -263,14 +281,13 @@ public class MonitorServiceImpl implements MonitorService {
 					PodInfo podInfo = new PodInfo();
 					podInfo.setPodName(pod.getMetadata().getName());
 					List<ContainerInfo> containers = new ArrayList<>();
-					ContainerInfo containerInfo = new ContainerInfo();
-//					containerInfo.setHostname("192.168.80.137");
-					containerInfo.setHostname(pod.getSpec().getNodeName());
-					String containerID = pod.getStatus().getContainerStatuses().get(0).getContainerID();
-					String containerid = containerID.substring(9);
-//					containerInfo.setContainerId("5255d4080a48c6748353793b5a6fa0180105b5049e67387dfab2f2ed5715f755");
-					containerInfo.setContainerId(containerid);
-					containers.add(containerInfo);
+					List<ContainerStatus> containerStatuses = pod.getStatus().getContainerStatuses();
+					for (ContainerStatus containerStatus : containerStatuses) {
+						ContainerInfo containerInfo = new ContainerInfo();
+						containerInfo.setHostname(pod.getSpec().getNodeName());
+						containerInfo.setContainerId(containerStatus.getContainerID().substring(9));
+						containers.add(containerInfo);
+					}
 					podInfo.setContainers(containers);
 					targetInfo.setPod(podInfo);
 					targetInfoList.add(targetInfo);

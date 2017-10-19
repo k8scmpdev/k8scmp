@@ -65,7 +65,81 @@
 					});
 				});
 			}); 
-
+		//主机监控搜索
+		function getHostbyHostname(){
+			var hostName = $("#monitorhostname").val();
+			 $.ajax({
+				url:"/monitor/hostsearch",
+				data:{
+					hostName : hostName
+				},
+				type:"post",
+				dataType:"json",
+				success:function(data){
+					var hostList = eval(data.result);
+					//alert("1");
+					$("#monitorhostTbody").empty();
+					//var total = 0;
+					if(hostList != null){
+						$.each(hostList,function(k,v){
+							var tr = '<tr>'
+								+'<td></td>'
+								+'<td>'+v.hostName+'</td>'
+								+'<td>'+v.logicCluster+'</td>'
+								+'<td>'+v.state+'</td>'
+								+'<td>'+v.CPUPercent+'</td>'
+								+'<td>'+v.memoryPercent+'</td>'
+								+'<td>'+v.diskPercent+'</td>'
+								+'<td>'+v.netin+'</td>'
+								+'<td>'+v.netout+'</td>'
+								+'<td><a title="单击查看规则" th:href="@{/monitor/host}" class="tip-top">查看</a></td>'
+								+'</tr>';
+							$("#monitorhostTbody").append(tr);
+							//total++;
+						})
+					}
+					
+			 	 }
+			}) 
+		}
+		
+		//实例监控搜索
+		function getInstenceByName(){
+			var serviceName = $("#monitorInstenceName").val();
+			 $.ajax({
+				url:"/monitor/instenceSearch",
+				data:{
+					serviceName : serviceName
+				},
+				type:"post",
+				dataType:"json",
+				success:function(data){
+					var instenceList = eval(data.result);
+					//alert("1");
+					$("#monitorInstenceTbody").empty();
+					//var total = 0;
+					if(instenceList != null){
+						$.each(instenceList,function(k,v){
+							var tr = '<tr>'
+								+'<td></td>'
+								+'<td>'+v.instanceName+'</td>'
+								+'<td>'+v.appName+'</td>'
+								+'<td>'+v.serviceName+'</td>'
+								+'<td>'+v.CPUUsed+'</td>'
+								+'<td>'+v.memoryUsed+'</td>'
+								+'<td>'+v.netInput+'</td>'
+								+'<td>'+v.netOutput+'</td>'
+								+'<td><a title="单击查看规则" th:href="@{/monitor/instence}" class="tip-top">查看</a></td>'
+								+'</tr>';
+							$("#monitorInstenceTbody").append(tr);
+							//total++;
+						})
+					}
+					
+			 	 }
+			}) 
+		}
+		
 	</script>
 	</body>
 </html>

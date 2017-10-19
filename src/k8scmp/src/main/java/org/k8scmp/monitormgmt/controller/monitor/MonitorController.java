@@ -66,7 +66,7 @@ public class MonitorController {
 		String type = "node";
 		Calendar current = Calendar.getInstance();
         long endTime = current.getTimeInMillis();
-        current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 60*60);
+        current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 60*10*1000);
         long startTime = current.getTimeInMillis();
 		String dataSpec = "AVERAGE";
 		model.addAttribute("nodeData", getMonitorData(type,startTime,endTime,dataSpec));
@@ -80,7 +80,7 @@ public class MonitorController {
 		String type = "pod";
 		Calendar current = Calendar.getInstance();
         long endTime = current.getTimeInMillis();
-        current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 60*60);
+        current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 60*10*1000);
         long startTime = current.getTimeInMillis();
 		String dataSpec = "AVERAGE";
 		model.addAttribute("instenceData", getMonitorData(type,startTime,endTime,dataSpec));
