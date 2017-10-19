@@ -16,7 +16,7 @@ public class ContainerDraft {
     private double mem;
     private double cpuRequest;
     private double memRequest;
-    private ImagePullPolicy imagePullPolicy;
+    private ImagePullPolicy imagePullPolicy = ImagePullPolicy.IfNotPresent;
     private List<Env> envs;
     private List<Env> envCheckers;
     private List<LogItemDraft> logItemDrafts;
