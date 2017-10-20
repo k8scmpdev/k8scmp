@@ -330,6 +330,7 @@ public class ServiceServiceImpl implements ServiceService {
             serviceStatusManager.failedEventForDeployment(serviceId, null, e.getMessage());
             throw ApiException.wrapMessage(ResultStat.SERVICE_START_FAILED, e.getMessage());
         }
+		refreshServiceState(serviceId);
 		return serviceId;
 	}
 	
@@ -426,6 +427,7 @@ public class ServiceServiceImpl implements ServiceService {
             serviceStatusManager.failedEventForDeployment(serviceId, null, e.getMessage());
             throw ApiException.wrapMessage(ResultStat.SERVICE_STOP_FAILED, e.getMessage());
         }
+		refreshServiceState(serviceId);
 	}
 	
 	
@@ -488,6 +490,7 @@ public class ServiceServiceImpl implements ServiceService {
 				"升级版本", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
+		refreshServiceState(serviceId);
 	}
 	
 	@Override
@@ -549,6 +552,7 @@ public class ServiceServiceImpl implements ServiceService {
 				"升级版本", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
+		refreshServiceState(serviceId);
 	}
 	
 	@Override
@@ -594,6 +598,7 @@ public class ServiceServiceImpl implements ServiceService {
 				"实例扩容", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
+		refreshServiceState(serviceId);
 	}
 	
 	@Override
@@ -639,6 +644,7 @@ public class ServiceServiceImpl implements ServiceService {
 				"实例缩容", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
+		refreshServiceState(serviceId);
 	}
 	
 	@Override
@@ -1025,5 +1031,44 @@ public class ServiceServiceImpl implements ServiceService {
 		 map.put(serviceConfigInfo.getId(), serviceDao.getServiceStatu(serviceConfigInfo.getId()));
 		 return map;
 	 }
+	 
+	 
+	 private class GetStateTask implements Runnable {
+		 String serviceId;
+
+		 public GetStateTask(String serviceId){
+			 this.serviceId = serviceId;
+		 }
+		 public void run() {
+			Map map = null;
+			boolean expire = false;
+			while (!expire) {
+				try {
+					map = getServiceState(serviceId);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				String state = (String) map.get(serviceId);
+				if ((ServiceStatus.STOP.name().equals(state) || ServiceStatus.ERROR.name().equals(state)
+						|| ServiceStatus.RUNNING.name().equals(state))) {
+					expire = true;
+				}
+				System.out.println(state);
+
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	 public void refreshServiceState(String serviceId) throws Exception{
+		 GetStateTask getStateTask = new GetStateTask(serviceId);
+		 new Thread(getStateTask).start();
+	}
 	 
 }
