@@ -18,12 +18,12 @@
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="buttons">
-							<a title="添加一个服务" id="addService" class="btn tip-bottom" th:href="@{/app/service/service-new(appCode=${#httpServletRequest.getParameter('appCode')})}"><i class="icon-plus"></i>添加服务</a>
-							<a title="启动服务" id="startService" class="btn tip-bottom" href="/app/service/service-info"><i class="icon-play"></i>启动</a>
-							<a title="停止服务" id="stopService" class="btn tip-bottom" href="service-stop.html"><i class="icon-off"></i>停止</a>
-							<a title="升级/回滚" id="upService" class="btn tip-bottom" href="service-upordowngrade.html"><i class="icon-repeat"></i>升级/回滚</a>
-							<a title="扩容/缩容" id="extenService" class="btn tip-bottom" href="service-capacity.html"><i class="icon-resize-small"></i>扩容/缩容</a>
-							<a title="删除" id="deleteService" class="btn tip-bottom" href="javascript:void(0);" onclick="deleteService();"><i class="icon-remove"></i>删除</a>
+							<a title="添加一个服务" id="addService" class="btn tip-bottom" th:href="@{/app/service/service-new(appId=${#httpServletRequest.getParameter('appId')})}"><i class="icon-plus"></i>添加服务</a>
+							<a title="启动服务" id="startService" class="btn tip-bottom" href="javascript:void(0);" onclick="startService();"><i class="icon-play"></i>启动</a>
+							<a title="停止服务" id="stopService" class="btn tip-bottom" href="javascript:void(0);" onclick="stopService();"><i class="icon-off"></i>停止</a>
+							<a title="升级/回滚" id="upService" class="btn tip-bottom" href="javascript:void(0);" onclick="startUpdateRollback();"><i class="icon-repeat"></i>升级/回滚</a>
+							<a title="扩容/缩容" id="extenService" class="btn tip-bottom" href="#scaleUpDown" onclick="scaleUpDown();"><i class="icon-resize-small"></i>扩容/缩容</a>
+							<!-- <a title="删除" id="deleteService" class="btn tip-bottom" href="javascript:void(0);" onclick="deleteService();"><i class="icon-remove"></i>删除</a> -->
 							<!-- <div class="input-append" style="float:right">
 								<form id="serviceSearchForm">
 				                	<input type="search" placeholder="请输入查询内容" name="appCode"/><button class="btn prepend" type="submit"><i class="icon-search"></i> </button>
@@ -48,22 +48,24 @@
 											<th class="s40">创建人</th>
 											<th class="s50">创建时间</th>
 											<th class="s70">操作</th>
+											<th>Id</th>
 										</tr>
 									</thead>
 									<tbody id="tBody">
 									    <tr th:each="service,itState:${serviceList}">
 									    	<td style="text-align: center;width:30px"><label><input type="checkbox"/></label></td>
-									        <td class="s10"><a title='单击查看服务详情' th:href="@{/app/service-detail(serviceId=${service.serviceCode})}" th:text="${service.serviceCode}" class="tip-top"></a></td>
+									        <td class="s10"><a title='单击查看服务详情' th:href="@{/app/service/service-info(serviceId=${service.id})}" th:text="${service.serviceCode}" class="tip-top"></a></td>
 									        <td class="s20" th:text="${service.startSeq}"></td>
 									        <td class="s30" th:text="${service.state}"></td>
 									        <td class="s40" th:text="${service.appId}"></td>
 									        <td class="s50" th:text="${service.creatorId}"></td>
-									        <td class="s60" th:text="${service.createTime}"></td>
+									        <td class="s60" th:name="${service.id}" th:text="${service.createTime}"></td>
 									        <td class="operation s70">
 									        	<a class="iconOperation" 
 									        	th:href="@{/app/service/modify}"><i class="icon-edit"></i><span>编辑</span></a>
-									        	<a class="iconOperation" href="javascript:void(0);" th:onclick="'deleteSingleService('+'\''+${service.id}+'\''+')'"><i class="icon-trash"></i><span>删除</span></a>
+									        	<a class="iconOperation" href="javascript:void(0);" th:onclick="'deleteSingleService('+'\''+${service.id}+'\''+',this)'"><i class="icon-trash"></i><span>删除</span></a>
 									        </td>
+									        <td th:text="${service.id}"></td>
 									    </tr>
 									</tbody>
 								</table>							
@@ -72,6 +74,28 @@
 					</div>
 				</div>
 				
+				<div class="modal hide" id="scaleUpDown">
+					<div class="modal-header">
+						<button data-dismiss="modal" class="close" type="button">×</button>
+						<h3>扩容缩容</h3>
+					</div>
+					<div class="modal-body">
+						<input id="hiddenUnique" type="hidden"/>
+						<div>
+                            <label class="modalStyle" style="padding-right: 10px;">当前实例个数</label>
+                            <label><span id="instanceNumber"></span>个</label>
+                        </div>
+                        <div>
+                            <label class="modalStyle" style="padding-right: 10px;">期望实例个数</label>
+                            <label><input id="futureNumber" type="text"/>个</label>
+                        </div>
+						<div style="float: right;">
+							<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+							<button id="scaleSubmit" class="btn-primary btn-mini" type="button">确定</button>
+						</div>
+					</div>
+				</div>
+								
 				<div id="common-footer">
 					<div th:include="/public/commonframe::app-footer"></div>
 				</div>

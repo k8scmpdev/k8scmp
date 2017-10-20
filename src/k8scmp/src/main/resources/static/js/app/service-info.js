@@ -40,3 +40,10 @@ $(document).ready(function(){
 	    }
 	});
 });
+
+$("#btnnew2pre").bind("click",function(event){
+	//show port mapped detail into sPort tab
+	
+	//close this window
+	$("#sPortMappedModel").modal("hide");
+});
