@@ -14,7 +14,7 @@ $(document).ready(function(){
 	        "zeroRecords": "没有找到记录",
 	        "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 )",
 	        "infoEmpty": "无记录",
-	        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+	        "infoFiltered": "",
 	        "paginate": {
 	            "first": "首页",
 	            "previous": "上页",
@@ -49,12 +49,12 @@ $(document).ready(function(){
 	            "last": "末页"
 	        }
 	    },
-	    /*"columnDefs": [ {
-	        "targets": 0,
-	        "render": function(data,type,full,meta){
-	        	return '<label><input type="checkbox" name="id[]" value="'+$('<div/>').text(data).html()+'"></label>';
-	        }
-	      } ],*/
+	    "columnDefs": [ 
+	    	{
+	        "targets": 8,
+	        "visible":false
+	    	} 
+	    ],
 	    "fnDrawCallback":function(oSettings){
 	    	$(".dataTables_length").offset({top:$(".dataTables_info").offset().top+6});
 	    }

@@ -230,7 +230,7 @@ public class AlarmDaoImpl implements AlarmDao{
 	public void addHostInfo(HostInfo hostInfo) {
 		hostInfoMapper.addHostInfo(hostInfo);
 	}
-
+	
 	@Override
 	public List<HostInfo> getHostInfoByHostGroupId(int hostGroupId) {
 		return hostInfoMapper.getHostInfoByHostGroupId(hostGroupId);

@@ -1,7 +1,13 @@
 //ajax提交form表单
 $('#createAppFrom').submit(function(){
-	var AjaxURL= "/app/create";
+	var AjaxURL= "";
 	var paramData = getSerializeJson();
+	var edit = $("#edit").val();
+	if(edit == "true"){
+		AjaxURL= "/app/modify";
+	}else{
+		AjaxURL= "/app/create";
+	}
 	$.ajax({
 		type: "POST",
 		dataType: "html",

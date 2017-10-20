@@ -17,29 +17,29 @@
 					<table class="table table-bordered data-table" style="table-layout: fixed;">
 						<thead>
 							<tr>
-								<th data-field="id">id</th>
-								<th data-field="hostGroupName">组名</th>
-								<th data-field="creatorName">创建者</th>
-								<th data-field="createTime">创建时间</th>
-								<th data-field="hostList">主机</th>
-								<th data-field="operation">操作</th>
+								<th data-field="id" width="10%">id</th>
+								<th data-field="hostGroupName" width="10%">组名</th>
+								<th data-field="creatorName" width="10%">创建者</th>
+								<th data-field="createTime" width="20%">创建时间</th>
+								<th data-field="hostList" width="30%">主机</th>
+								<th data-field="operation" width="20%">操作</th>
 							</tr>
 						</thead>
 						<tbody id="hostGroupTbody">
 							<tr th:each="hostGroup,hostGroupStat:${hostGroupInfoList}">
-								<td th:text="${hostGroup.id}"></td>
-								<td th:text="${hostGroup.hostGroupName}"></td>
-								<td th:text="${hostGroup.creatorName}"></td>
-								<td th:text="${hostGroup.createTime}"></td>
-								<td >
+								<td th:text="${hostGroup.id}" width="10%"></td>
+								<td th:text="${hostGroup.hostGroupName}" width="10%"></td>
+								<td th:text="${hostGroup.creatorName}" width="10%"></td>
+								<td th:text="${hostGroup.createTime}" width="20%"></td>
+								<td width="30%">
 									<div style="width: 200px">
 										<table>
 											<thead>
-												<!-- <tr>
+												<tr>
 													<th data-field="id">id</th>
 													<th data-field="hostname">主机名</th>
 													<th data-field="ip">IP</th>
-												</tr> -->
+												</tr> 
 											</thead>
 											<tbody>
 												<tr th:each="host,hostStat:${hostGroup.hostList}">
@@ -51,8 +51,8 @@
 										</table>
 									</div>
 								</td>
-								<td>
-									<a title='单击添加主机' th:href="@{/hostgroup/bindHostGroup}" class="tip-top">添加主机</a>&nbsp;&nbsp;
+								<td width="20%">
+									<a title='单击添加主机' th:href="@{/hostgroup/bindHostGroup(id=${hostGroup.id})}" class="tip-top">添加主机</a>&nbsp;&nbsp;
 									<a title='单击修改组名' th:onclick="'editHostGroup(\''+${hostGroup.id}+'\')'" class="tip-top">修改</a>&nbsp;&nbsp;
 									<a title='单击删除组' th:onclick="'deleteHostGroup(\''+${hostGroup.id}+'\')'" class="tip-top">删除</a>
 								</td>

@@ -64,7 +64,7 @@
 										<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
 										<button id="btnnew1next" class="btn-primary btn-mini" type="button">下一步</button>
 									</div>
-									<input id="appCode" type="hidden" th:value="@{appCode}"/>
+									<input id="appId" type="hidden" th:value="${#httpServletRequest.getParameter('appId')}"/>
 								</div>
 								
 								<div class="widget-content" id="service-new2" style="display: none;">
@@ -91,7 +91,7 @@
 											<h5>镜像列表</h5>
 										</div>
 										<div class="widget-content nopadding">										
-										<table class="table table-bordered image-table display" style="width:100%">
+										<table class="table table-bordered image-table display" style="width:100%;table-layout: fixed;">
 											<thead>
 												<tr>
 													<th class="i10">镜像名称</th>
@@ -101,28 +101,13 @@
 												</tr>
 											</thead>
 											<tbody id="tBody">
-												<!-- <tr>
-													<td class="i10">
-													dev-test/java
-													</td>
-													<td class="i20">
-													http://123.com
-													</td>
-													<td class="i30">
-													1.2
-													</td>
-													<td class="i40">
-													<a title="配置" class="tip-bottom iconOperation" href="#service-new3" data-toggle="modal" onclick="showImageConfiguration('dev-test/java');"><i class="icon-edit"></i><span>配置</span></a>
-							        				<a title="删除" class="tip-bottom iconOperation" href="deleteImage();"><i class="icon-trash"></i><span>删除</span></a>
-													</td>
-												</tr> -->
 											    <tr th:each="images,itState:(${versions==null?versions:versions[0].containerDrafts})">
 											        <td class="i10" th:text="${images.image}"></td>
 											        <td class="i20" th:text="${images.registry}"></td>
 											        <td class="i30" th:text="${images.tag}"></td>
 											        <td class="i40">
-														<a title="配置" class="tip-bottom iconOperation" href="#service-new3" data-toggle="modal" onclick="showImageConfiguration(${images.image}+${images.registry},${images.volumeMountDrafts});"><i class="icon-edit"></i><span>配置</span></a>
-								        				<a title="删除" class="tip-bottom iconOperation" href="deleteImage();"><i class="icon-trash"></i><span>删除</span></a>
+														<a title="配置" class="tip-bottom iconOperation" href="#service-new3" data-toggle="modal" onclick="showImageConfiguration(${images.image}+${images.registry}+${images.tag},${images.volumeMountDrafts},$(versions:versions[0].volumeDrafts));"><i class="icon-edit"></i><span>配置</span></a>
+								        				<a title="删除" class="tip-bottom iconOperation" href="'deleteImage(123)'"><i class="icon-trash"></i><span>删除</span></a>
 													</td>
 											    </tr>
 											</tbody>
@@ -132,7 +117,7 @@
 									<div class="form-actions">
 										<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
 										<button id="btnnew2pre" class="btn-primary btn-mini" type="button">上一步</button>&nbsp;&nbsp;&nbsp;
-										<button id="btnnew2next" class="btn-primary btn-mini" type="button">下一步</button>
+										<button id="btnnew2next" class="btn-primary btn-mini" type="button">提交</button>
 									</div>
 								</div>
 							
@@ -142,6 +127,7 @@
 										<h3>配置镜像</h3>
 									</div>
 									<div class="modal-body">
+										<input id="hiddenUnique" type="hidden"/>
 										<div>
 		                                    <label class="modalStyle" style="padding-right: 10px;">挂载存储</label>
 	                                        <a title="添加挂载存储" class="tip-bottom" href="javascript:void(0);" onclick="showStorage();"><i class="icon-plus"></i></a>
@@ -154,16 +140,16 @@
 		                                </div>
 										<div>
 		                                    <label class="modalStyle" style="padding-right: 10px;">启动命令</label>
-		                                    <input class="modalStyle" type="text"/>
+		                                    <input id="startCommands" class="modalStyle" type="text"/>
 		                                </div>
 										<div style="padding-top: 40px;">
 		                                    <label class="modalStyle" style="padding-right: 10px;">环境变量</label>
-											<input class="modalStyle" type="text" placeholder="环境变量以键值对key=value形式保存，以逗号,分割" style="font-style: italic;font-size: 13px"/>
+											<input id="envvar" class="modalStyle" type="text" placeholder="环境变量以键值对key=value形式保存，以逗号,分割" style="font-style: italic;font-size: 13px"/>
 		                                </div>
 		                                <div style="padding-top: 40px;">
 		                                	<label class="modalStyle" style="padding-right: 10px;">容器大小</label>
-	                                	 	<span class="modalStyle">CPU(个)<input type="text" class="combine tip-top"/></span>&nbsp;&nbsp;&nbsp;
-											<span class="modalStyle">内存(MB)<input type="text" class="combine tip-top"/></span>
+	                                	 	<span class="modalStyle">CPU(个)<input id="cpus" type="text" class="combine tip-top"/></span>&nbsp;&nbsp;&nbsp;
+											<span class="modalStyle">内存(MB)<input id="mems" type="text" class="combine tip-top"/></span>
 		                                </div>
 										<div style="float: right;">
 											<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
@@ -198,7 +184,7 @@
 									<div class="form-actions" style="text-align: left;padding-left: 40%">
 										<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
 										<button id="btnnew4pre" class="btn-primary btn-mini" type="button">上一步</button>&nbsp;&nbsp;&nbsp;
-										<button id="btnnew4pre" class="btn-primary btn-mini" type="submit">提交</button>
+										<button id="serviceSubmit" class="btn-primary btn-mini" type="submit">提交</button>
 									</div>
 								</div>
 							</form>
@@ -236,50 +222,45 @@
 															<th style="width: 26%;">版本</th>
 														</tr>
 													</thead>
-													<tbody id="tBody">
+													<tbody id="tImageBody">
 													<tr>
 														<td style="width: 26%;"><input type="checkbox"/></td>
-														<td id="registry" style="width: 26%;" >http://123.com</td>
-														<td id="id" style="width: 26%;" >test-java</td>
-														<td id="versions" style="width: 26%;">
-																<select name="versions">
-																	<option value="6.0">6.0</option>
-																	<option value="7.0">7.0</option>
-																	<option value="8.0">8.0</option>
-																</select>
-															
-														</td>
-													</tr>
-													<tr>
-														<td style="width: 26%;"><label><input type="checkbox"/></label></td>
-														<td id="registry" style="width: 26%;" >http://123.com</td>
-														<td id="id" style="width: 26%;" >dev-mysql</td>
-														<td id="versions" style="width: 26%;">
-																<select name="versions">
-																	<option value="6.0">6.0</option>
-																	<option value="7.0">7.0</option>
-																	<option value="8.0">8.0</option>
-																</select>
-															
-														</td>
-													</tr>
-													<tr>
-														<td style="width: 26%;"><label><input type="checkbox"/></label></td>
-														<td id="registry" style="width: 26%;" >http://123.com</td>
+														<td id="registry" style="width: 26%;" ></td>
 														<td id="id" style="width: 26%;" >nginx</td>
 														<td id="versions" style="width: 26%;">
 																<select name="versions">
-																	<option value="6.0">6.0</option>
-																	<option value="7.0">7.0</option>
-																	<option value="8.0">8.0</option>
+																	<option value="latest">latest</option>
 																</select>
 															
 														</td>
 													</tr>
 													<tr>
-														<td style="width: 26%;"><label><input type="checkbox"/></label></td>
-														<td id="registry" style="width: 26%;" >http://123.com</td>
+														<td style="width: 26%;"><input type="checkbox"/></td>
+														<td id="registry" style="width: 26%;" ></td>
 														<td id="id" style="width: 26%;" >tomcat</td>
+														<td id="versions" style="width: 26%;">
+																<select name="versions">
+																	<option value="latest">latest</option>
+																</select>
+															
+														</td>
+													</tr>
+													<tr>
+														<td style="width: 26%;"><input type="checkbox"/></td>
+														<td id="registry" style="width: 26%;" >http://123.com</td>
+														<td id="id" style="width: 26%;" >dev-java</td>
+														<td id="versions" style="width: 26%;">
+																<select name="versions">
+																	<option value="8.0">8.0</option>
+																	<option value="9.0">9.0</option>
+																</select>
+															
+														</td>
+													</tr>
+													<tr>
+														<td style="width: 26%;"><input type="checkbox"/></td>
+														<td id="registry" style="width: 26%;" >http://123.com</td>
+														<td id="id" style="width: 26%;" >mysql</td>
 														<td id="versions" style="width: 26%;">
 																<select name="versions">
 																	<option value="6.0">6.0</option>

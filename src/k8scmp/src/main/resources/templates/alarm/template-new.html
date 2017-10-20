@@ -1,21 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<title>Unicorn Admin</title>
-		<meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		
-		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
-		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	</head>
-	
+	<head th:include="/public/commonframe :: cssScript" />
 	<body>
-		<div id="common-header"></div>
+		<div id="common-header">
+			<div th:include="/public/commonframe :: app-header"></div>
+		</div>
 		<div id="content">
 			<div id="content-header">
 				<h2>新建规则</h2>
@@ -94,7 +83,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="control-group">
+                                    <div class="control-group" hidden="true">
                                         <label class="control-label">指定报警回调</label>
                                         <div class="controls">
                                         	<input type="text" placeholder="请指定报警地址" id="callbackurl"
@@ -130,19 +119,12 @@
 						</div>
 					</div>
 				</div>
-				<div id="common-footer"></div>
+			<div class="common-footer">
+				<div th:include="/public/commonframe::app-footer"></div>
+			</div>
 			</div>
 		</div>	
-
-		<script th:src="@{/js/jquery.min.js}"></script>
-		<script th:src="@{/js/jquery.ui.custom.js}"></script>
-		<script th:src="@{/js/bootstrap.min.js}"></script>
-		<script th:src="@{/js/jquery.uniform.js}"></script>
-		<script th:src="@{/js/select2.min.js}"></script>
-		<script th:src="@{/js/jquery.dataTables.min.js}"></script>
-		<script th:src="@{/js/unicorn.js}"></script>
-		<script th:src="@{/js/unicorn.tables.js}"></script>
-		<script th:src="@{/js/commonDisplay.js}"></script>
+		<div th:include="/public/commonframe::jsScript(activeMenuNumber=43)" ></div>
 		
 		<script type="text/javascript">
 			$(document).ready(function() {

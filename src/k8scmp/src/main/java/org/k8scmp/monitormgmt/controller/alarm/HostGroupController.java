@@ -71,27 +71,29 @@ public class HostGroupController extends ApiController {
         return hostGroupService.deleteHostGroup(ID);
     }
     
-    @ResponseBody
+
     @RequestMapping(value = "/bindHostGroup", method = RequestMethod.GET)
-    public ModelAndView bindHostGroup() {
+    public String bindHostGroup(Model model,@RequestParam("id") int id) {
     	//获取主机列表
-    	List<NodeInfo> nodeList = hostGroupService.getNodeList();
-        return new ModelAndView("alarm/hostGroup-bind", "nodeList", nodeList);
+//    	List<HostInfo> nodeList = hostGroupService.getHostInfo();
+    	List<HostInfo> nodeList = hostGroupService.getHostList();
+    	List<HostInfo> bindList = hostGroupService.getHostBindList(id);
+    	model.addAttribute("nodeList", nodeList);
+    	model.addAttribute("bindList", bindList);
+    	model.addAttribute("hostGroupId", id);
+        return "alarm/hostGroup-bind";
     }
     
     @ResponseBody
     @RequestMapping(value = "/bind/{id}", method = RequestMethod.POST)
-    public HttpResponseTemp<?> bindHostList(@PathVariable String id, @RequestBody List<HostInfo> hostInfoList) {
-    	int ID = Integer.parseInt(id);
-        return hostGroupService.bindHostList(ID, hostInfoList);
+    public HttpResponseTemp<?> bindHostList(@PathVariable int id, @RequestBody List<HostInfo> hostInfoList) {
+        return hostGroupService.bindHostList(id, hostInfoList);
     }
 
     @ResponseBody
     @RequestMapping(value = "/bind/{id}/{hostId}", method = RequestMethod.DELETE)
-    public HttpResponseTemp<?> unbindHost(@PathVariable String id, @PathVariable String hostId) {
-    	int ID = Integer.parseInt(id);
-    	int hostID = Integer.parseInt(hostId);
-        return hostGroupService.unbindHost(ID, hostID);
+    public HttpResponseTemp<?> unbindHost(@PathVariable int id, @PathVariable int hostId) {
+        return hostGroupService.unbindHost(id, hostId);
     }
 
 }

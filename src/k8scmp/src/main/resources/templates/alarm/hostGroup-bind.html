@@ -1,19 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<title>Unicorn Admin</title>
-		<meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
-		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />	
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	</head>
+	<head th:include="/public/commonframe :: cssScript" />
 	<body>
-		<div id="common-header"></div>
+		<div id="common-header">
+			<div th:include="/public/commonframe :: app-header"></div>
+		</div>
 		<div id="content">
 			<div id="content-header">
 				<h2>添加主机</h2>
@@ -28,18 +19,18 @@
 						<div class="widget-box">
 							<table width="100%" height="100%">
 							  <tr> 
-							    <td width="45%" valign="top">
+							    <td width="30%" valign="top">
 							    	<div>
-							    	<div class="controls">
+							    	<!-- <div class="controls">
 							    		<br/>
 										&nbsp;&nbsp;&nbsp;&nbsp;选择集群&nbsp;<select name="clusterName" id="clusterName" style="width: 65px;">	
-											<!-- <option th:each="hostGroupBasic:${templateInfo.hostGroupList}" th:value="${hostGroupBasic.id}" 	
+											<option th:each="hostGroupBasic:${templateInfo.hostGroupList}" th:value="${hostGroupBasic.id}" 	
 											th:selected="${#strings.contains(hostGroupBasic,hostGroupBasic.id)}"
-											th:text="${hostGroupBasic.hostGroupName}" ></option> -->	
-											<option>生产</option>
+											th:text="${hostGroupBasic.hostGroupName}" ></option>	
+											<option >生产</option>
 											<option>测试</option>
 										</select>
-									</div>
+									</div> -->
 									<br/>
 							    	&nbsp;&nbsp;&nbsp;&nbsp;<span>选择主机</span>
 							    	&nbsp;&nbsp;&nbsp;&nbsp;<i style="font-size: 10px">勾选要添加的主机之后可在所选主机列表中查看。</i>
@@ -55,34 +46,22 @@
 							    					</div>
 							    				</td>
 							    				<td>
-							    					<div style="text-align: center;width: 80px">
+							    					<div style="text-align: center;width: 80px" data-field="hostname">
 							    						主机
 							    					</div>
 							    				</td>
 							    				<td>
-							    					<div style="text-align: center;width: 80px">
+							    					<div style="text-align: center;width: 80px" data-field="hostip">
 							    						IP
 							    					</div>
 							    				</td>
 							    			</tr>
 							    		</thead>
-							    		<tbody>
-							    			<tr>
-							    				<td >
-							    					<div style="text-align: center;width: 40px">
-							    						<input type="checkbox" />
-							    					</div>
-							    				</td>
-							    				<td >
-							    					<div style="text-align: center;width: 80px">
-							    						k8s-node-1
-							    					</div>
-							    				</td>
-							    				<td>
-							    					<div style="text-align: center;width: 80px">
-							    						192.168.80.134
-							    					</div>
-							    				</td>
+							    		<tbody id="hosttbody">
+							    			<tr th:each="host,hostStat:${nodeList}" id="hosttr">
+							    				<td>&nbsp;&nbsp;<input type="checkbox" id="hostchecked" name="eCheck" th:onclick="'checkedtable2table(\''+${hostGroupId}+'\',\''+${host.id}+'\')'"/></td>
+							    				<td th:text="${host.hostname}" name="hostname"></td>
+							    				<td th:text="${host.ip}" name="hostip"></td>
 							    			</tr>
 							    		</tbody>
 							    	</table>
@@ -96,61 +75,45 @@
 								    	&nbsp;&nbsp;&nbsp;&nbsp;<i style="font-size: 10px">展示上一步勾选的所有主机。</i>
 								    	<br/>
 								    	<br/>
-								    	<table class="table" width="100%">
+								    	<table class="table">
 								    		<thead>
 								    			<tr>
-								    				<td>
+								    				<td width="120px">
 								    					<div style="text-align: center;width: 80px">
 								    						主机
 								    					</div>
 								    				</td>
-								    				<td>
-								    					<div style="text-align: center;width: 80px">
+								    				<td width="120px">
+								    					<div style="text-align: center;width: 60px">
 								    						IP
 								    					</div>
 								    				</td>
-								    				<td>
-								    					<div style="text-align: center;width: 80px">
-								    						集群
+								    				<td width="120px">
+								    					<div style="text-align: center;width: 70px">
+								    						创建时间
 								    					</div>
 								    				</td>
-								    				<td>
-								    					<div style="text-align: center;width: 80px">
+								    				<td width="120px">
+								    					<div style="text-align: center;width: 30px">
 								    						操作
 								    					</div>
 								    				</td>
 								    			</tr>
 								    		</thead>
-								    		<tbody>
-								    			<tr>
-								    				<td>
-								    					<div style="text-align: right;width: 80px">
-								    						k8s-node-1
-								    					</div>
-								    				</td>
-								    				<td>
-								    					<div style="text-align: center;width: 80px">
-								    						192.168.80.134
-								    					</div>
-								    				</td>
-								    				<td>
-								    					<div style="text-align: center;width: 80px">
-								    						k8s-centos
-								    					</div>
-								    				</td>
-								    				<td>
-								    					<div style="text-align: center;width: 80px">
-								    						<a>解除</a>
-								    					</div>
-								    				</td>
-								    			</tr>
+								    		<tbody id="bindtbody">
+								    			<tr  th:each="bind,bindStat:${bindList}" id="bindtr">
+								    				<td th:text="${bind.hostname}"></td>
+								    				<td th:text="${bind.ip}"></td>
+								    				<td th:text="${bind.createTime}"></td>
+								    				<td><a th:onclick="'javascript:$(this).parent().parent().remove();unBinding(\''+${hostGroupId}+'\',\''+${bind.id}+'\')'">解除</a></td>
+							    				</tr>
 								    		</tbody>
 								    	</table>
-								    	
+								    		
 								    	
 								    	<br/><br/><br/>
 								    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a th:href="@{/alarm}" class="btn tip-bottom">返回</a>
-								    	<input type="submit" value="提交" class="btn btn-primary"></input>
+								    	<input type="submit" value="提交" th:onclick="'putBinding(\''+${hostGroupId}+'\')'" class="btn btn-primary"></input>
 							    	</div>
 							    </td>
 							  </tr>
@@ -159,22 +122,63 @@
 					</div>
 				</div>
 			</div>
-			<div id="common-footer"></div>
+			<div class="common-footer">
+				<div th:include="/public/commonframe::app-footer"></div>
+			</div>
 		</div>	
-
-		<script th:src="@{/js/jquery.min.js}"></script>
-		<script th:src="@{/js/jquery.ui.custom.js}"></script>
-		<script th:src="@{/js/bootstrap.min.js}"></script>
-		<script th:src="@{/js/jquery.uniform.js}"></script>
-		<script th:src="@{/js/select2.min.js}"></script>
-		<script th:src="@{/js/jquery.dataTables.min.js}"></script>
-		<script th:src="@{/js/commonDisplay.js}"></script>
-		<script th:src="@{/js/unicorn.js}"></script>
-		<script th:src="@{/js/unicorn.tables.js}"></script>
-		<script th:src="@{/js/bootpopup.js}"></script>
-		<script type="text/javascript">
-			
+		<div th:include="/public/commonframe::jsScript(activeMenuNumber=43)" ></div>
 		
+		<script type="text/javascript">
+			function checkedtable2table(hostGroupId,hostId){
+				$("input[name='eCheck']").each(function(i,v){
+					if($(this).attr("checked")){
+						var $tr = $(this).parent().parent().parent().parent();
+						  var hostname = $tr.find('[name="hostname"]').text();
+						  var hostip= $tr.find('[name="hostip"]').text();
+						  var date = new Date('2017-10-19 09:39:23');
+						  var $tr = '<tr><td>'+hostname+'</td><td>'+hostip+'</td><td>'+date.toLocaleString() +'</td><td><a onclick="javascript:$(this).parent().parent().remove();">解除</a></td></tr>';
+						  $("#bindtbody").append($tr);
+					}
+				});
+				
+				
+			}	
+			
+			function unBinding(id,hostId){
+				$.ajax({
+					url:"/hostgroup/bind/"+id+"/"+hostId,
+					type:"delete"
+				});
+			}
+			
+			
+			
+			function putBinding(id){
+				var hostInfoList = new Array();
+				$("#bindtbody").children("tr").each(function(){
+					//alert("1");
+					var arr = []
+					$(this).children('td').each(function(i,v){
+						//alert($(this).text());
+						arr.push($(this).text());
+					})
+					var hostInfo = new Object();
+					hostInfo.hostname = arr[0];
+					hostInfo.ip = arr[1];
+					hostInfoList.push(hostInfo);
+				})
+				
+				$.ajax({
+					url:"/hostgroup/bind/"+id,
+					data:JSON.stringify(hostInfoList),
+					type:"post",
+					dataType: "json",
+					contentType : 'application/json;charset=utf-8',
+					success:function(data){
+						location.reload();
+					}
+				})
+			}
 		
 		
 		</script>

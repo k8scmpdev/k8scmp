@@ -38,7 +38,7 @@
 									<tbody id="tBody">
 									    <tr th:each="app,itState:${appList}">
 									        <td class="t10">
-									        	<a title='单击查看服务列表' id="appCode" th:href="@{'/app/service/'+${app.id}+'?1=1'(appCode=${app.appCode},hostLabel=${app.hostLabel},namespace=${app.namespace})}" th:text="${app.appCode}" class="tip-top" style="white-space:nowrap;"></a>
+									        	<a title='单击查看服务列表' id="appCode" th:href="@{'/app/service/'+${app.id}+'?1=1'(appId=${app.id},hostLabel=${app.hostLabel},namespace=${app.namespace})}" th:text="${app.appCode}" class="tip-top" style="white-space:nowrap;"></a>
 									        </td>
 									        <td class="t20" th:text="${app.state}"></td>
 									        <td class="t30" th:text="${app.hostLabel}"></td>
@@ -48,7 +48,7 @@
 									        <td class="operation t70">
 									        	<a class="iconOperation" 
 									        	th:href="@{/app/app-new(appCode=${app.appCode},hostLabel=${app.hostLabel},
-									        	namespace=${app.namespace},description=${app.description},
+									        	namespace=${app.namespace},description=${app.description},edit=true,
 									        	clusterId=${app.clusterId})}"><i class="icon-edit"></i><span>编辑</span></a>
 									        	<a class="iconOperation" href="javascript:void(0);" th:onclick="'deleteApp('+'\''+${app.id}+'\''+');'"><i class="icon-trash"></i><span>删除</span></a>
 									        </td>
