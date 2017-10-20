@@ -1,20 +1,3 @@
-$(document).ready(function(){
-	$.ajax({
-		type: "POST",
-		dataType: "html",
-		url: AjaxURL,
-		data: JSON.stringify(paramData),
-		contentType:"application/json",
-		success: function (data) {
-			refreshApp();
-		},
-		error: function(data) {
-			alert("error!");
-		}
-	});
-	
-});
-
 //ajax提交form表单
 $('#createAppFrom').submit(function(){
 	var AjaxURL= "";
