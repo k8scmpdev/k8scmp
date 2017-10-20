@@ -24,7 +24,7 @@ public interface AppMapper {
 
     @Update("update application" +
             " set appCode=#{item.appCode}, description=#{item.description} ,namespace=#{item.namespace}, hostLabel=#{item.hostLabel}, clusterId=#{item.clusterId},lastModifiedTime=#{item.lastModifiedTime},lastModifierId=#{item.lastModifierId})" +
-            "where id = #{item.id}")
+            " where id = #{item.id}")
     int updateApp(@Param("item") AppInfo item);
     
     @Delete("delete from application where id = #{id}")
