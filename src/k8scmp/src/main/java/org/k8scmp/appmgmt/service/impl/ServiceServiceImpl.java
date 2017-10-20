@@ -269,10 +269,11 @@ public class ServiceServiceImpl implements ServiceService {
         }
     }
 
-//	@Override
-//	public List<ServiceConfigInfo> getService(String serviceId) {
-//		 
-//	}
+	@Override
+	public ServiceConfigInfo getServiceById(String id) throws Exception {
+		ServiceInfo serviceInfo = serviceDao.getService(id);
+		return serviceInfo.toModel(ServiceConfigInfo.class);
+	}
 	
 	@Override
 	public String startService(String serviceId, int version,int replicas) throws Exception{

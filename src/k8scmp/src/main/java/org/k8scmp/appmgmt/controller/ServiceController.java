@@ -36,9 +36,10 @@ public class ServiceController {
         return "app/service-mgmt";
     }
 
-    @RequestMapping(value = "/service-info")
-    public String showServiceInfo() throws Exception {
-        return "app/service-info";
+    @RequestMapping(value = "/service-info/{id}")
+    public ModelAndView showServiceInfo(@PathVariable String id) throws Exception {
+    	
+        return new ModelAndView("app/service-info","serviceInfo",serviceService.getServiceById(id));
     }
     
     @RequestMapping(value = "/create")

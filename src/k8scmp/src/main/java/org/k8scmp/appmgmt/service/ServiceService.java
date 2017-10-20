@@ -57,4 +57,6 @@ public interface ServiceService {
 	List<Long> getCurrentVersionNum(String serviceId) throws Exception;
 
 	long getReplicasByServiceId(String serviceId) throws Exception;
+
+	ServiceConfigInfo getServiceById(String id) throws Exception;
 }
