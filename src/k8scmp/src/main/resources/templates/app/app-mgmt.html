@@ -38,7 +38,7 @@
 									<tbody id="tBody">
 									    <tr th:each="app,itState:${appList}">
 									        <td class="t10">
-									        	<a title='单击查看服务列表' id="appCode" th:href="@{'/app/service/'+${app.id}+'?1=1'(appId=${app.id},hostLabel=${app.hostLabel},namespace=${app.namespace})}" th:text="${app.appCode}" class="tip-top" style="white-space:nowrap;"></a>
+									        	<a title='单击查看服务列表' id="appCode" th:href="@{'/app/service/'+${app.id}+'?1=1'(appId=${app.id},hostLabel=${app.hostLabel},namespace=${app.namespace})}" th:text="${app.appCode}" style="white-space:nowrap;"></a>
 									        </td>
 									        <td class="t20" th:text="${app.state}"></td>
 									        <td class="t30" th:text="${app.hostLabel}"></td>

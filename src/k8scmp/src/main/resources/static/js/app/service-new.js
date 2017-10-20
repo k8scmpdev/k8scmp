@@ -47,6 +47,17 @@ $("*.cancleService").bind("click", function(event) {
 	window.location.href="/app/service/service-mgmt";
 });
 
+function refreshService(appId){
+	var AjaxURL = "/app/service/"+appId+"?appId="+appId;
+	window.location.href=AjaxURL;
+}
+
+$("#btnnew2next").bind("click",function(event){
+	$("#service-new1").css("display","none"); 
+	$("#service-new2").css("display","block");
+	$("#service-new4").css("display","none");
+});
+
 //save single image configuration 
 $("#btnnew3pre").bind("click", function(event) {
 	var uniqueImage = $("#hiddenUnique").val();
@@ -197,6 +208,7 @@ $(document).ready(function(){
 $('#createServiceForm').submit(function(){
 	var AjaxURL= "/app/service/create";
 	var paramData = getServiceFormJson();
+	var appId = $("#appId").val();
 	$.ajax({
 		type: "POST",
 		dataType: "html",
@@ -204,7 +216,7 @@ $('#createServiceForm').submit(function(){
 		data: JSON.stringify(paramData),
 		contentType:"application/json",
 		success: function (data) {
-			window.location.href="/app";
+			refreshService(appId);
 		},
 		error: function(data) {
 			alert("error!");
