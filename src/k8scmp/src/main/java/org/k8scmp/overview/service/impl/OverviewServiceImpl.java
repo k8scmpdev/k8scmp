@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.k8scmp.engine.k8s.util.NodeWrapper;
 import org.k8scmp.login.domain.User;
+import org.k8scmp.model.ServiceStatus;
 import org.k8scmp.monitormgmt.domain.monitor.MonitorResult;
 import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
 import org.k8scmp.monitormgmt.domain.monitor.TargetInfo;
@@ -63,13 +64,13 @@ public class OverviewServiceImpl implements OverviewService {
      	int count_o = 0;
      	for(int i=0;i<countInfoList.size();i++){
      		OverviewCountInfo count_info = countInfoList.get(i);
-     		if("running".equals(count_info.getCountName())) count_r=count_info.getCount();
-     		if("stop".equals(count_info.getCountName())) count_s=count_info.getCount();
-     		if("operating".equals(count_info.getCountName())) count_o=count_info.getCount();
+     		if(ServiceStatus.RUNNING.name().equalsIgnoreCase(count_info.getCountName())) count_r=count_info.getCount();
+     		else if(ServiceStatus.STOP.name().equalsIgnoreCase(count_info.getCountName())||ServiceStatus.ERROR.name().equalsIgnoreCase(count_info.getCountName())) count_s=count_info.getCount();
+     		else count_o=count_info.getCount();
      	}
      	data.put("运行中: "+count_r,   count_r);
      	data.put("已停止: "+count_s,   count_s);
-     	data.put("操作中: "+count_o,   count_o);
+     	data.put("其他: "+count_o,   count_o);
 		return data;
 	}
 	
