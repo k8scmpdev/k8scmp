@@ -8,7 +8,7 @@
 		
 		<div id="content">
 			<div id="content-header">
-				<h2>用户管理</h2>
+				<h2>逻辑集群管理</h2>
 				<div class="btn-group">
 					<a class="btn btn-large tip-bottom" title="Manage Users"><i class="icon-user"></i></a>
 					<a class="btn btn-large tip-bottom" title="Manage Comments"><i class="icon-comment"></i><span class="label label-important">5</span></a>
@@ -16,8 +16,8 @@
 			</div>
 			<div id="breadcrumb">
 				<a href="#" class="tip-bottom"><i class="icon-home"></i>全局配置</a>
-				<a href="/user/list" class="tip-bottom">用户管理</a>
-				<a href="#" class="current">修改用户信息</a>
+				<a href="/cluster/logic/list" class="tip-bottom">逻辑集群管理</a>
+				<a href="#" class="current">修改逻辑集群</a>
 			</div>
 			<div class="container-fluid">
 				
@@ -29,33 +29,45 @@
 								<span class="icon">
 									<i class="icon-align-justify"></i>									
 								</span>
-								<h5>用户信息</h5>
+								<h5>请输入逻辑集群信息</h5>
 							</div>
 							<div class="widget-content nopadding">
-								<form class="form-horizontal" action="#" th:action="@{/user/modify}" th:object="${User}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
+								<form class="form-horizontal" action="#" th:action="@{/cluster/logic/create}" th:object="${logicClusterDetail}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
                                     <div class="control-group">
-                                        <label class="control-label">*登录名</label>
+                                        <label class="control-label">*逻辑集群名</label>
                                         <div class="controls">
-                                            <input id="loginname" name="loginname" type="text"  th:field="*{loginname}" readonly="readonly"/>
+                                            <input id="name" name="name" type="text"  th:field="*{name}"/>
                                         </div>
                                     </div>
-                                    <div class="control-group">
-                                        <label class="control-label">*用户名</label>
+			                        <div class="control-group">
+                                        <label class="control-label">选择所属物理主机</label>
                                         <div class="controls">
-                                            <input id="username" name="username" type="text"  th:field="*{username}" />
-                                        </div>
+				                            <select class="combine" style="width:170px" id="status">
+												<option value="ok" >k8scmp</option>
+											</select>
+										</div>
                                     </div>
-                                    
-									
+                                    <div class="control-group">
+                                        <label class="control-label">选择所属namespace</label>
+                                        <div class="controls">
+			                            <select class="combine" style="width:170px" id="status">
+											<option value="ok" >default</option>
+										</select>
+										</div>
+                                    </div>
 									<div class="control-group">
-                                        <label class="control-label">邮箱</label>
+                                        <label class="control-label">选择关联主机</label>
                                         <div class="controls">
-                                            <input id="email" name="email" type="text" th:field="*{email}"/>
+                                            <select multiple="multiple" class="multiselect" name="nodelist" id="nodelist" style="width: 854px;" required="required">	
+												<option th:each="node:*{nodeList}" th:value="${node.name}" 	
+												th:selected="${#strings.contains(node.name,node.name)}"
+												th:text="${node.name}" ></option>	
+											</select>
                                         </div>
                                     </div>
                                     
                                     <div class="form-actions">
-                                    	<a  class="btn tip-bottom" href="/user/list">返回</a>
+                                    	<a  class="btn tip-bottom" href="/cluster/logic/list">返回</a>
                                         <input type="submit" value="确认修改" class="btn btn-primary" />
                                     </div>
                                 </form>
@@ -71,13 +83,14 @@
 		</div>
 		
 
-            <div th:include="/public/commonframe::jsScript(activeMenuNumber=21)" ></div>
-            
+           <div th:include="/public/commonframe::jsScript(activeMenuNumber=23)" ></div>
+           
             <script th:src="@{/js/jquery.uniform.js}"></script>
             <script th:src="@{/js/select2.min.js}"></script>
             <script th:src="@{/js/jquery.validate.js}"></script>
             <script th:src="@{/js/unicorn.js}"></script>
             <script th:src="@{/js/unicorn.form_validation.js}"></script>
             <script th:src="@{/js/commonDisplay.js}"></script>
+	
 	</body>
 </html>

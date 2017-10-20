@@ -2,6 +2,7 @@ package org.k8scmp.monitormgmt.service.monitor;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.monitormgmt.domain.monitor.InstenceInfoBack;
@@ -25,5 +26,7 @@ public interface MonitorService {
 	List<GraphHistoryResponse> postJson(String requestUrl, GraphHistoryRequest graphHistoryRequest) throws IOException;
 
 	MonitorResult getMonitorDataForOverview(TargetRequest targetRequest, long startTime, long endTime, String dataSpec);
+
+	Map<String, Map<Long, Double>> getMonitorDetailData(String type, long startTime, long endTime, String dataSpec);
 
 }

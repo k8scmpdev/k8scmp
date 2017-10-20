@@ -1,5 +1,6 @@
 package org.k8scmp.globalmgmt.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,9 +9,12 @@ import org.apache.shiro.subject.Subject;
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
+import org.k8scmp.engine.k8s.util.NodeWrapper;
+import org.k8scmp.exception.K8sDriverException;
 import org.k8scmp.globalmgmt.domain.ClusterInfo;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
+import org.k8scmp.globalmgmt.domain.LogicClusterInfo;
 import org.k8scmp.globalmgmt.domain.MonitorInfo;
 import org.k8scmp.globalmgmt.domain.RegisterInfo;
 import org.k8scmp.globalmgmt.service.GlobalService;
@@ -19,6 +23,7 @@ import org.k8scmp.login.domain.LoginType;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.login.domain.UserPassword;
 import org.k8scmp.login.service.UserService;
+import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
 import org.k8scmp.operation.OperationLog;
 import org.k8scmp.operation.OperationRecord;
 import org.k8scmp.operation.OperationType;
@@ -39,6 +44,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import io.fabric8.kubernetes.api.model.Node;
 
 /**
  * Created by jason on 2017/9/9.
@@ -77,6 +84,63 @@ public class GlobalController {
     	return "/global/cluster-edit";
     }
     
+    
+    @RequestMapping(value = "/cluster/logic/list", method = RequestMethod.GET)
+    public String showLogicCluster(Model model) {
+    	long userId = AuthUtil.getUserId();
+        if (userId <= 0) {
+            model.addAttribute("info","请先登录");
+        }
+        
+//        HttpResponseTemp<?> resp = globalService.listLogicCluster();
+//        List<LogicClusterInfo> logicClusterInfos = (List<LogicClusterInfo>) resp.getResult();
+        List<LogicClusterInfo> logicClusterInfos  = new ArrayList<>();
+        LogicClusterInfo lci = new LogicClusterInfo();
+        lci.setName("基础平台部-逻辑集群1");
+        lci.setHostNum(2);
+        logicClusterInfos.add(lci);
+
+        model.addAttribute("logicClusterInfos",logicClusterInfos);
+        return "/global/cluster-logic-list";
+    }
+    
+    @RequestMapping(value = "/cluster/logic/create", method = RequestMethod.GET)
+    public String createLogicCluster(Model model) {
+//        HttpResponseTemp<?> resp = globalService.listLogicCluster();
+//        List<LogicClusterInfo> logicClusterInfos = (List<LogicClusterInfo>) resp.getResult();
+        LogicClusterInfo lci = new LogicClusterInfo();
+		try {
+			NodeWrapper nodeWrapper = new NodeWrapper().init("default");
+			List<NodeInfo> nodeInfoInCluster = nodeWrapper.getNodeInfoListWithoutPods();
+			lci.setNodeList(nodeInfoInCluster);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        model.addAttribute("logicClusterDetail",lci);
+        return "/global/cluster-logic-new";
+    }
+    
+    @RequestMapping(value = "/cluster/logic/edit", method = RequestMethod.GET)
+    public String editLogicCluster(Model model) {
+//        HttpResponseTemp<?> resp = globalService.listLogicCluster();
+//        List<LogicClusterInfo> logicClusterInfos = (List<LogicClusterInfo>) resp.getResult();
+        LogicClusterInfo lci = new LogicClusterInfo();
+        lci.setName("基础平台部-逻辑集群1");
+        lci.setHostNum(2);
+		try {
+			NodeWrapper nodeWrapper = new NodeWrapper().init("default");
+			List<NodeInfo> nodeInfoInCluster = nodeWrapper.getNodeInfoListWithoutPods();
+			lci.setNodeList(nodeInfoInCluster);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        model.addAttribute("logicClusterDetail",lci);
+        return "/global/cluster-logic-edit";
+    }
     
     @RequestMapping(value="/cluster/edit", method = RequestMethod.POST)
     public String editCluster(Model model,@ModelAttribute ClusterInfo clusterInfo) {

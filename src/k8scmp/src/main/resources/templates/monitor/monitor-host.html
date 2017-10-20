@@ -19,7 +19,8 @@
 					<div class="span12">
 					<br/>
 						<div class="control-group">
-						  <div style="float:left;border:1px">
+						    <!-- <div class="col-lg-5  pull-right" style="float:right;border:1px"> -->
+                               		<form action="#" method="post"> 
 							    集群：<strong><span class="text" th:text="cent-os-01"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							    主机：<strong><span class="text" th:text="node-dex003"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							    采样方式&nbsp;&nbsp;<select id="dataSpec" name="dataSpec" class="selectpicker show-tick form-control" data-live-search="false" onclick="javascript(0);">
@@ -27,9 +28,6 @@
 							        <option value="average" selected="selected">平均值</option>
 							        <option value="min">最小值</option>
 							    </select>
-						    </div>
-						    <!-- <div class="col-lg-5  pull-right" style="float:right;border:1px"> -->
-                               		<form action="#" method="post"> 
                                      	自定义&nbsp;&nbsp;<input id="date_begin" type="text" class="datepicker"/>
                                      	-&nbsp;<input id="date_end" type="text" class="datepicker"/>
                                      	<button type="submit" class="tip-top" title="Search" ><i class="icon-search"></i></button>

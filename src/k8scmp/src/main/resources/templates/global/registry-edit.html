@@ -1,23 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<title>PaaS云管理平台</title>
-		<meta charset="UTF-8" />
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/fullcalendar.css}" />	
-		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
-		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
-		
-	</head>
+	<head th:include="/public/commonframe :: cssScript" />
 	<body>
-		
-		
-		<div id="common-header"></div>
+		<div id="common-header">
+			<div th:include="/public/commonframe :: app-header"></div>
+		</div>
 		
 		<div id="content">
 			<div id="content-header">
@@ -76,15 +63,14 @@
 					</div>
 				</div>
 
-				<div class="common-footer">
+				<div id="common-footer">
+					<div th:include="/public/commonframe::app-footer"></div>
 				</div>
 			</div>
 		</div>
 		
 
-            <script th:src="@{/js/jquery.min.js}"></script>
-            <script th:src="@{/js/jquery.ui.custom.js}"></script>
-            <script th:src="@{/js/bootstrap.min.js}"></script>
+            <div th:include="/public/commonframe::jsScript(activeMenuNumber=24)" ></div>
             
             <script th:src="@{/js/jquery.uniform.js}"></script>
             <script th:src="@{/js/select2.min.js}"></script>

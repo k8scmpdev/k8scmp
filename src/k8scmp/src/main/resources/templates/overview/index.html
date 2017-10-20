@@ -1,20 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh">
-	<head>
-		<title>PaaS云管理平台</title>
-		<meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/fullcalendar.css}" />	
-		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
-		<link rel="stylesheet" type="text/css" th:href="@{/css/timeline.css}" />
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>
+	<head th:include="/public/commonframe :: cssScript" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/timeline.css}" />
 	<body>
 		
 		
-		<div id="common-header"></div>
+		<div id="common-header">
+			<div th:include="/public/commonframe :: app-header"></div>
+		</div>
 		
 		<div id="content">
 			<div id="content-header">
@@ -168,19 +161,14 @@
 					</div>
 				</div>
 
-				<div class="common-footer">
+				<div id="common-footer">
+					<div th:include="/public/commonframe::app-footer"></div>
 				</div>
 			</div>
 		</div>
 		
 
-            <script th:src="@{/js/excanvas.min.js}"></script>
-            <script th:src="@{/js/jquery.min.js}"></script>
-            <script th:src="@{/js/jquery.ui.custom.js}"></script>
-            <script th:src="@{/js/bootstrap.min.js}"></script>
-            <script th:src="@{/js/jquery.peity.min.js}"></script>
-            <script th:src="@{/js/unicorn.js}"></script>
-            <script th:src="@{/js/commonDisplay.js}" id="commonScript" menu="1"></script>
+            <div th:include="/public/commonframe::jsScript(activeMenuNumber=1)" ></div>
             
 			<script th:src="@{/highcharts/js/highcharts.js}"></script>
             <script th:src="@{/highcharts/js/chart-app.js}"></script>

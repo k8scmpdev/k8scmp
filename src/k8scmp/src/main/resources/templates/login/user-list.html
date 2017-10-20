@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<title>PaaS云管理平台</title>
-		<meta charset="UTF-8" />
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/fullcalendar.css}" />	
-		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
-		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
+	<head th:include="/public/commonframe :: cssScript" />
 		
 		<script>
 		function delUser(loginname){
@@ -26,11 +15,10 @@
 			$('#getform').attr("action", "/user/get?keyword="+keyword).submit();
 		}
 		</script>
-	</head>
 	<body>
-		
-		
-		<div id="common-header"></div> 
+		<div id="common-header">
+			<div th:include="/public/commonframe :: app-header"></div>
+		</div>
 		
 		<div id="content">
 			<div id="content-header">
@@ -42,6 +30,7 @@
 			</div>
 			<div class="container-fluid">
 				
+				<!-- 
 				<div class="row-fluid" >
 					
 					<div class="span12" style="margin-top:10px;margin-bottom:-10px">
@@ -57,15 +46,18 @@
 						
 					</div>
 				</div>
+				 -->
 				
 				<div class="row-fluid" >
 					<div class="span12">
+						<a title="新增用户" class="btn tip-bottom" href="/user/create"><i class="icon-plus"></i>新增</a>
+						<font color="red"><span th:text="${info}"></span></font>
 						<div class="widget-box">
 							<div class="widget-title">
 								<h5>用户列表</h5>
 							</div>
 							<div class="widget-content nopadding">
-								<table class="table table-bordered data-table" style="table-layout: fixed;">
+								<table class="table table-bordered data-table display" style="width:100%">
 									<thead>
 										<tr>
 											<th>*登录名</th>
@@ -74,8 +66,8 @@
 											<th >操作</th>
 										</tr>
 									</thead>
-									<tbody th:each="user : ${users}">
-										<tr class="gradeX" th:object="${user}">
+									<tbody >
+										<tr class="gradeX" th:each="user : ${users}" th:object="${user}">
 											<td><a th:href="'/user/get/'+*{loginname}"><span th:text="*{loginname}"></span></a></td>
 											<td><span th:text="*{username}"></span></td>
 											<td><span th:text="*{email}"></span></td>
@@ -117,26 +109,13 @@
 					</form>
 				</div>
 				
-				<div class="row-fluid">
-					<div id="footer" class="span12">
-						2017 &copy; k8scmp. 
-					</div>
+				<div id="common-footer">
+					<div th:include="/public/commonframe::app-footer"></div>
 				</div>
 			</div>
 		</div>
 		
 
-            <script th:src="@{/js/jquery.min.js}"></script>
-            <script th:src="@{/js/jquery.ui.custom.js}"></script>
-            <script th:src="@{/js/bootstrap.min.js}"></script>
-            
-            <script th:src="@{/js/jquery.uniform.js}"></script>
-            <script th:src="@{/js/select2.min.js}"></script>
-            <script th:src="@{/js/jquery.dataTables.min.js}"></script>
-            <script th:src="@{/js/unicorn.js}"></script>
-            <script th:src="@{/js/unicorn.tables.js}"></script>
-            <script th:src="@{/js/jquery.validate.js}"></script>
-            <script th:src="@{/js/unicorn.form_validation.js}"></script>
-            <script th:src="@{/js/commonDisplay.js}" id="commonScript" menu="21"></script>
+           <div th:include="/public/commonframe::jsScript(activeMenuNumber=21)" ></div>
 	</body>
 </html>

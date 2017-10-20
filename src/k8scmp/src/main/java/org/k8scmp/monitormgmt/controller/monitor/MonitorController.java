@@ -1,12 +1,15 @@
 package org.k8scmp.monitormgmt.controller.monitor;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.monitormgmt.domain.monitor.InstenceInfoBack;
 import org.k8scmp.monitormgmt.domain.monitor.NodeInfoBack;
+import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryResponse;
 import org.k8scmp.monitormgmt.service.monitor.MonitorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @RequestMapping("/monitor")
@@ -66,12 +72,68 @@ public class MonitorController {
 		String type = "node";
 		Calendar current = Calendar.getInstance();
         long endTime = current.getTimeInMillis();
-        current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 60*10*1000);
+        current.set(Calendar.MINUTE, current.get(Calendar.MINUTE) - 60*1000);
         long startTime = current.getTimeInMillis();
 		String dataSpec = "AVERAGE";
-		model.addAttribute("nodeData", getMonitorData(type,startTime,endTime,dataSpec));
+		model.addAttribute("monitorDetailData", monitorService.getMonitorDetailData(type,startTime,endTime,dataSpec));
 		
         return "monitor/monitor-host";
+    }
+	
+	@ResponseBody
+    @RequestMapping(value="/host/getDetailData", method=RequestMethod.GET)
+    public String getDetailData() {
+     	
+    	ObjectMapper obj = new ObjectMapper();
+
+		//默认监控当前时间1小时内的值  单个主机的指标展示
+		String type = "node";
+		Calendar current = Calendar.getInstance();
+		long endTime = current.getTimeInMillis();
+		current.set(Calendar.MILLISECOND, current.get(Calendar.MILLISECOND) - 30*60*1000);
+		long startTime = current.getTimeInMillis();
+		String dataSpec = "AVERAGE";
+		Map<String,Map<Long,Double>> monitorDetailDataList = monitorService.getMonitorDetailData(type,startTime,endTime,dataSpec);
+		
+		Map<String, Object> appinfo = new HashMap<>();
+		appinfo.put("datalist", monitorDetailDataList);
+		
+        try {
+        	return obj.writeValueAsString(appinfo);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
+
+    }
+	
+	@ResponseBody
+    @RequestMapping(value="/host/getDetailData1raw", method=RequestMethod.GET)
+    public String getDetailData1row() {
+     	
+    	ObjectMapper obj = new ObjectMapper();
+
+		//默认监控当前时间半小时内的值  单个主机的指标展示
+		String type = "node";
+		Calendar current = Calendar.getInstance();
+		long endTime = current.getTimeInMillis();
+		current.set(Calendar.MILLISECOND, current.get(Calendar.MILLISECOND) - 30*1000);
+		long startTime = current.getTimeInMillis();
+		String dataSpec = "AVERAGE";
+		Map<String,Map<Long,Double>> monitorDetailDataList = monitorService.getMonitorDetailData(type,startTime,endTime,dataSpec);
+		
+		Map<String, Object> appinfo = new HashMap<>();
+		appinfo.put("datalist", monitorDetailDataList);
+		
+        try {
+        	return obj.writeValueAsString(appinfo);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
+
     }
 	
 	@RequestMapping(value = "/instence", method = RequestMethod.GET)

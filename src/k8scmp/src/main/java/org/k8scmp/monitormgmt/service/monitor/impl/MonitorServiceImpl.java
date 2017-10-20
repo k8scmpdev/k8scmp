@@ -32,6 +32,7 @@ import org.k8scmp.monitormgmt.domain.monitor.NodeInfoBack;
 import org.k8scmp.monitormgmt.domain.monitor.PodInfo;
 import org.k8scmp.monitormgmt.domain.monitor.TargetInfo;
 import org.k8scmp.monitormgmt.domain.monitor.TargetRequest;
+import org.k8scmp.monitormgmt.domain.monitor.falcon.CounterValue;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.EndpointCounter;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryRequest;
 import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryResponse;
@@ -93,11 +94,13 @@ public class MonitorServiceImpl implements MonitorService {
 	    	
 		    		nodeInfoBack.setHostName(nodeInfo.getName());
 		    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
-		    		nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
-		    		nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
-		    		nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
-//		    		nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
-//		    		nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
+		    		if("Ready".equalsIgnoreCase(nodeInfo.getStatus())){
+			    		nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
+			    		nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
+			    		nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
+	//		    		nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
+	//		    		nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
+		    		}
 		    		nodeInfoBack.setState(nodeInfo.getStatus());
 		    		nodeInfoBackList.add(nodeInfoBack);
 	    		}else if(hostName != null && !hostName.equals("") && nodeInfo.getName().indexOf(hostName) < 0){
@@ -106,11 +109,13 @@ public class MonitorServiceImpl implements MonitorService {
 	    			NodeInfoBack nodeInfoBack = new NodeInfoBack();
 		    		nodeInfoBack.setHostName(nodeInfo.getName());
 		    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
-		    		nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
-		    		nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
-		    		nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
-//		    		nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
-//		    		nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
+		    		if("Ready".equalsIgnoreCase(nodeInfo.getStatus())){
+			    		nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
+			    		nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
+			    		nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
+	//		    		nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
+	//		    		nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
+		    		}
 		    		nodeInfoBack.setState(nodeInfo.getStatus());
 		    		nodeInfoBackList.add(nodeInfoBack);
 	    		}
@@ -247,6 +252,99 @@ public class MonitorServiceImpl implements MonitorService {
         createMonitorResult(monitorResult, graphHistoryResponseMap, monitorDataRequest);
 
         return ResultStat.OK.wrap(monitorResult);
+    }
+    
+    @Override
+    public Map<String,Map<Long,Double>> getMonitorDetailData(String type, long startTime, long endTime, String dataSpec) {
+
+       // AuthUtil.verify(CurrentThreadInfo.getUserId(), cid, ResourceType.CLUSTER, OperationType.GET);
+        
+    	//根据type实时查询node\pod\container
+    	List<TargetInfo> targetInfos = getTargetInfos(type);
+    	
+       //TargetRequest targetRequest = fetchTargetRequest(targetId);
+       // if (targetRequest == null) {
+       //    throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_REQUEST_NOT_LEGAL, "target request info not exists");
+       // }
+        MonitorDataRequest monitorDataRequest = new MonitorDataRequest(
+                startTime,
+                endTime,
+                dataSpec,
+                type,
+                targetInfos);
+
+        if (!StringUtils.isBlank(monitorDataRequest.checkLegality())) {
+            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_REQUEST_NOT_LEGAL, monitorDataRequest.checkLegality());
+        }
+
+        // preparation
+        GlobalInfo queryInfo = globalBiz.getGlobalInfoByType(GlobalType.MONITOR_QUERY);
+        if (queryInfo == null) {
+            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "query is null");
+        }
+        String queryUrl = "http://" + queryInfo.getValue() + "/graph/history";
+
+        MonitorResult monitorResult = new MonitorResult();
+        monitorResult.setTargetType(monitorDataRequest.getTargetType());
+        monitorResult.setDataSpec(monitorDataRequest.getDataSpec());
+
+        // fetch data from query api
+        List<GraphHistoryResponse> graphHistoryResponses = new ArrayList<>();
+        // create graphHistoryRequest
+        GraphHistoryRequest graphHistoryRequest = getGraphHistoryRequest(monitorDataRequest);
+        List<EndpointCounter> endpointCounterList = graphHistoryRequest.getEndpoint_counters();
+        //Concurrent requests, sending 500 counters at a time
+        int max_size = 500;
+        int times = endpointCounterList.size() % max_size == 0 ? endpointCounterList.size() / max_size : endpointCounterList.size() / max_size + 1;
+        List<postJsonTask> tasks = new ArrayList<>(times);
+        for (int i = 0; i < times; i++) {
+            GraphHistoryRequest tmp = new GraphHistoryRequest();
+            tmp.setStart(graphHistoryRequest.getStart());
+            tmp.setEnd(graphHistoryRequest.getEnd());
+            tmp.setCf(graphHistoryRequest.getCf());
+            tmp.setEndpoint_counters(endpointCounterList.subList(i * max_size, Math.min((i + 1) * max_size, endpointCounterList.size())));
+            tasks.add(new postJsonTask(queryUrl, tmp));
+        }
+        List<List<GraphHistoryResponse>> taskResult = ClientConfigure.executeCompletionService(tasks);
+        for (List<GraphHistoryResponse> result : taskResult) {
+            if (result != null && result.size() > 0) {
+                graphHistoryResponses.addAll(result);
+            }
+        }
+        
+        Map<String,Map<Long,Double>> resultList = createDetailInfo(graphHistoryResponses);
+        return resultList;
+    }
+    
+    private Map<String,Map<Long,Double>> createDetailInfo(List<GraphHistoryResponse> graphHistoryResponses){
+    	Map<String,Map<Long,Double>> resultMap = new HashMap<String,Map<Long,Double>>();
+    	for(GraphHistoryResponse gp :graphHistoryResponses){
+    		if("cpu.busy".equals(gp.getCounter())&&gp.getValues()!=null){
+    			Map<Long,Double> cpu_map = new HashMap<Long,Double>();
+    			for(CounterValue cv :gp.getValues()){
+    				if(cv!=null&&cv.getValue()!=null)
+    				cpu_map.put(cv.getTimestamp(), cv.getValue());
+    			}
+    			resultMap.put("cpu.busy", cpu_map);
+    		}
+    		if("mem.memused.percent".equals(gp.getCounter())&&gp.getValues()!=null){
+    			Map<Long,Double> mem_map = new HashMap<Long,Double>();
+    			for(CounterValue cv :gp.getValues()){
+    				if(cv!=null&&cv.getValue()!=null)
+    					mem_map.put(cv.getTimestamp(), cv.getValue());
+    			}
+    			resultMap.put("mem.memused.percent", mem_map);
+    		}
+    		if("df.bytes.used.percent/fstype=xfs,mount=/".equals(gp.getCounter())&&gp.getValues()!=null){
+    			Map<Long,Double> bytes_map = new HashMap<Long,Double>();
+    			for(CounterValue cv :gp.getValues()){
+    				if(cv!=null&&cv.getValue()!=null)
+    					bytes_map.put(cv.getTimestamp(), cv.getValue());
+    			}
+    			resultMap.put("df.bytes.used.percent", bytes_map);
+    		}
+    	}
+    	return resultMap;
     }
    
     private List<TargetInfo> getTargetInfos(String type) {

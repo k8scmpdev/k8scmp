@@ -1,26 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<title>PaaS云管理平台</title>
-		<meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/bootstrap-responsive.min.css}" />
-		<link rel="stylesheet" th:href="@{/css/uniform.css}" />
-		<link rel="stylesheet" th:href="@{/css/select2.css}" />		
-		<link rel="stylesheet" th:href="@{/css/unicorn.main.css}" />
-		<link rel="stylesheet" th:href="@{/css/unicorn.grey.css}" class="skin-color" />
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		
+	<head th:include="/public/commonframe :: cssScript" />
 		<script>
 		function getLogList(){
 			var arr = new Array("first", "second", "third") 
 			var arr2 = new Array("first", "second", "third") 
-			for(var item in arr) {
-				alert(item);
-				alert(arr[item]);
-				alert(arr2[item]);
-			}
+			//for(var item in arr) {
+				//alert(item);
+				//alert(arr[item]);
+				//alert(arr2[item]);
+			//}
 			
 			var keyword = $('#keyword').val();
 			var rtype = $('#rtype').val();
@@ -31,11 +20,11 @@
 			$('#getform').attr("action", url).submit();
 		}
 		</script>
-	</head>
 	<body>
 		<div id="common-header">
-			
+			<div th:include="/public/commonframe :: app-header"></div>
 		</div>
+			
 		<div id="content">
 			<div id="content-header">
 				<h2>审计日志</h2>
@@ -62,19 +51,21 @@
 								<option value="fail" th:selected="${'fail'==infos[3]}">fail</option>
 							</select>
 						</div>
+						<!-- 
 						<div style="float:right;display:inline-block">
 							
 							<div class="input-append" >
 			                	<input type="text" id="keyword" placeholder="请输入查询内容" th:value="${infos[0]}"/><button class="btn prepend"  onclick="getLogList()" ><i class="icon-search"></i> </button>
 			            	</div>
 			            </div>
+			             -->
 			          </form>
 						<div class="widget-box">
 							<div class="widget-title">
 								<h5>应用列表</h5>
 							</div>
 							<div class="widget-content nopadding">
-								<table class="table table-bordered data-table" style="table-layout: fixed;">
+								<table class="table table-bordered data-table" style="width:100%">
 									<thead>
 										<tr>
 											<th><font color="red">*</font>资源id</th>
@@ -105,18 +96,12 @@
 					</div>
 				</div>
 				<div id="common-footer">
+					<div th:include="/public/commonframe::app-footer"></div>
 				</div>
 			</div>
 		</div>
 		
-		<script th:src="@{/js/jquery.min.js}"></script>
-        <script th:src="@{/js/jquery.ui.custom.js}"></script>
-        <script th:src="@{/js/bootstrap.min.js}"></script>
-        <script th:src="@{/js/jquery.uniform.js}"></script>
-        <script th:src="@{/js/select2.min.js}"></script>
-        <script th:src="@{/js/jquery.dataTables.min.js}"></script>
-        <script th:src="@{/js/commonDisplay.js}" id="commonScript" menu="41"></script>
-        <script th:src="@{/js/unicorn.js}"></script>
-        <script th:src="@{/js/unicorn.tables.js}"></script>
+
+           <div th:include="/public/commonframe::jsScript(activeMenuNumber=41)" ></div>
 	</body>
 </html>

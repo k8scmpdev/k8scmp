@@ -1,5 +1,9 @@
 package org.k8scmp.globalmgmt.domain;
 
+import java.util.List;
+
+import io.fabric8.kubernetes.api.model.Node;
+
 /**
  * Created by feiliu206363 on 2016/1/20.
  */
