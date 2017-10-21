@@ -17,6 +17,7 @@ public class ServiceInfo extends DataModelBase{
         add("serviceCode");
         add("startSeq");
         add("appId");
+        add("appCode");
         add("description");
         add("state");
         add("createTime");
@@ -33,6 +34,8 @@ public class ServiceInfo extends DataModelBase{
     private int startSeq;
     
     private String appId;
+    
+    private String appCode;
 
     private String description;
 
@@ -78,6 +81,14 @@ public class ServiceInfo extends DataModelBase{
     
     public void setAppId(String appId) {
     	this.appId = appId == null ? null : appId.trim();
+    }
+    
+    public String getAppCode() {
+    	return appCode;
+    }
+    
+    public void setAppCode(String appCode) {
+    	this.appCode = appCode == null ? null : appCode.trim();
     }
 
     public String getDescription() {
