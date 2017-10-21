@@ -32,11 +32,11 @@ public interface ServiceMapper {
 		"</when>","order by createTime desc","</script>"})
     List<ServiceInfo> getServices(@Param("item") ServiceInfo item);
 	
-	@Select("SELECT s.id, s.serviceCode, s.appId, a.appCode, s.startSeq, s.description, s.state, s.data, s.createTime, s.creatorId, s.lastModifiedTime, lastModifierId  FROM service s left join application a"
+	@Select("SELECT s.id, s.serviceCode, s.appId, a.appCode, s.startSeq, s.description, s.state, s.data, s.createTime, s.creatorId, s.lastModifiedTime, s.lastModifierId  FROM service s left join application a"
 			+" on s.appId=a.id where s.appId=#{appId}")
     List<ServiceInfo> getServicesByAppId(@Param("appId") String appId);
 	
-	@Select("SELECT s.id, s.serviceCode, s.appId, a.appCode, s.startSeq, s.description, s.state, s.data, s.createTime, s.creatorId, s.lastModifiedTime, lastModifierId  FROM service s left join application a"
+	@Select("SELECT s.id, s.serviceCode, s.appId, a.appCode, s.startSeq, s.description, s.state, s.data, s.createTime, s.creatorId, s.lastModifiedTime, s.lastModifierId  FROM service s left join application a"
 			+" on s.appId=a.id where s.id=#{id}")
 	ServiceInfo getService(@Param("id") String id);
 	
