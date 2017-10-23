@@ -33,7 +33,7 @@
 		<div th:include="/public/commonframe::jsScript(activeMenuNumber=43)" ></div>
 		<script type="text/javascript">
 			$(document).ready(function(){ 
-			　　$.get("/alarm/templatelist",function(data){ //初始將a.html include div#iframe
+			　　$.get("/alarm/templatelist",function(data){ 
 					$('#myTabContent').html(data);
 				}); 
 			
@@ -51,21 +51,23 @@
 			//规则
 			//删除规则
 			 function deleteTemplate(id){
-				 alert("您确定删除该规则吗？");
-				 $.ajax({
-					 url:"/alarm/delete/"+id,
-					 data:{
-						 id:id
-					 },
-				 	 type:"delete",
-				 	 dataType:"json",
-				 	 success:function(data){
-				 		var redata = eval(data);
-						$.get("/alarm/templatelist",function(data){
-							$('#myTabContent').html(data);
-						});
-				 	 }
-				 });
+				 var r = confirm("您确定删除该规则吗？");
+				 if(r == true){
+					 $.ajax({
+						 url:"/alarm/delete/"+id,
+						 data:{
+							 id:id
+						 },
+					 	 type:"delete",
+					 	 dataType:"json",
+					 	 success:function(data){
+					 		var redata = eval(data);
+							$.get("/alarm/templatelist",function(data){
+								$('#myTabContent').html(data);
+							});
+					 	 }
+					 });
+				}
 			 }
 			 //搜索规则
 			 function getTemplatByName(){
