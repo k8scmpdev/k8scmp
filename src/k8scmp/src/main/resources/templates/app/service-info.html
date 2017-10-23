@@ -179,7 +179,7 @@
 						    <div class="tab-pane fade" id="sUpgrade">  
 						    	<div>
 						    		<div>
-							    		<span class="deploySpan">选择镜像</span>
+							    		<span class="deploySpan">添加镜像</span>
 							    		<span class="deploySpan">
 	                                        <a href="#myModal" data-toggle="modal" class="btn btn-primary btn-mini" style="font-size: 13px;">添加</a>
                                             <a title="点击添加按钮，在弹出的页面中，输入
@@ -189,112 +189,193 @@
 											</a>
 							    		</span>
 						    		</div>
+						    		
 						    	</div>
-						    	<div class="filletDiv">
-								<div class="thirdFillet">
-									<div class="filletLi" style="float: left">
-									<ul>
-										<li class="normalLineSpace">镜像仓库</li>
-										<li class="normalLineSpace">镜像名称</li>
-										<li class="normalLineSpace">镜像版本</li>
-										<li class="larLineSpace">版本说明</li>
-										<li class="larLineSpace">挂载存储</li>
-										<li class="middleLineSpace">启动命令</li>
-										<li class="middleLineSpace">容器大小</li>
-										<li class="middleLineSpace">端口映射</li>
-									</ul>
+						    	<div class="control-group">
+										<div class="widget-content ">										
+										<table class="table table-bordered image-table display" style="width:90%;table-layout: fixed; ">
+											<thead>
+												<tr>
+													<th class="i10">镜像名称</th>
+													<th class="i20">镜像仓库</th>
+													<th class="i30">版本</th>
+													<th class="i40">配置</th>
+												</tr>
+											</thead>
+											<tbody id="tBody1">
+											    <tr th:each="images,itState:(${versions==null?versions:versions[0].containerDrafts})" >
+											        <td class="i10" th:text="${images.image}"></td>
+											        <td class="i20" th:text="${images.registry}"></td>
+											        <td class="i30" th:text="${images.tag}"></td>
+											        <td class="i40">
+														<a title="配置" class="tip-bottom iconOperation" data-target="#service-new3" data-toggle="modal" onclick="showImageConfiguration(null);"><i class="icon-edit"></i><span>配置</span></a>&nbsp;&nbsp;&nbsp;
+								        				<a title="删除" class="tip-bottom iconOperation" href="'deleteImage(123)'"><i class="icon-trash"></i><span>删除</span></a>
+													</td>
+											    </tr>
+											</tbody>
+										</table>							
+										</div>
+	                                </div>
+	                                <div style="text-align: center;">
+										<button class="btn-mini btn-primary cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+										<button id="versionUpdate" class="btn-mini btn-primary" type="button">确定</button>
 									</div>
-									<div class="filletLi" style="float: left">
-										<ul>
-											<li class="normalLineSpace">http://pub.test.com</li>
-											<li class="normalLineSpace">test/java</li>										
-							    			<li class="normalLineSpace">
-								    			<select style="width: 100px">
-													<option>1</option>
-													<option>5.0-beta</option>	
-												</select>
-							    			</li>
-							    			<li class="textareaLineSpace">
-								    			<textarea rows="3"></textarea>
-							    			</li>
-							    			<li style="list-style-type: none">
-													 <div class="control-group">
-					                                <div class="row-fluid">
-													<div class="span12">
-														<div class="widget-box">
-															<div class="widget-title">
-																<h5>挂载列表</h5>
-															</div>
-															<div class="widget-content nopadding" style="height: 10%;">
-																<table class="table table-bordered">
-																	<thead>
-																		<tr>
-																			<th>名称</th>
-																			<th>类型</th>
-																			<th>版本</th>
-																			<th>权限</th>
-																			<th>容器内路径</th>
-																			<th>主机路径</th>
-																	</tr>
-																	</thead>
-																	<tbody id="tBody">
-																	    <tr th:each="app,itState:${imageList}">
-																	    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
-																	        <td><a title='单击查看服务列表' th:href="@{/app/service-mgmt(appId=${app.appId},logicClusterId=${app.logicClusterId},namespace=${app.namespace})}" th:text="${app.appId}" class="tip-top"></a></td>
-																	        <td th:text="${app.createTime}"></td>
-																	        <td th:text="${app.description}"></td>
-																	    </tr>
-																	</tbody>
-																</table>							
-														</div>
-													</div>				
-												</div>
-												</div>
-				                                </div>
-				                                <div class="controls">
-		                                           <a title="添加挂载存储" class="btn tip-bottom" href="javascript:void(0);" onclick="showStorage();"><i class="icon-plus"></i></a>
-		                                       		<br/>
-		                                       		<br/>
-		                                       		<div id="storages">
-		                                       			
-		                                       		</div>
-	                                       		</div>
-												</li>
-						    			
-						    			<li class="normalLineSpace">
-						    				<input type="text" style="width: 40%"/>
-						    			</li>
-						    			<li class="normalLineSpace">
-							    			<div class="controls">
-		                                	 	<span>CPU(个)</span><input type="text" class="combine tip-top"/>&nbsp;&nbsp;&nbsp;
-												<span>内存(MB)</span><input type="text" class="combine tip-top"/>
-											</div>
-						    			</li>
-						    			<li class="normalLineSpace">
-							    			<div class="controls">
-		                               			<input type="text" class="combine tip-top" title="对外访问服务端口"/>
-		                               			<input type="text" class="combine tip-top" title="容器端口"/>
-												<select class="combine">
-													<option>TCP</option>
-													<option>UDP</option>
-												</select>
-	                               			</div>
-						    			</li>
-										</ul>
-									</div>
-								</div>
-								
-							</div>
 						    </div>  
 						
 							<div class="tab-pane fade" id="sPort"> 
 								
 								<a class="btn" href="#sPortMappedModel" data-toggle="modal"><span style="font-size: 13px;">创建负载均衡器</span></a>
-						    	<div id="ports">
-						    	
-						    	</div>
 						    </div>
-						</div>				
+						</div>	
+						
+						<div id="myModal" class="modal hide">
+							<div class="modal-header">
+								<button data-dismiss="modal" class="close" type="button">×</button>
+								<h3>选择镜像</h3>
+							</div>
+							<div class="modal-body">
+	                            <div style="padding-bottom: 6%;">
+	                                <label class="modalStyle" style="padding-right: 10px;">镜像仓库</label>
+	                                <label class="modalStyle" id="registry">http://123.com</label>
+	                            </div>
+	                            <div>
+	                            	<label class="modalStyle" style="padding-right: 10px;">选择镜像</label>
+                                 	<div class="input-append">
+					            		<input class="global_filter" id="global_filter" type="text" placeholder="请输入查询内容" style="font-style: italic;font-size: 13px"/><button class="btn prepend" type="button"><i class="icon-search"></i> </button>
+					            	</div> 
+	                             </div>
+	                             
+	                            <div class="control-group">
+	                                <div class="row-fluid">
+									<div class="span12">
+										<div class="widget-box">
+											<div class="widget-title">
+												<h5>镜像列表</h5>
+											</div>
+											<div class="widget-content nopadding">
+												<table class="table table-bordered image-table display" style="width: 100%;table-layout: fixed;">
+													<thead>
+														<tr>
+															<th style="width: 26%;">选择</th>
+															<th style="width: 26%;">镜像仓库</th>
+															<th style="width: 26%;">镜像名称</th>
+															<th style="width: 26%;">版本</th>
+														</tr>
+													</thead>
+													<tbody id="tImageBody">
+													<tr>
+														<td style="width: 26%;"><input type="checkbox"/></td>
+														<td id="registry" style="width: 26%;" ></td>
+														<td id="id" style="width: 26%;" >nginx</td>
+														<td id="versions" style="width: 26%;">
+																<select name="versions">
+																	<option value="latest">latest</option>
+																</select>
+															
+														</td>
+													</tr>
+													<tr>
+														<td style="width: 26%;"><input type="checkbox"/></td>
+														<td id="registry" style="width: 26%;" ></td>
+														<td id="id" style="width: 26%;" >tomcat</td>
+														<td id="versions" style="width: 26%;">
+																<select name="versions">
+																	<option value="latest">latest</option>
+																</select>
+															
+														</td>
+													</tr>
+													<tr>
+														<td style="width: 26%;"><input type="checkbox"/></td>
+														<td id="registry" style="width: 26%;" >http://123.com</td>
+														<td id="id" style="width: 26%;" >dev-java</td>
+														<td id="versions" style="width: 26%;">
+																<select name="versions">
+																	<option value="8.0">8.0</option>
+																	<option value="9.0">9.0</option>
+																</select>
+															
+														</td>
+													</tr>
+													<tr>
+														<td style="width: 26%;"><input type="checkbox"/></td>
+														<td id="registry" style="width: 26%;" >http://123.com</td>
+														<td id="id" style="width: 26%;" >mysql</td>
+														<td id="versions" style="width: 26%;">
+																<select name="versions">
+																	<option value="6.0">6.0</option>
+																	<option value="7.0">7.0</option>
+																	<option value="8.0">8.0</option>
+																</select>
+															
+														</td>
+													</tr>
+													    <!-- <tr th:each="image,itState:${chooseImagesList}">
+													    	<td style="width: 33%;"><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
+													        <td style="width: 33%;" th:text="${image.id}"></td>
+													        <td style="width: 33%;" th:text="${image.version}"></td>
+													    </tr> -->
+													</tbody>
+												</table>							
+											</div>
+										</div>				
+									</div>
+									</div>
+	                               </div>
+	                                <div style="text-align: left;padding-left: 35%">
+										<button class="btn-mini btn-primary cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+										<button id="imagesbtn" class="btn-mini btn-primary" type="button">确定</button>&nbsp;&nbsp;&nbsp;
+									</div>
+								</div>
+							</div>	
+							
+							<div class="modal hide" id="service-new3">
+									<div class="modal-header">
+										<button data-dismiss="modal" class="close" type="button">×</button>
+										<h3>配置镜像</h3>
+									</div>
+									<div class="modal-body">
+										<input id="uniqueImage" type="hidden" />
+										<input id="registryConfig" type="hidden" />
+										<input id="imageConfig" type="hidden" />
+										<div>
+		                                    <label class="modalStyle" style="padding-right: 10px;">镜像版本</label>
+		                                    <span class="modalStyle">
+								    			<select  id="tagConfig" class="modalStyle">
+													<option>1.0</option>
+													<option>latest</option>	
+												</select>
+						    				</span>
+		                                </div>
+										<div style="padding-top: 40px;">
+		                                    <label class="modalStyle" style="padding-right: 10px;">挂载存储</label>
+	                                        <a title="添加挂载存储" class="tip-bottom" href="javascript:void(0);" onclick="showStorage();"><i class="icon-plus"></i></a>
+	                                    		<br/>
+	                                    		<br/>
+	                                    		<div id="storages">
+	                                    			
+	                                    		</div>
+	                                    		<br/>
+		                                </div>
+										<div>
+		                                    <label class="modalStyle" style="padding-right: 10px;">启动命令</label>
+		                                    <input id="startCommands" class="modalStyle" type="text"/>
+		                                </div>
+										<div style="padding-top: 40px;">
+		                                    <label class="modalStyle" style="padding-right: 10px;">环境变量</label>
+											<input id="envvar" class="modalStyle" type="text" placeholder="环境变量以键值对key=value形式保存，以逗号,分割" style="font-style: italic;font-size: 13px"/>
+		                                </div>
+		                                <div style="padding-top: 40px;">
+		                                	<label class="modalStyle" style="padding-right: 10px;">容器大小</label>
+	                                	 	<span class="modalStyle">CPU(个)<input id="cpus" type="number" class="combine tip-top"/></span>&nbsp;&nbsp;&nbsp;
+											<span class="modalStyle">内存(MB)<input id="mems" type="number" class="combine tip-top"/></span>
+		                                </div>
+										<div style="float: right;">
+											<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+											<button id="btnnew3pre" class="btn-primary btn-mini" type="button">确定</button>
+										</div>
+									</div>
+								</div>		
 					</div>
 				</div>
 				<div id="sPortMappedModel" class="modal hide">
@@ -335,5 +416,6 @@
 		</div>
 	</body>
 	<div th:include="/public/commonframe::jsScript(activeMenuNumber=3)" ></div>
+	<script th:src="@{/js/app/serviceUtil.js}"></script>
 	<script th:src="@{/js/app/service-info.js}"></script>
 </html>
