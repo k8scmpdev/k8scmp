@@ -24,7 +24,7 @@ public class Version extends VersionBase {
     private LogDraft logDraft;
     private List<LabelSelector> labelSelectors;
     private String podSpecStr;
-    private VersionType versionType;
+    private VersionType versionType=VersionType.CUSTOM;
     private boolean deprecate = false;
     private List<String> hostList;
     

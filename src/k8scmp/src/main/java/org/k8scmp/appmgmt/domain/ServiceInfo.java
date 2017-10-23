@@ -158,6 +158,7 @@ public class ServiceInfo extends DataModelBase{
         result.setServiceCode(serviceCode);
         result.setStartSeq(startSeq);
         result.setAppId(appId);
+        result.setAppCode(appCode);
         result.setDescription(description);
         result.setState(state);
         result.setCreateTime(createTime);
