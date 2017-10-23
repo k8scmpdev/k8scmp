@@ -132,12 +132,12 @@
 			function checkedtable2table(hostGroupId,hostId){
 				$("input[name='eCheck']").each(function(i,v){
 					if($(this).attr("checked")){
-						var $tr = $(this).parent().parent().parent().parent();
-						  var hostname = $tr.find('[name="hostname"]').text();
-						  var hostip= $tr.find('[name="hostip"]').text();
-						  var date = new Date('2017-10-19 09:39:23');
-						  var $tr = '<tr><td>'+hostname+'</td><td>'+hostip+'</td><td>'+date.toLocaleString() +'</td><td><a onclick="javascript:$(this).parent().parent().remove();">解除</a></td></tr>';
-						  $("#bindtbody").append($tr);
+						var $tr = $(this).parent().parent().parent().parent().parent().parent();
+						var hostname = $tr.find('[name="hostname"]').text();
+						var hostip= $tr.find('[name="hostip"]').text();
+						var date = new Date('2017-10-19 09:39:23');
+						var $tr = '<tr><td>'+hostname+'</td><td>'+hostip+'</td><td>'+date.toLocaleString() +'</td><td><a onclick="javascript:$(this).parent().parent().remove();">解除</a></td></tr>';
+						$("#bindtbody").append($tr);
 					}
 				});
 				
