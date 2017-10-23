@@ -1,5 +1,5 @@
 function showPortMapped(){
-??? var childdiv=$('<div></div>');??
+    var childdiv=$('<div></div>');
 	childdiv.attr("id","id" + new Date().getTime());
 	$("#portMapped").append(childdiv);
 	childdiv.load("/js/statichtml/app/portMappedTemplate.html #portMappedTemplate");
@@ -66,9 +66,9 @@ $(document).ready(function(){
 	
 	var oTable=$('.storage-table').dataTable({
 		"scrollY": "160px",
-	????"scrollCollapse": "true",
+		"scrollCollapse": "true",
 		"pagingType":"full_numbers",
-	????"paging": "true",
+		"paging": "true",
 		"lengthMenu":[5],
 		"language":	{
 			"search":"搜索",
@@ -616,3 +616,87 @@ function deleteVersion(){
 		}
 	});
 }
+
+//服务实例列表
+function getInstenceByServiceId(serviceId){
+	$.ajax({
+		url:"/app/service/listPodsByServiceId",
+		 data:{
+			 serviceId:serviceId
+		 },
+	 	 type:"get",
+	 	 dataType:"json",
+	 	 success:function(data){
+	 		 var podList = data.result;
+	 		$("#podTBody").empty();
+	 		$.each(podList,function(i,v){
+	 			var images = '';
+	 			$.each(v.containers,function(t,n){
+					var image = '<span>' + n.imageName + '</span>';
+					images += image;
+				})
+	 			var $tr = '<tr>'
+						+'<td style="text-align:center;">'+v.serviceCode+'</td>'
+						+'<td style="text-align:center;">'+v.status+'</td>'
+						+'<td style="text-align:center;">'+images+'</td>'
+						+'<td style="text-align:center;">'+v.startTime+'</td>'
+						+'<td style="text-align:center;"><a>日志</a></td>'
+						+'</tr>';
+				$("#podTBody").append($tr);
+	 		})
+	 	 }
+	})
+}
+
+//服务事件
+function getEventByServiceId(serviceId){
+	$.ajax({
+		url:"/app/service/listDeployEvent",
+		 data:{
+			 serviceId:serviceId
+		 },
+	 	 type:"get",
+	 	 dataType:"json",
+	 	 success:function(data){
+	 		 var eventList = data.result;
+	 		$("#eventTBody").empty();
+	 		$.each(eventList,function(i,v){
+	 			var message = '';
+	 			var primary = new Array();
+	 			var target = new Array();
+	 			var current = new Array();
+	 			if(v.primarySnapshot != null){
+	 				$.each(v.primarySnapshot,function(t,n){
+	 					primary.push('v'+(t+1)+':'+n.version +',r'+(t+1)+':'+n.replicas);
+	 				});
+	 				$.each(v.targetSnapshot,function(t,n){
+	 					target.push('v'+(t+1)+':'+n.version +',r'+(t+1)+':'+n.replicas);
+	 				});
+	 				$.each(v.currentSnapshot,function(t,n){
+	 					current.push('v'+(t+1)+':'+n.version +',r'+(t+1)+':'+n.replicas);
+	 				});
+	 				message = '起始版本:'+primary.join(';')+' 目标版本:'+target.join(';')+' 当前版本:'+current.join(';');
+	 				
+	 			}else{
+	 				$.each(v.targetSnapshot,function(t,n){
+	 					target.push('v'+(t+1)+':'+n.version +',r'+(t+1)+':'+n.replicas);
+	 				});
+	 				$.each(v.currentSnapshot,function(t,n){
+	 					current.push('v'+(t+1)+':'+n.version +',r'+(t+1)+':'+n.replicas);
+	 				});
+	 				message = '目标版本:'+target.join(';')+' 当前版本:'+current.join(';');
+	 			}
+	 			var $tr = '<tr>'
+						+'<td style="text-align:center;">'+v.operation+'</td>'
+						+'<td style="text-align:center;">'+v.startTime+'</td>'
+						+'<td style="text-align:center;">'+v.expireTime+'</td>'
+						+'<td style="text-align:center;">'+v.state+'</td>'
+						+'<td style="text-align:center;">'+v.userName+'</td>'
+						+'<td style="text-align:center;">'+message+'</td>'
+						+'</tr>';
+				$("#eventTBody").append($tr);
+	 		})
+	 	 }
+	})
+}
+

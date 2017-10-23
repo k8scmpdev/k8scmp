@@ -53,7 +53,12 @@
 								<li class="active">
 							        <a href="#sInfo" data-toggle="tab" class="fontSizeControl">服务详情</a>  
 							    </li>
-								<li><a href="#sExample" data-toggle="tab" class="fontSizeControl">服务实例</a></li>
+								<li>
+									<a href="#sExample" data-toggle="tab" class="fontSizeControl" th:onclick="'getInstenceByServiceId(\''+${serviceInfo.id}+'\')'">服务实例</a>
+								</li>
+								<li>
+									<a href="#sEvent" data-toggle="tab" class="fontSizeControl" th:onclick="'getEventByServiceId(\''+${serviceInfo.id}+'\')'">服务事件</a>
+								</li>
 								<li><a href="#sUpgrade" data-toggle="tab" class="fontSizeControl">升级配置</a></li>
 								<li><a href="#sPort" data-toggle="tab" class="fontSizeControl">负载</a></li>
 							</ul> 
@@ -97,26 +102,13 @@
 																			<th>实例名称</th>
 																			<th>状态</th>
 																			<th>镜像</th>
-																			<th>地址</th>
-																			<th>创建事件</th>
+																			<!-- <th>地址</th> -->
+																			<th>创建时间</th>
 																			<th>日志</th>
 																	</tr>
 																	</thead>
-																	<tbody id="tBody">
-																	   <!--  <tr th:each="app,itState:${imageList}">
-																	    	<td><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox" /></td>
-																	        <td><a title='单击查看服务列表' th:href="@{/app/service-mgmt(appId=${app.appId},logicClusterId=${app.logicClusterId},namespace=${app.namespace})}" th:text="${app.appId}" class="tip-top"></a></td>
-																	        <td th:text="${app.createTime}"></td>
-																	        <td th:text="${app.description}"></td>
-																	    </tr> -->
-																	    <tr>
-																	    <td>service01-instance01</td>
-																	    <td>运行中</td>
-																	    <td>dev-test/java</td>
-																	    <td>http://123:8080</td>
-																	     <td></td>
-																	      <td></td>
-																	    </tr>
+																	<tbody id="podTBody">
+																	  
 																	</tbody>
 																</table>							
 														</div>
@@ -125,6 +117,38 @@
 												</div>
 				                                </div>  
 						    </div> 
+						     
+						     <div class="tab-pane fade" id="sEvent">  
+						         <div class="control-group">
+					                                <div class="row-fluid">
+													<div class="span12">
+														<div class="widget-box">
+															<div class="widget-title">
+																<h5>事件列表</h5>
+															</div>
+															<div class="widget-content nopadding" style="height: 10%;">
+																<table class="table table-bordered">
+																	<thead>
+																		<tr>
+																			<th>操作类型</th>
+																			<th>创建时间</th>
+																			<th>更新时间</th>
+																			<th>操作结果</th>
+																			<th>操作用户</th>
+																			<!-- <th>地址</th> -->
+																			<th>操作描述</th>
+																	</tr>
+																	</thead>
+																	<tbody id="eventTBody">
+																	  
+																	</tbody>
+																</table>							
+														</div>
+													</div>				
+												</div>
+												</div>
+				                                </div>  
+						    </div>
 						     
 						    <div class="tab-pane fade" id="sUpgrade">  
 						    	<div>

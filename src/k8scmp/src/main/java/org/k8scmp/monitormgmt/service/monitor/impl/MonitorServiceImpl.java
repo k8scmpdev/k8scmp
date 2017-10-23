@@ -154,9 +154,9 @@ public class MonitorServiceImpl implements MonitorService {
 	    		if(serviceId != null && !serviceId.equals("")){
 		    		ServiceInfo service = serviceDao.getService(serviceId);
 		    		if(serviceName != null && !serviceName.equals("") && pod.getMetadata().getName().indexOf(serviceName)>=0 ){
-		    					instenceInfoBack.setServiceName(service.getServiceCode());
 		    					AppInfo app = appDao.getApp(service.getAppId());
 		    					instenceInfoBack.setAppName(app.getAppCode());
+		    					instenceInfoBack.setServiceName(service.getServiceCode());
 		    					instenceInfoBack.setInstanceName(pod.getMetadata().getName());
 		    					instenceInfoBack.setCPUUsed(formatDouble(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(pod.getMetadata().getName())));
 		    					instenceInfoBack.setMemoryUsed(formatDouble(result.getCounterResults().get("container.mem.usage.percent").get(0).get(pod.getMetadata().getName())));
@@ -165,8 +165,6 @@ public class MonitorServiceImpl implements MonitorService {
 					}else if(serviceName != null && !serviceName.equals("") && pod.getMetadata().getName().indexOf(serviceName)<0){
 						continue;
 					}else{
-						serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
-						service = serviceDao.getService(serviceId);
 						AppInfo app = appDao.getApp(service.getAppId());
 						instenceInfoBack.setAppName(app.getAppCode());
 						instenceInfoBack.setServiceName(service.getServiceCode());
