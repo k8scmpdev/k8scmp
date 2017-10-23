@@ -61,4 +61,10 @@ public class VersionDaoImpl implements VersionDao {
 	public List<Version> getVersionNames(String serviceId) {
 		return mapper.getVersionNames(serviceId);
 	}
+
+	@Override
+	public void deleteVersionByServiceId(String serviceId, int version) {
+		mapper.deleteVersionByServiceId(serviceId, version);
+		
+	}
 }

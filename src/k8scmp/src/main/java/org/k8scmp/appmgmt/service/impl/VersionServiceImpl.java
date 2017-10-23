@@ -148,6 +148,20 @@ public class VersionServiceImpl implements VersionService {
 	}
 
 	@Override
+	public void deleteVersion(String serviceId, int ver) throws Exception {
+		ServiceInfo serviceInfo = serviceDao.getService(serviceId);
+		if (serviceInfo == null) {
+            throw ApiException.wrapResultStat(ResultStat.SERVICE_NOT_EXIST);
+        }
+		
+		if(!ServiceStatus.STOP.name().equals(serviceInfo.getState()) || !ServiceStatus.ERROR.name().equals(serviceInfo.getState())){
+			throw ApiException.wrapResultStat(ResultStat.CANNOT_DELETE_VERSION);
+		}
+		
+		versionDao.deleteVersionByServiceId(serviceId, ver);
+	}
+	
+	@Override
 	public void deprecateVersion(String serviceId, int ver) throws Exception {
 		VersionBase verBase = versionDao.getVersion(serviceId, ver);
 		if(verBase == null){

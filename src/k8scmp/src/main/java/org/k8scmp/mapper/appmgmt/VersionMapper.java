@@ -25,6 +25,9 @@ public interface VersionMapper {
     @Delete("delete from serviceversion where id = #{id}")
     int deleteVersionById(@Param("id") String id);
 
+    @Delete("delete from serviceversion where serviceId = #{serviceId} and version=#{version}")
+    int deleteVersionByServiceId(@Param("serviceId") String serviceId, @Param("version") int version);
+    
     @Select("select " + BASIC_COLUMNS + " from serviceversion where serviceId = #{serviceId} and version=#{version}")
     VersionBase getVersion(@Param("serviceId") String serviceId, @Param("version") int version);
 

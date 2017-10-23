@@ -16,6 +16,8 @@ public interface VersionDao{
     VersionBase getVersion(String serviceId,int version);
 
     List<VersionBase> getAllVersionByServiceId(String serviceId);
+    
+    void deleteVersionByServiceId(String serviceId,int version);
 
 	void deleteVersionById(String id);
 

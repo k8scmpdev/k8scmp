@@ -45,7 +45,7 @@
 				</div>
 			</div>
 
-			<div class="container-fluid" style="width: $(window).height() - 320">
+			<div class="container-fluid" style="width: $(window).height()?-?320">
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="widget-box">
@@ -288,12 +288,12 @@
 										<input id="uniqueImage" type="hidden" />
 										<input id="registryConfig" type="hidden" />
 										<input id="imageConfig" type="hidden" />
-										<div>
+										<div style="padding-top: 10px;">
 		                                    <label class="modalStyle" style="padding-right: 10px;">镜像版本</label>
 		                                    <span class="modalStyle">
 								    			<select  id="tagConfig" class="modalStyle">
-													<option>1.0</option>
-													<option>latest</option>	
+													<option value="1.0">1.0</option>
+													<option value="latest">latest</option>	
 												</select>
 						    				</span>
 		                                </div>
@@ -321,7 +321,7 @@
 											<span class="modalStyle">内存(MB)<input id="mems" type="number" class="combine tip-top"/></span>
 		                                </div>
 										<div style="float: right;">
-											<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+											<button id="btncancel3pre" class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
 											<button id="btnnew3pre" class="btn-primary btn-mini" type="button">确定</button>
 										</div>
 									</div>

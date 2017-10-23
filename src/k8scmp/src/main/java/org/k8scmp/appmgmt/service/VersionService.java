@@ -21,4 +21,6 @@ public interface VersionService {
 
 	List<Version> getVersionNames(String serviceId);
 
+	void deleteVersion(String serviceId, int ver) throws Exception;
+
 }

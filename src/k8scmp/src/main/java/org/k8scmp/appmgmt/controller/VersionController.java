@@ -49,6 +49,14 @@ public class VersionController {
     }
     
     @ResponseBody
+    @RequestMapping(value = "/deleteVersion", method = RequestMethod.POST)
+    public HttpResponseTemp<Object> deleteVersion(@RequestParam(value = "serviceId", required = true) String serviceId,
+															@RequestParam(value = "version", required = true) int version) throws Exception {
+    	versionService.deleteVersion(serviceId, version);
+    	return ResultStat.OK.wrap(null);
+    }
+    
+    @ResponseBody
     @RequestMapping(value = "/enableVersion", method = RequestMethod.POST)
     public HttpResponseTemp<Object> enableVersion(@RequestParam(value = "serviceId", required = true) String serviceId,
     		@RequestParam(value = "version", required = true) int version) throws Exception {

@@ -1,5 +1,5 @@
 function showPortMapped(){
-    var childdiv=$('<div></div>');  
+??? var childdiv=$('<div></div>');??
 	childdiv.attr("id","id" + new Date().getTime());
 	$("#portMapped").append(childdiv);
 	childdiv.load("/js/statichtml/app/portMappedTemplate.html #portMappedTemplate");
@@ -66,9 +66,9 @@ $(document).ready(function(){
 	
 	var oTable=$('.storage-table').dataTable({
 		"scrollY": "160px",
-	    "scrollCollapse": "true",
+	????"scrollCollapse": "true",
 		"pagingType":"full_numbers",
-	    "paging": "true",
+	????"paging": "true",
 		"lengthMenu":[5],
 		"language":	{
 			"search":"搜索",
@@ -91,10 +91,13 @@ $(document).ready(function(){
 	
 	
 	
+	
+	var paramData={};
+	paramData["serviceId"] = "7623bcc8b3734e71a91604db5a66f96b";
 	$.ajax({
 		type: "GET",
 		dataType: "json",
-		url: "/app/version/getMaxVersion?serviceId="+$('#serviceID').val(),
+		url: "/app/version/getMaxVersion?serviceId=7623bcc8b3734e71a91604db5a66f96b",
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
@@ -164,10 +167,10 @@ function loadsUpgradeDatas(containers){
 			var id = registry+image;
 			//add new row to the images list table
 			var trRow = "<tr>" +
-					"<td class='i10' style='width: 30%;min-width:30%;max-width:30%;'>"+image+"</td>" +
-					"<td class='i20' style='width: 30%;min-width:30%;max-width:30%;'>"+registry+"</td>" +
-					"<td class='i30' style='width: 10%;min-width:10%;max-width:10%;'>"+tag+"</td>" +
-					"<td class='i40' style='width: 30%;min-width:30%;max-width:30%;'><a title='配置' class='tip-bottom iconOperation' data-target='#service-new3' data-toggle='modal' onclick='showImageConfiguration(\""+id+"\");'><i class='icon-edit'></i><span>配置</span></a>&nbsp;&nbsp;"+
+					"<td class='i10' style='width: 30%;min-width:30%;max-width:30%;text-align: center;'>"+image+"</td>" +
+					"<td class='i20' style='width: 30%;min-width:30%;max-width:30%;text-align: center;'>"+registry+"</td>" +
+					"<td class='i30' style='width: 10%;min-width:10%;max-width:10%;text-align: center;'>"+tag+"</td>" +
+					"<td class='i40' style='width: 30%;min-width:30%;max-width:30%;text-align: center;'><a title='配置' class='tip-bottom iconOperation' data-target='#service-new3' data-toggle='modal' onclick='showImageConfiguration(\""+id+"\");'><i class='icon-edit'></i><span>配置</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
 					"<a title='删除' class='tip-bottom iconOperation' href='javascript:void(0);' onclick='deleteImage(this);'><i class='icon-trash'></i><span>删除</span></a></td>" +
 					"</tr>";
 			htmlContent = htmlContent.concat(trRow);
@@ -191,6 +194,7 @@ $("#imagesbtn").bind("click",function(event){
 function getSelectedRow(){
 	var returnObj = [];
 	var tmpObj = {};
+	var valid = true;
 	$(".image-table span[class='checked'] input[type='checkbox']").each(function(){
 		tmpObj = $(this).parent().parent().parent().parent().parent().parent();
 		var tr = {};
@@ -200,10 +204,14 @@ function getSelectedRow(){
 		
 		if(currentContainerMap[tr["registry"]+tr["image"]]!=null){
 			alert("镜像["+tr["image"]+"]已存在!");
-			return;
+			valid = false;
+			return false;
 		}
 		returnObj.push(tr);
 	});
+	if(!valid){
+		return null;
+	}
 	return returnObj;
 }
 
@@ -215,6 +223,7 @@ function deleteImage(obj){
 }
 
 function showImageConfiguration(id){
+	console.log(currentContainerMap);
 	var container = currentContainerMap[id];
 	$("#storages").html("");//clear all sub divs
 	
@@ -230,34 +239,37 @@ function showImageConfiguration(id){
 		//曾经打开过该页面设过值
 		if(volumeMountDrafts != null){
 			for(var k=0;k<volumeMountDrafts.length;k++){
-				var tmpDraft = volumeMountDrafts[k];
-				var volumeType= volumeMountDrafts["volumeType"];
+				var volume = volumeMountDrafts[k];
+				//var volumeType= tmpDraft["volumeType"];
 				var childdiv=$('<div></div>');  
 				$("#storages").append(childdiv);
-				childdiv.load("/js/statichtml/app/storageTemplate.html #storageTemplate",
+				childdiv.load("/js/statichtml/app/storageTemplate.html",{"volumeName":"h1","mountPath":"/123"},
 						function(responseTxt,statusTxt,xhr){
-					
+					var tmpDraft = data;
+					console.log(tmpDraft);
 					//set value
-					if(volumeType == "EMPTYDIR"){
+					if(tmpDraft["volumeType"] == "EMPTYDIR"){
 						$(this).find("select[name='dirs']").find("option[value='EMPTYDIR']").attr("selected","selected");
-						$(this).find("select[name='writeOrRead']").find("option[value=']"+tmpDraft["readOnly"]+"'").attr("selected","selected");
+						$(this).find("select[name='writeOrRead']").find("option[value='"+tmpDraft["readOnly"]+"']").attr("selected","selected");
 						$(this).find("input[name='volumeName']").val(tmpDraft["name"]);
+alert(k+"-1"+$(this).find("input[name='volumeName']").val());
 						$(this).find("input[name='insPath']").val(tmpDraft["mountPath"]);
 						
 						//hide hostpath and show emptydirs info
 						$(this).find("input[name='mountPath']").css("display","none");
 						$(this).find("input[name='hostPath']").css("display","none");
-						$(this).find("input[name='insPath']").css("display","block");
-					}else if(volumeType == "HOSTPATH"){
+						$(this).find("input[name='insPath']").css("display","");
+					}else if(tmpDraft["volumeType"] == "HOSTPATH"){
 						$(this).find("select[name='dirs']").find("option[value='HOSTPATH']").attr("selected","selected");
-						$(this).find("select[name='writeOrRead']").find("option[value=']"+tmpDraft["readOnly"]+"'").attr("selected","selected");
+						$(this).find("select[name='writeOrRead']").find("option[value='"+tmpDraft["readOnly"]+"']").attr("selected","selected");
 						$(this).find("input[name='volumeName']").val(tmpDraft["name"]);
+						alert(k+"-2"+$(this).find("input[name='volumeName']").val());
 						$(this).find("input[name='mountPath']").val(tmpDraft["mountPath"]);
 						$(this).find("input[name='hostPath']").val(tmpDraft["hostPath"]);
 						
 						//hide emptydirs and show hostpath info
-						$(this).find("input[name='mountPath']").css("display","block");
-						$(this).find("input[name='hostPath']").css("display","block");
+						$(this).find("input[name='mountPath']").css("display","");
+						$(this).find("input[name='hostPath']").css("display","");
 						$(this).find("input[name='insPath']").css("display","none");
 					}
 					
@@ -265,14 +277,14 @@ function showImageConfiguration(id){
 					$($(this).find("select[name='dirs']")).bind("change",function(){
 						var currentSelect = $(this).val();
 						//host
-						if(currentSelect == "1"){
+						if(currentSelect == "HOSTPATH"){
 							$(this).parent().children("input[name='insPath']").hide();
-							$(this).parent().children("input[name='conPath']").show();
+							$(this).parent().children("input[name='mountPath']").show();
 							$(this).parent().children("input[name='hostPath']").show();
 						//instance
-						}else if(currentSelect == "2"){
+						}else if(currentSelect == "EMPTYDIR"){
 							$(this).parent().children("input[name='insPath']").show();
-							$(this).parent().children("input[name='conPath']").hide();
+							$(this).parent().children("input[name='mountPath']").hide();
 							$(this).parent().children("input[name='hostPath']").hide();
 						}
 					});
@@ -300,7 +312,8 @@ function getEnvsToString(envs){
 		return "";
 	}
 	var arr=[];
-	for(var map in envs){
+	for(var i=0;i<envs.length;i++){
+		var map = envs[i];
 		arr.push(map.key+"="+map.value);
 	}
 	return arr.join(",");
@@ -311,10 +324,12 @@ function getEnvsToArray(envsStr){
 		return null;
 	}
 	var envs=[];
-	for(var envStr in envsStr.split(",")){
+	var arr = envsStr.split(",");
+	for(var i=0;i<arr.length;i++){
+		envStr = arr[i];
 		var env={};
-		env.key=envStr.split("=")[0];
-		env.key=envStr.split("=")[1];
+		env.key=envStr.split("=")[0]+"";
+		env.value=envStr.split("=")[1]+"";
 		envs.push(env);
 	}
 	return envs;
@@ -373,12 +388,12 @@ $("#btnnew3pre").bind("click", function(event) {
 	currentContainerDraft["volumeMountDrafts"] = volumeMountDrafts;
 	
 	currentContainerMap[uniqueImage] = currentContainerDraft;
+	console.log(currentContainerMap);
 	$("#service-new3").modal("hide");
 });
 
 //save single image configuration 
 $("#versionUpdate").bind("click", function(event) {
-	console.log(currentContainerMap);
 	var version = getVersion(currentContainerMap);
 	version.serviceId = $('#serviceID').val();
 	var paramData={};
@@ -392,10 +407,15 @@ $("#versionUpdate").bind("click", function(event) {
 		data: JSON.stringify(paramData),
 		contentType:"application/json",
 		success: function (data) {
+			if(data.resultCode==200){
+				alert("版本配置升级成功!");
+			}else{
+				alert("版本配置升级失败!");
+			}
 			
 		},
 		error: function(data) {
-			alert("error!");
+			alert("版本配置升级失败!");
 		}
 	});
 });
@@ -426,6 +446,15 @@ function showStorage(){
 		
 	});
 }
+
+$("#btncancel3pre").bind("click",function(event){
+	//show port mapped detail into sPort tab
+	
+	//close this window
+	$("#service-new3").modal("hide");
+});
+
+
 
 //根据version信息生成页面div
 function loadsVersionDetail(versionDetail){
