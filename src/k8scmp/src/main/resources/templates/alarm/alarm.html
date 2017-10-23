@@ -172,6 +172,7 @@
 							//alert(templateList);
 							$("#hostGroupTbody").empty();
 							$.each(hostGroupList,function(k,v){
+								var $id = 'htbody'+k
 								var tr = '<tr>'
 								+'<td>'+v.id+'</td>'
 								+'<td>'+v.hostGroupName+'</td>'
@@ -182,7 +183,8 @@
 										+'<table>'
 											+'<thead>'
 											+'</thead>'
-											+'<tbody id="htbody">'
+											+'<tbody id="'+$id+'">'
+												
 											+'</tbody>'
 										+'</table>'
 									+'</div>'
@@ -195,17 +197,17 @@
 							+'</tr>';
 								$("#hostGroupTbody").append(tr);	
 								
-								$("#htbody").empty();
-								$.each(v.hostList,function(k,host){
+								$("#"+$id).empty();
+								$.each(v.hostList,function(t,host){
 									var trr = '<tr>'
 										+'<td>'+host.id+'</td>'
 										+'<td>'+host.hostname+'</td>'
 										+'<td>'+host.ip+'</td>'
 									+'</tr>'
-									$("#htbody").append(trr);
+									$("#"+$id).append(trr);
 								});
 								
-							})
+							});
 					 	 }
 					}) 
 			 }

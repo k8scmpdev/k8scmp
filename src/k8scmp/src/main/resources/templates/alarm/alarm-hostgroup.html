@@ -34,13 +34,13 @@
 								<td width="30%">
 									<div style="width: 200px">
 										<table>
-											<thead>
+											<!-- <thead>
 												<tr>
 													<th data-field="id">id</th>
 													<th data-field="hostname">主机名</th>
 													<th data-field="ip">IP</th>
 												</tr> 
-											</thead>
+											</thead> -->
 											<tbody>
 												<tr th:each="host,hostStat:${hostGroup.hostList}">
 													<td th:text="${host.id}"></td>
