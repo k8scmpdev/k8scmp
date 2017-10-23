@@ -22,6 +22,48 @@ var volumeDraftsMap = {};
 var containerDrafts = [];
 var currentContainerMap = {};
 $(document).ready(function(){
+	
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: "/app/service/getCurrentVersion?serviceId="+$('#serviceID').val(),
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				var currenttVersion = data.result;
+				if(currenttVersion!=null){
+					versionDetail = getContainerVolumes(currenttVersion);
+					loadsVersionDetail(versionDetail);
+					//console.log(oldContainers);
+				}
+			}else{
+				alert("error!");
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+	
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: "/app/version/getVersionNames?serviceId="+$('#serviceID').val(),
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				var versionList = data.result;
+				var currentVersion = $('#currentVersion').val();
+				createVersionSelect(currentVersion,versionList);
+			}else{
+				alert("error!");
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+	
 	var oTable=$('.storage-table').dataTable({
 		"scrollY": "160px",
 	    "scrollCollapse": "true",
@@ -49,13 +91,10 @@ $(document).ready(function(){
 	
 	
 	
-	
-	var paramData={};
-	paramData["serviceId"] = "7623bcc8b3734e71a91604db5a66f96b";
 	$.ajax({
 		type: "GET",
 		dataType: "json",
-		url: "/app/version/getMaxVersion?serviceId=7623bcc8b3734e71a91604db5a66f96b",
+		url: "/app/version/getMaxVersion?serviceId="+$('#serviceID').val(),
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
@@ -339,15 +378,13 @@ $("#btnnew3pre").bind("click", function(event) {
 
 //save single image configuration 
 $("#versionUpdate").bind("click", function(event) {
-	var id="7623bcc8b3734e71a91604db5a66f96b";
 	console.log(currentContainerMap);
 	var version = getVersion(currentContainerMap);
-	version.serviceId = id;
+	version.serviceId = $('#serviceID').val();
 	var paramData={};
 	paramData = version;
-	console.log(paramData);
 	console.log(JSON.stringify(paramData));
-	var AjaxURL= "/app/version/createVersion?serviceId="+id;
+	var AjaxURL= "/app/version/createVersion?serviceId="+$('#serviceID').val();
 	$.ajax({
 		type: "POST",
 		dataType: "json",
@@ -390,3 +427,163 @@ function showStorage(){
 	});
 }
 
+//根据version信息生成页面div
+function loadsVersionDetail(versionDetail){
+	var htmlContent = "";
+	$("#versionDetail").html("");
+	
+//	htmlContent = $("#versionDetail").html();
+//	if(containers!=null){
+		for(var i=0;i<versionDetail.length;i++){
+			var container = versionDetail[i];
+			var image = container["image"]==null?"-":container["image"];
+			var registry = container["registry"]==null?"-":container["registry"];
+			var tag = container["tag"]==null?"-":container["tag"];
+			var volumeMountDrafts = container["volumeMountDrafts"];
+//			console.log(volumeMountDrafts)
+			var id = registry+image;
+			//add new row to the images list table
+			var childDiv1 = "<div class='filletLi' style='border:1px solid #000;width: 97%;margin-top:20px'>"+
+					"<ul>"+
+						"<li style='list-style-type: none; padding-bottom: 3px;'>镜像名称:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+image+"</li>"+
+						"<li style='list-style-type: none; padding-bottom: 3px;'>镜像仓库:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+registry+"</li>"+
+						"<li style='list-style-type: none; padding-bottom: 3px;'>镜像版本:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+tag+"</li>"+
+//						"<li style='list-style-type: none; padding-bottom: 3px;'>是否已废弃:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+tag+"</li>"+
+//						"<li style='list-style-type: none; padding-bottom: 3px;'>访问地址:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+registry+"</li>"+
+						"<li style='list-style-type: none; padding-bottom: 3px;'>挂载存储:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+			
+			var tableStr = "";
+			if(volumeMountDrafts!=null){
+				tableStr = "<table class='table table-bordered data-table display' style='border:1px;width:95%'><tr><th>挂载类型</th><th>名称</th><th>是否只读</th><th>主机目录</th><th>挂载目录</th></tr>";
+				for(var j=0;j<volumeMountDrafts.length;j++){	
+					var vm = volumeMountDrafts[j];
+					var volumeType = vm["volumeType"]==null?"-":vm["volumeType"];
+					var name = vm["name"]==null?"-":vm["name"];
+					var readOnly = vm["readOnly"]==null?"-":vm["readOnly"];
+					var hostPath = vm["hostPath"]==null?"-":vm["hostPath"];
+					var mountPath = vm["mountPath"]==null?"-":vm["mountPath"];
+					tableStr += "<tr><td>"+volumeType+"</td><td>"+name+"</td><td>"+readOnly+"</td><td>"+hostPath+"</td><td>"+mountPath+"</td></tr>";
+				}
+				tableStr+="</table>";
+			}
+			var childDiv2 ="</li>"+
+						"</ul>"+
+				"</div>";
+			htmlContent = htmlContent.concat(childDiv1).concat(tableStr).concat(childDiv2);
+//			currentContainerMap[id]= container;
+		}
+//	}
+	$("#versionDetail").html(htmlContent);
+}
+
+function changeVersion(){
+	var version = $('#depVersion option:selected').val();
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: "/app/version/getVersion?serviceId="+$('#serviceID').val()+"&version="+version,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				var currenttVersion = data.result;
+				console.log(currenttVersion)
+				if(currenttVersion!=null){
+					versionDetail = getContainerVolumes(currenttVersion);
+					loadsVersionDetail(versionDetail);
+					//console.log(oldContainers);
+					if(currenttVersion.deprecate){
+						$('#fqbutton').attr('display','none');
+						$('#qybutton').attr('display','');
+					}else{
+						$('#fqbutton').attr('display','');
+						$('#qybutton').attr('display','none');
+					}
+				}
+			}else{
+				alert("error!");
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+}
+
+function createVersionSelect(currentVersion,versionList){
+//	console.log(versionList)
+	for(var i=0;i<versionList.length;i++){   
+		var version = versionList[i];
+		var versionid = version.version;
+		var versionname = version.versionName;
+		if(versionid==currentVersion){
+			$('#depVersion').append("<option value='"+versionid+"' selected='selected'>"+versionname+"</option>");
+			$('#depVersion').prev().children().find('span').html(versionname)
+		}else{
+			$('#depVersion').append("<option value='"+versionid+"'>"+versionname+"</option>");
+		}
+    }
+
+}
+
+function deprecate(){
+	var version = $('#depVersion option:selected').val();
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: "/app/service/deprecateVersion?serviceId="+$('#serviceID').val()+"&version="+version,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				alert("废除成功!");
+				changeVersion();
+			}else{
+				alert("error!");
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+}
+
+function enableVersion(){
+	var version = $('#depVersion option:selected').val();
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: "/app/service/enableVersion?serviceId="+$('#serviceID').val()+"&version="+version,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				alert("启用成功!");
+				changeVersion();
+			}else{
+				alert("error!");
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+}
+
+function deleteVersion(){
+	var version = $('#depVersion option:selected').val();
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: "/app/service/deprecateVersion?serviceId="+$('#serviceID').val()+"&version="+version,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				alert("删除成功!");
+				changeVersion();
+			}else{
+				alert("error!");
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+}
