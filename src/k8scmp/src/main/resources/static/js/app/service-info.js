@@ -238,59 +238,7 @@ function showImageConfiguration(id){
 		volumeMountDrafts = container["volumeMountDrafts"];
 		//曾经打开过该页面设过值
 		if(volumeMountDrafts != null){
-			for(var k=0;k<volumeMountDrafts.length;k++){
-				var volume = volumeMountDrafts[k];
-				//var volumeType= tmpDraft["volumeType"];
-				var childdiv=$('<div></div>');  
-				$("#storages").append(childdiv);
-				childdiv.load("/js/statichtml/app/storageTemplate.html",{"volumeName":"h1","mountPath":"/123"},
-						function(responseTxt,statusTxt,xhr){
-					var tmpDraft = data;
-					console.log(tmpDraft);
-					//set value
-					if(tmpDraft["volumeType"] == "EMPTYDIR"){
-						$(this).find("select[name='dirs']").find("option[value='EMPTYDIR']").attr("selected","selected");
-						$(this).find("select[name='writeOrRead']").find("option[value='"+tmpDraft["readOnly"]+"']").attr("selected","selected");
-						$(this).find("input[name='volumeName']").val(tmpDraft["name"]);
-alert(k+"-1"+$(this).find("input[name='volumeName']").val());
-						$(this).find("input[name='insPath']").val(tmpDraft["mountPath"]);
-						
-						//hide hostpath and show emptydirs info
-						$(this).find("input[name='mountPath']").css("display","none");
-						$(this).find("input[name='hostPath']").css("display","none");
-						$(this).find("input[name='insPath']").css("display","");
-					}else if(tmpDraft["volumeType"] == "HOSTPATH"){
-						$(this).find("select[name='dirs']").find("option[value='HOSTPATH']").attr("selected","selected");
-						$(this).find("select[name='writeOrRead']").find("option[value='"+tmpDraft["readOnly"]+"']").attr("selected","selected");
-						$(this).find("input[name='volumeName']").val(tmpDraft["name"]);
-						alert(k+"-2"+$(this).find("input[name='volumeName']").val());
-						$(this).find("input[name='mountPath']").val(tmpDraft["mountPath"]);
-						$(this).find("input[name='hostPath']").val(tmpDraft["hostPath"]);
-						
-						//hide emptydirs and show hostpath info
-						$(this).find("input[name='mountPath']").css("display","");
-						$(this).find("input[name='hostPath']").css("display","");
-						$(this).find("input[name='insPath']").css("display","none");
-					}
-					
-					//bind change event
-					$($(this).find("select[name='dirs']")).bind("change",function(){
-						var currentSelect = $(this).val();
-						//host
-						if(currentSelect == "HOSTPATH"){
-							$(this).parent().children("input[name='insPath']").hide();
-							$(this).parent().children("input[name='mountPath']").show();
-							$(this).parent().children("input[name='hostPath']").show();
-						//instance
-						}else if(currentSelect == "EMPTYDIR"){
-							$(this).parent().children("input[name='insPath']").show();
-							$(this).parent().children("input[name='mountPath']").hide();
-							$(this).parent().children("input[name='hostPath']").hide();
-						}
-					});
-					
-				});
-			}
+			loadStorages(volumeMountDrafts,volumeMountDrafts.length)
 		}
 		/*************show commands***********/
 		$("#startCommands").val(container["commands"]==null?"":container["commands"].join(","));
@@ -305,6 +253,59 @@ alert(k+"-1"+$(this).find("input[name='volumeName']").val());
 		$("#mems").val(container["mem"]==null?0:container["mem"]);
 	}
 	
+}
+
+function loadStorages(volumeMountDrafts,seq){
+	if(seq>0){
+		var childdiv=$('<div></div>'); 
+		$("#storages").append(childdiv);
+		childdiv.load("/js/statichtml/app/storageTemplate.html  #storageTemplate",
+				function(responseTxt,statusTxt,xhr){
+			tmpDraft = volumeMountDrafts[seq-1];
+			//set value
+			if(tmpDraft["volumeType"] == "EMPTYDIR"){
+				$(this).find("select[name='dirs']").find("option[value='EMPTYDIR']").attr("selected","selected");
+				$(this).find("select[name='writeOrRead']").find("option[value='"+tmpDraft["readOnly"]+"']").attr("selected","selected");
+				$(this).find("input[name='volumeName']").val(tmpDraft["name"]);
+				$(this).find("input[name='insPath']").val(tmpDraft["mountPath"]);
+				
+				//hide hostpath and show emptydirs info
+				$(this).find("input[name='mountPath']").css("display","none");
+				$(this).find("input[name='hostPath']").css("display","none");
+				$(this).find("input[name='insPath']").css("display","");
+			}else if(tmpDraft["volumeType"] == "HOSTPATH"){
+				$(this).find("select[name='dirs']").find("option[value='HOSTPATH']").attr("selected","selected");
+				$(this).find("select[name='writeOrRead']").find("option[value='"+tmpDraft["readOnly"]+"']").attr("selected","selected");
+				$(this).find("input[name='volumeName']").val(tmpDraft["name"]);
+				$(this).find("input[name='mountPath']").val(tmpDraft["mountPath"]);
+				$(this).find("input[name='hostPath']").val(tmpDraft["hostPath"]);
+				
+				//hide emptydirs and show hostpath info
+				$(this).find("input[name='mountPath']").css("display","");
+				$(this).find("input[name='hostPath']").css("display","");
+				$(this).find("input[name='insPath']").css("display","none");
+			}
+			
+			//bind change event
+			$($(this).find("select[name='dirs']")).bind("change",function(){
+				var currentSelect = $(this).val();
+				//host
+				if(currentSelect == "HOSTPATH"){
+					$(this).parent().children("input[name='insPath']").hide();
+					$(this).parent().children("input[name='mountPath']").show();
+					$(this).parent().children("input[name='hostPath']").show();
+				//instance
+				}else if(currentSelect == "EMPTYDIR"){
+					$(this).parent().children("input[name='insPath']").show();
+					$(this).parent().children("input[name='mountPath']").hide();
+					$(this).parent().children("input[name='hostPath']").hide();
+				}
+			});
+			seq--;
+			loadStorages(volumeMountDrafts,seq);
+			
+		});
+	}
 }
 
 function getEnvsToString(envs){
