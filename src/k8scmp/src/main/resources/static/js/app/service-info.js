@@ -238,7 +238,7 @@ function showImageConfiguration(id){
 		volumeMountDrafts = container["volumeMountDrafts"];
 		//曾经打开过该页面设过值
 		if(volumeMountDrafts != null){
-			loadStorages(volumeMountDrafts,volumeMountDrafts.length)
+			loadStorages(volumeMountDrafts,volumeMountDrafts.length);
 		}
 		/*************show commands***********/
 		$("#startCommands").val(container["commands"]==null?"":container["commands"].join(","));
