@@ -24,7 +24,7 @@
 								<h5>创建应用</h5>
 							</div>
 							<div class="widget-content">
-								<form method="POST" class="form-horizontal" id="createAppFrom">
+								<form method="POST" class="form-horizontal" id="createAppFrom" onsubmit="createApp();return false;">
 									<input id="edit" type="hidden" th:value="${#httpServletRequest.getParameter('edit')}"/>
 									<div class="control-group">
 	                                        <label class="control-label">应用名称</label>

@@ -11,7 +11,7 @@
 			</div>
 			<div id="breadcrumb">
 				<a href="/app" class="tip-bottom" title="应用管理">应用管理</a>
-				<a href="/app/service/service-mgmt" class="tip-bottom" title="应用管理">服务管理</a>
+				<a href="javascript:void(0);" onclick="goToMgmt();return false;" class="tip-bottom" title="应用管理">服务管理</a>
 				<a href="#" class="current" title="新建应用">添加服务</a>
 			</div>
 			<div class="container-fluid">
@@ -25,12 +25,14 @@
 								<h5>添加服务</h5>
 							</div>
 							
-							<form method="post" class="form-horizontal" novalidate="novalidate" id="createServiceForm">
+							<form method="post" class="form-horizontal" novalidate="novalidate" id="createServiceForm" onsubmit="createService();return false;">
 								<div class="widget-content" id="service-new1" style="display: block">
 									<div class="control-group">
                                         <label class="control-label required">服务名称</label>
                                         <div class="controls">
-                                            <input id="serviceName" class="normaltext" type="text" placeholder="输入服务名称（字母数字）..." style="font-style: italic;font-size: 13px"/>
+                                            <input id="serviceName" class="normaltext" type="text" 
+                                            placeholder="输入服务名称（字母数字）..." 
+                                            style="font-style: italic;font-size: 13px"/>
                                         </div>
 	                                </div>
 	                                <div class="control-group">
@@ -101,15 +103,6 @@
 												</tr>
 											</thead>
 											<tbody id="tBody">
-											    <tr th:each="images,itState:(${versions==null?versions:versions[0].containerDrafts})">
-											        <td class="i10" th:text="${images.image}"></td>
-											        <td class="i20" th:text="${images.registry}"></td>
-											        <td class="i30" th:text="${images.tag}"></td>
-											        <td class="i40">
-														<a title="配置" class="tip-bottom iconOperation" href="#service-new3" data-toggle="modal" onclick="showImageConfiguration(${images.image}+${images.registry}+${images.tag},${images.volumeMountDrafts},$(versions:versions[0].volumeDrafts));"><i class="icon-edit"></i><span>配置</span></a>
-								        				<a title="删除" class="tip-bottom iconOperation" href="'deleteImage(123)'"><i class="icon-trash"></i><span>删除</span></a>
-													</td>
-											    </tr>
 											</tbody>
 										</table>							
 										</div>

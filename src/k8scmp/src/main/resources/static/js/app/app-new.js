@@ -1,5 +1,4 @@
-//ajax提交form表单
-$('#createAppFrom').submit(function(){
+function createApp(){
 	var AjaxURL= "";
 	var paramData = getSerializeJson();
 	var edit = $("#edit").val();
@@ -16,13 +15,14 @@ $('#createAppFrom').submit(function(){
 		contentType:"application/json",
 		success: function (data) {
 			refreshApp();
+			return false;
 		},
 		error: function(data) {
 			alert("error!");
+			return false;
 		}
 	});
-});
-
+}
 function refreshApp(){
 	window.location.href="/app";
 }
