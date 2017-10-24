@@ -111,20 +111,6 @@ $(document).ready(function(){
 		}
 	});
 	
-	$("#dirs").change(function(){
-		var currentSelect = $(this).val();
-		if(currentSelect == "HOSTPATH"){
-			$(this).parent().children("input[name='insPath']").hide();
-			$(this).parent().children("input[name='conPath']").show();
-			$(this).parent().children("input[name='hostPath']").show();
-		//instance
-		}else if(currentSelect == "EMPTYDIR"){
-			$(this).parent().children("input[name='insPath']").show();
-			$(this).parent().children("input[name='conPath']").hide();
-			$(this).parent().children("input[name='hostPath']").hide();
-		}
-	});
-	
 	//init service info common data
 	/**get init**/
 	var replies = initReplicasByServiceId(serviceId);//replies
