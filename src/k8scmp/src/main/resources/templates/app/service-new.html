@@ -102,7 +102,7 @@
 													<th class="i40">配置</th>
 												</tr>
 											</thead>
-											<tbody id="tBody">
+											<tbody id="tBody1">
 											</tbody>
 										</table>							
 										</div>
@@ -120,7 +120,10 @@
 										<h3>配置镜像</h3>
 									</div>
 									<div class="modal-body">
-										<input id="hiddenUnique" type="hidden"/>
+										<input id="uniqueImage" type="hidden" />
+										<input id="registryConfig" type="hidden" />
+										<input id="imageConfig" type="hidden" />
+										<input id="tagConfig" type="hidden" />
 										<div>
 		                                    <label class="modalStyle" style="padding-right: 10px;">挂载存储</label>
 	                                        <a title="添加挂载存储" class="tip-bottom" href="javascript:void(0);" onclick="showStorage();"><i class="icon-plus"></i></a>
@@ -145,7 +148,7 @@
 											<span class="modalStyle">内存(MB)<input id="mems" type="text" class="combine tip-top"/></span>
 		                                </div>
 										<div style="float: right;">
-											<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+											<button id="btncancel3pre" class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
 											<button id="btnnew3pre" class="btn-primary btn-mini" type="button">确定</button>
 										</div>
 									</div>
@@ -291,5 +294,6 @@
 		</div> 
 	</body>
 	<div th:include="/public/commonframe::jsScript(activeMenuNumber=3)" ></div>
+	<script th:src="@{/js/app/serviceUtil.js}"></script>
 	<script th:src="@{/js/app/service-new.js}"></script>
 </html>
