@@ -4,7 +4,9 @@ import org.k8scmp.appmgmt.domain.AppInfo;
 import org.k8scmp.appmgmt.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -27,9 +29,9 @@ public class AppController {
     }
 
     @RequestMapping(value = "/delete/{id}")
-    public String deleteApp(@PathVariable String id) throws Exception {
+    public ModelAndView deleteApp(@PathVariable String id) throws Exception {
         appService.deleteApp(id);
-        return "app/app-mgmt";
+        return listApps();
     }
 
     @RequestMapping(value = "/modify")
@@ -42,10 +44,9 @@ public class AppController {
     public ModelAndView listApps() throws Exception {
     	return searchApps(null);
     }
-
+    
     @RequestMapping(value = "/search")
     public ModelAndView searchApps(@RequestBody AppInfo appInfo) throws Exception {
-        return new ModelAndView("app/app-mgmt","appList",appService.listApps(appInfo));
+    	return new ModelAndView("app/app-mgmt","appList",appService.listApps(appInfo));
     }
-    
 }

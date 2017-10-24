@@ -44,12 +44,20 @@ $("*.cancleService").bind("click", function(event) {
 	$("#service-new1").css("display","none"); 
 	$("#service-new2").css("display","none");
 	$("#service-new4").css("display","none"); 
-	window.location.href="/app/service/service-mgmt";
+	var appId = $("#appId").val();
+	refreshService(appId);
 });
 
+//refresh service mgmt
 function refreshService(appId){
 	var AjaxURL = "/app/service/"+appId+"?appId="+appId;
 	window.location.href=AjaxURL;
+}
+
+//go to mgmt when click service mgmt
+function goToMgmt(){
+	var appId = $("#appId").val();
+	refreshService(appId);
 }
 
 $("#btnnew2next").bind("click",function(event){
@@ -68,6 +76,7 @@ $("#btnnew3pre").bind("click", function(event) {
 	var singleVolumeDraftList = [];
 	var currentContainerDraft = [];
 	var singleVolumeMountDrafts=[];
+	var singleVolumeMountDraftsItem = {};
 	//save storages
 	$("#storages >div").each(function(){
 		currentContainerDraft = containerDraftsMap[uniqueImage];
@@ -82,9 +91,9 @@ $("#btnnew3pre").bind("click", function(event) {
 		//hostpath
 		if(selectDir == "HOSTPATH"){
 			//saved into containerdraft --> volumeMountDraft
-			singleVolumeMountDrafts["name"] = volumeName;
-			singleVolumeMountDrafts["readOnly"] = writeOrRead;
-			singleVolumeMountDrafts["mountPath"] = mountPath;
+			singleVolumeMountDraftsItem["name"] = volumeName;
+			singleVolumeMountDraftsItem["readOnly"] = writeOrRead;
+			singleVolumeMountDraftsItem["mountPath"] = mountPath;
 			
 			//saved into volumedraft
 			var singleVolumeDraftItem = {};
@@ -97,21 +106,21 @@ $("#btnnew3pre").bind("click", function(event) {
 		//emptydir
 		}else if(selectDir == "EMPTYDIR"){
 			//set name,volumetype into volumeDrafts
-			singleVolumeDraft = {};
-			singleVolumeDraft["name"] = volumeName;
-			singleVolumeDraft["volumeType"] = "EMPTYDIR";
-			volumeDraftsMap[hiddenUnique]=singleVolumeDraft;
+			singleVolumeDraftItem = {};
+			singleVolumeDraftItem["name"] = volumeName;
+			singleVolumeDraftItem["volumeType"] = "EMPTYDIR";
+			singleVolumeDraftItemMap[volumeName] = singleVolumeDraftItem;
+			singleVolumeDraftList.push(singleVolumeDraftItemMap);	
 			
 			//set name,readonly,mountpath into containerDrafts
-			singleVolumeMountDrafts["name"] = volumeName;
-			singleVolumeMountDrafts["readOnly"] = writeOrRead;
-			singleVolumeMountDrafts["mountPath"] = mountPath;
+			singleVolumeMountDraftsItem["name"] = volumeName;
+			singleVolumeMountDraftsItem["readOnly"] = writeOrRead;
+			singleVolumeMountDraftsItem["mountPath"] = mountPath;
 		}
-		
+		singleVolumeMountDrafts.push(singleVolumeMountDraftsItem);
 	});
 	
-	volumeDraftsMap[hiddenUnique]=singleVolumeDraftList;
-	
+	volumeDraftsMap[uniqueImage]=singleVolumeDraftList;
 	//save commands
 	currentContainerDraft["commands"] = commands;
 	
@@ -138,14 +147,14 @@ function showStorage(){
 		$($(this).find("select[name='dirs']")).bind("change",function(){
 			var currentSelect = $(this).val();
 			//host
-			if(currentSelect == "1"){
+			if(currentSelect == "HOSTPATH"){
 				$(this).parent().children("input[name='insPath']").hide();
-				$(this).parent().children("input[name='conPath']").show();
+				$(this).parent().children("input[name='mountPath']").show();
 				$(this).parent().children("input[name='hostPath']").show();
 			//instance
-			}else if(currentSelect == "2"){
+			}else if(currentSelect == "EMPTYDIR"){
 				$(this).parent().children("input[name='insPath']").show();
-				$(this).parent().children("input[name='conPath']").hide();
+				$(this).parent().children("input[name='mountPath']").hide();
 				$(this).parent().children("input[name='hostPath']").hide();
 			}
 		});
@@ -182,10 +191,11 @@ $(document).ready(function(){
 	    	$(".dataTables_length").offset({top:$(".dataTables_info").offset().top});
 	    }*/
 	});
-	
+	//set table width
 	$(".dataTables_scrollHeadInner").width("100%");
 	$(".nosearch-table").width("100%");
 	$(".image-table").width("100%");
+	
 	//set imageList width
 	$(".i10").css("width","30%");
 	$(".i10").css("min-width","30%");
@@ -202,10 +212,12 @@ $(document).ready(function(){
 	$(".i40").css("width","30%");
 	$(".i40").css("min-width","30%");
 	$(".i40").css("max-width","30%");
+	
+	//init service data
 });
 
 //create service
-$('#createServiceForm').submit(function(){
+/*$('#createServiceForm').submit(function(){
 	var AjaxURL= "/app/service/create";
 	var paramData = getServiceFormJson();
 	var appId = $("#appId").val();
@@ -222,7 +234,25 @@ $('#createServiceForm').submit(function(){
 			alert("error!");
 		}
 	});
-});
+});*/
+function createService(){
+	var AjaxURL= "/app/service/create";
+	var paramData = getServiceFormJson();
+	var appId = $("#appId").val();
+	$.ajax({
+		type: "POST",
+		dataType: "html",
+		url: AjaxURL,
+		data: JSON.stringify(paramData),
+		contentType:"application/json",
+		success: function (data) {
+			refreshService(appId);
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+}
 
 //get service form value
 function getServiceFormJson(){
@@ -360,33 +390,43 @@ function deleteImage(uniqueImage,obj){
  * @returns
  */
 function showImageConfiguration(imageId,localvolumeMountDrafts,localVolumeDrafts){
-	var uniqueImage = $("#hiddenUnique").val(imageId);//unique image
-	var singleVolumeDraftsMap = volumeDraftsMap[uniqueImage];//volumedraft of this image
-	$("#storages").html();//clear all sub divs
+	//set hidden value
+	$("#hiddenUnique").val(imageId);
+	//var uniqueImage = $("#hiddenUnique").val(imageId);//unique image
+	var singleVolumeDraftsList = volumeDraftsMap[imageId];//volumedraft of this image
+	alert("imageId "+imageId);
+	//clear all sub divs
+	$("#storages").html("");
+	$("#envvar").val("");
+	$("#cpus").val("");
+	$("#mems").val("");
+	$("#startCommands").val("");
 	
 	var singleContainerDraft = containerDraftsMap[imageId];
 	var singleVolumeMountDrafts = [];
+/*	var iteratorVolumeDrafts = ;*/
 	
 	/************************show storages*******************/
 	//haved setted part containerdraft
 	if(singleContainerDraft != null){
 		singleVolumeMountDrafts = singleContainerDraft["volumeMountDrafts"];
 		//曾经打开过该页面设过值
-		if(singleVolumeMountDrafts != null){
+		if(singleVolumeMountDrafts != null && singleVolumeMountDrafts.length>0){
 			//show stoages
 			//show emptydirs for singleVolumeMountDrafts saved all emptydirs info
-			var iteratorVolumeMountDrafts = singleVolumeMountDrafts;
-			var iteratorVolumeDrafts = singleVolumeDraftsMap[tmpDraft["name"]];
-			iteratorStorages(iteratorVolumeMountDrafts,iteratorVolumeDrafts);
+			//var iteratorVolumeMountDrafts = singleVolumeMountDrafts;
+			/*var iteratorVolumeDrafts = singleVolumeDraftsMap[tmpDraft["name"]];*/
+			//iteratorStorages(iteratorVolumeMountDrafts,iteratorVolumeDrafts);
 			for(var k=0;k<singleVolumeMountDrafts.length;k++){
 				var tmpDraft = singleVolumeMountDrafts[k];
+				var iteratorVolumeDrafts = singleVolumeDraftsList[tmpDraft["name"]];
 				var dirType= iteratorVolumeDrafts["volumeType"];
 				var childdiv=$('<div></div>');  
 				childdiv.attr("id","id" + new Date().getTime());
 				$("#storages").append(childdiv);
 				childdiv.load("/js/statichtml/app/storageTemplate.html #storageTemplate",
 						function(responseTxt,statusTxt,xhr){
-					
+					alert(dirType);
 					//set value
 					if(dirType == "EMPTYDIR"){
 						$(this).find("select[name='dirs']").find("option[value='EMPTYDIR']").attr("selected","selected");
@@ -430,47 +470,25 @@ function showImageConfiguration(imageId,localvolumeMountDrafts,localVolumeDrafts
 				});
 			}
 			
-			/*************show commands***********/
-			$("#startCommands").val(singleContainerDraft["commands"].join(","));
-			
-			/*************show envs***********/
-			$("#envvar").val(singleContainerDraft["envs"].join(","));
-			
-			/*************show cpu***********/
-			$("#cpus").val(singleContainerDraft["cpu"]);
-			
-			/*************show mem***********/
-			$("#mems").val(singleContainerDraft["mem"]);
-		
 		}else{
-			/*var childdiv=$('<div></div>');  
-			childdiv.attr("id","id" + new Date().getTime());
-			$("#storages").append(childdiv);
-			childdiv.load("/js/statichtml/app/storageTemplate.html #storageTemplate",
-					function(responseTxt,statusTxt,xhr){
-				
-				//bind change event
-				$($(this).find("select[name='dirs']")).bind("change",function(){
-					var currentSelect = $(this).val();
-					//host
-					if(currentSelect == "1"){
-						$(this).parent().children("input[name='insPath']").hide();
-						$(this).parent().children("input[name='conPath']").show();
-						$(this).parent().children("input[name='hostPath']").show();
-					//instance
-					}else if(currentSelect == "2"){
-						$(this).parent().children("input[name='insPath']").show();
-						$(this).parent().children("input[name='conPath']").hide();
-						$(this).parent().children("input[name='hostPath']").hide();
-					}
-				});
-				
-			});*/
+			//never set storage info,empty this
 		}
+		
+		/*************show commands***********/
+		$("#startCommands").val(singleContainerDraft["commands"]==null?"":singleContainerDraft["commands"].join(","));
+		
+		/*************show envs***********/
+		$("#envvar").val(singleContainerDraft["envs"]==null?"":singleContainerDraft["envs"].join(","));
+		
+		/*************show cpu***********/
+		$("#cpus").val(singleContainerDraft["cpu"]==null?"":singleContainerDraft["cpu"]);
+		
+		/*************show mem***********/
+		$("#mems").val(singleContainerDraft["mem"]==null?"":singleContainerDraft["mem"]);
 	}
 	
 	//saved into db before
-	if(localVolumeDrafts != null){
+/*	if(localVolumeDrafts != null){
 		for(var k=0;k<localvolumeMountDrafts.length;k++){
 			var tmpDraft = localvolumeMountDrafts[k];
 			var dirType= getDirType(tmpDraft["name"],localVolumeDrafts);
@@ -523,19 +541,19 @@ function showImageConfiguration(imageId,localvolumeMountDrafts,localVolumeDrafts
 			});
 		}
 		
-		/*************show commands***********/
+		*//*************show commands***********//*
 		$("#startCommands").val(singleContainerDraft["commands"].join(","));
 		
-		/*************show envs***********/
+		*//*************show envs***********//*
 		$("#envvar").val(singleContainerDraft["envs"].join(","));
 		
-		/*************show cpu***********/
+		*//*************show cpu***********//*
 		$("#cpus").val(singleContainerDraft["cpu"]);
 		
-		/*************show mem***********/
+		*//*************show mem***********//*
 		$("#mems").val(singleContainerDraft["mem"]);
 		
-	}
+	}*/
 /*	if(singleContainerDraft != null || volumeList!=null && volumeList.size()>0){
 		//get configuration window value
 		var singleVolumeMountDraftsList =  singleContainerDraft["volumeMountDrafts"];
@@ -622,4 +640,18 @@ function getDirType(name,localVolumeDrafts){
 		}
 	}
 	return returnDir;
+}
+
+function iteratorVolumeDrafts(voolumeDrafts,name){
+	var returnList = [];
+	if(voolumeDrafts !=null && voolumeDrafts.size()>0){
+		for(var i=0;i<voolumeDrafts.size();i++){
+			var tmp = voolumeDrafts[i];
+			if(name == tmp["name"]){
+				returnList = returnList[i]
+			}
+		}
+		
+	}
+	return returnList;
 }

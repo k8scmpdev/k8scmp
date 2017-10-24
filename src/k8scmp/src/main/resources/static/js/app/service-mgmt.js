@@ -36,10 +36,96 @@ function startService(){
 
 //upgrade rollback
 function startUpdateRollback(){
+	//get current version number
+	var currentVersionNum = "";
+	var selectedRow = getSelectedRow();
+	var serviceId = selectedRow[0]["id"];
+	var AjaxURL = "/app/service/getCurrentVersionNum?serviceId="+serviceId;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: AjaxURL,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				if(data.result != null && data.result.length>0){
+					currentVersionNum = data.result.join(",");
+				}
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
 	
+	//get version names
+	var versionList = null;
+	AjaxURL = "/app/version/getVersionNames?serviceId="+serviceId;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: AjaxURL,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				if(data.result != null && data.result.length>0){
+					versionList = eval(data.result);
+					var selectSecond = $("#selectVersionNumber");
+					selectSecond.empty();
+					for(var i=0;i<versionList.length;i++){
+						var opt= new Option();
+						opt.value=versionList[i].version;
+						opt.text = versionList[i].versionName;
+						selectSecond.options.add(opt);
+					}
+				}
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+	
+	//set init value
+	$("#currentVersionNumber").html(currentVersionNum);
 }
 
-//sacle up or down
+//show service modify page
+function showServiceModify(serviceId,description,serviceCode){
+	$("#serviceName").html(serviceCode==null?"":serviceCode);
+	$("#serviceDescription").val(description==null?"":description);
+	$("#hiddenSingleServiceId").val(serviceId);
+}
+
+//modify service submit 
+$("#serviceModifySubmit").bind("click",function(event){
+	var serviceId = $("#hiddenSingleServiceId").val();
+	var description = $("#serviceDescription").val();
+	var AjaxURL = "/app/service/modify";
+	var paramData = {};
+	paramData["id"] = serviceId;
+	paramData["description"] = description;
+	$.ajax({
+		type: "POST",
+		dataType: "html",
+		url: AjaxURL,
+		data:JSON.stringify(paramData),
+		contentType:"application/json",
+		success: function (data) {
+			refreshServices();
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+});
+
+//cancle service modify
+$("#cancleModifyService").bind("click",function(event){
+	$("#modifyServiceModal").modal("hide");
+});
+
+//show sacle up or down
 function scaleUpDown(){
 	var selectedRow = getSelectedRow();
 	var serviceId = selectedRow[0]["id"];
@@ -51,7 +137,6 @@ function scaleUpDown(){
 		url: AjaxURL,
 		contentType:"application/json",
 		success: function (data) {
-			alert("success");
 			if(data.resultCode == 200){
 				instanceNumber = data.result;
 			}
@@ -128,7 +213,6 @@ function deleteSingleService(serviceId,obj){
 		url: AjaxURL,
 		contentType:"application/json",
 		success: function (data) {
-			//refreshServices();
 			var tr=obj.parentNode.parentNode;
 			var tbody=tr.parentNode;
 			tbody.removeChild(tr);
@@ -139,21 +223,9 @@ function deleteSingleService(serviceId,obj){
 	});
 }
 
-
+//refresh service mgmt
 function refreshServices(){
 	var appId = $("#appId").val();
-	alert(appId);
 	var AjaxURL= "/app/service/"+appId;
-	$.ajax({
-		type: "GET",
-		dataType: "html",
-		url: AjaxURL,
-		contentType:"application/json",
-		success: function (data) {
-			
-		},
-		error: function(data) {
-			alert("error!");
-		}
-	});
+	window.location.href = AjaxURL;
 } 
