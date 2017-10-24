@@ -12,15 +12,15 @@ import org.k8scmp.model.DeployEventStatus;
 
 @Mapper
 public interface ServiceEventMapper {
-	String BASIC_COLUMNS = " id, serviceId, state, operation, content, startTime, expireTime, operatorId";
+	String BASIC_COLUMNS = " id, serviceId, state, operation, content, startTime, expireTime, operatorId,lastModifiedTime";
 	@Insert("INSERT INTO serviceEvent ("+ BASIC_COLUMNS +") values" +
-            "(#{item.id}, #{item.serviceId}, #{item.state}, #{item.operation}, #{data}, #{item.startTime}, #{item.expireTime}, #{item.operatorId})")
+            "(#{item.id}, #{item.serviceId}, #{item.state}, #{item.operation}, #{data}, #{item.startTime}, #{item.expireTime}, #{item.operatorId}, #{item.lastModifiedTime})")
     void createEvent(@Param("item") DeployEvent item, @Param("data") String data);
 
     @Select("SELECT "+ BASIC_COLUMNS +" FROM serviceEvent WHERE id=#{id}")
     DeployEvent getEvent(@Param("id") String id);
 
-    @Select("SELECT "+ BASIC_COLUMNS +" FROM serviceEvent WHERE serviceId=#{serviceId} order by startTime desc limit 1")
+    @Select("SELECT "+ BASIC_COLUMNS +" FROM serviceEvent WHERE serviceId=#{serviceId} order by lastModifiedTime desc limit 1")
     DeployEvent getNewestEvent(@Param("serviceId") String serviceId);
 
     @Select("SELECT "+ BASIC_COLUMNS +" FROM serviceEvent WHERE serviceId=#{serviceId}")
