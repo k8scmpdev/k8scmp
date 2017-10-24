@@ -13,6 +13,7 @@ import org.k8scmp.login.domain.User;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
 import org.k8scmp.monitormgmt.dao.alarm.PortalDao;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
+import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
@@ -159,6 +160,8 @@ public class TemplateServiceImpl implements TemplateService {
                 }
             }
             templateInfo.setDeploymentInfo(deploymentInfo);*/
+        	DeploymentInfo deploymentInfo = alarmDao.getDeploymentByTemplateId(id);
+        	templateInfo.setDeploymentInfo(deploymentInfo);
         }
         templateInfo.setStrategyList(alarmDao.listStrategyInfoByTemplateId(id));
         List<User> userInfos = new LinkedList<>();
@@ -213,7 +216,8 @@ public class TemplateServiceImpl implements TemplateService {
                 alarmDao.addTemplateHostGroupBind(templateId, hostGroupInfoBasic.getId(), current);
             }
         } else if (templateInfo.getTemplateType().equals(TemplateType.deploy.name())) {
-            alarmDao.setTemplateDeployIdByTemplateId(templateId, templateInfo.getDeploymentInfo().getId());
+//            alarmDao.setTemplateDeployIdByTemplateId(templateId, templateInfo.getDeploymentInfo().getId());
+        	alarmDao.setTemplateDeployIdByTemplateId(templateId, templateInfo.getDeploymentInfo().getDeploymentName());
         }
 
         // for strategy

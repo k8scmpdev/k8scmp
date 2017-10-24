@@ -5,6 +5,7 @@ import java.util.List;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
+import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
@@ -21,7 +22,7 @@ public interface AlarmDao {
 
 	void addTemplateHostGroupBind(int templateId, int id, String current);
 
-	void setTemplateDeployIdByTemplateId(int templateId, int id);
+	void setTemplateDeployIdByTemplateId(int templateId, String deploymentName);
 
 
 	void addStrategyInfo(StrategyInfo strategyInfo);
@@ -95,6 +96,8 @@ public interface AlarmDao {
 	List<HostGroupInfoBasic> listHostGroupInfoBasicByName(String hostGroupName);
 
 	List<TemplateInfoBasic> getTemplateInfoByName(String templateName);
+
+	DeploymentInfo getDeploymentByTemplateId(int id);
 
 
 

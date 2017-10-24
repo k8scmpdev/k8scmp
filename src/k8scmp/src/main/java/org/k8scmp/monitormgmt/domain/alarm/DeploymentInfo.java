@@ -6,7 +6,7 @@ package org.k8scmp.monitormgmt.domain.alarm;
  */
 public class DeploymentInfo {
 
-    private int id;
+//    private int id;
 //    private String clusterName;
     private String deploymentName;
 //    private HostEnv hostEnv;
@@ -22,19 +22,19 @@ public class DeploymentInfo {
 //    }
 
     public DeploymentInfo(int id, String clusterName, String deploymentName, HostEnv hostEnv) {
-        this.id = id;
+//        this.id = id;
 //        this.clusterName = clusterName;
         this.deploymentName = deploymentName;
 //        this.hostEnv = hostEnv;
     }
 
-    public int getId() {
-        return id;
-    }
+//    public int getId() {
+//        return id;
+//    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+//    public void setId(int id) {
+//        this.id = id;
+//    }
 
 //    public String getClusterName() {
 //        return clusterName;

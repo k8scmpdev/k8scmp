@@ -16,6 +16,7 @@ import org.k8scmp.mapper.login.UserMapper;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
 import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
+import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
@@ -66,8 +67,8 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public void setTemplateDeployIdByTemplateId(int templateId, int deployId) {
-		templateInfoBasicMapper.setTemplateDeployIdByTemplateId(templateId, deployId);
+	public void setTemplateDeployIdByTemplateId(int templateId, String deploymentName) {
+		templateInfoBasicMapper.setTemplateDeployIdByTemplateId(templateId, deploymentName);
 	}
 
 	@Override
@@ -249,6 +250,11 @@ public class AlarmDaoImpl implements AlarmDao{
 	@Override
 	public List<TemplateInfoBasic> getTemplateInfoByName(String templateName) {
 		return templateInfoBasicMapper.getTemplateInfoByName(templateName);
+	}
+
+	@Override
+	public DeploymentInfo getDeploymentByTemplateId(int id) {
+		return templateInfoBasicMapper.getDeploymentByTemplateId(id);
 	}
 
 

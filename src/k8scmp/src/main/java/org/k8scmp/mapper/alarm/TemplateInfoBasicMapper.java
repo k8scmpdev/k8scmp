@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
 
 @Mapper
@@ -27,8 +28,11 @@ public interface TemplateInfoBasicMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     int addTemplateInfoBasic(TemplateInfoBasic templateInfoBasic);
 
-	@Update("UPDATE alarm_template_info SET deployId=#{deployId} WHERE id=#{id}")
-    int setTemplateDeployIdByTemplateId(@Param("id") int id, @Param("deployId") int deployId);
+//	@Update("UPDATE alarm_template_info SET deployId=#{deployId} WHERE id=#{id}")
+//    int setTemplateDeployIdByTemplateId(@Param("id") int id, @Param("deployId") int deployId);
+	
+	@Update("UPDATE alarm_template_info SET deploymentName=#{deploymentName} WHERE id=#{id}")
+    int setTemplateDeployIdByTemplateId(@Param("id") int id, @Param("deploymentName") String deploymentName);
 
 	@Update("UPDATE alarm_template_info SET callbackId=#{callbackId} WHERE id=#{id}")
     int setTemplateCallbackIdByTemplateId(@Param("id") int id, @Param("callbackId") int callbackId);
@@ -49,5 +53,8 @@ public interface TemplateInfoBasicMapper {
             "alarm_template_info.id = alarm_template_host_group_bind.templateId WHERE alarm_template_host_group_bind.hostGroupId " +
             "= #{hostGroupId} AND alarm_template_info.isRemoved = 0 order by alarm_template_host_group_bind.bindTime")
     List<TemplateInfoBasic> getTemplateInfoBasicByHostGroupId(@Param("hostGroupId") int hostGroupId);
+	
+	@Select("SELECT deploymentName FROM alarm_template_info WHERE isRemoved = 0 AND id=#{id}")
+	DeploymentInfo getDeploymentByTemplateId(int id);
 	
 }
