@@ -869,7 +869,7 @@ function infoStartService(){
 						opt.value=versionList[i].version;
 						opt.text = versionList[i].versionName;
 						selectSecond.options.add(opt);*/
-						$("#selectStartVersionNumbers").append("<option value='"+versionList[i].version+"' selected='selected'>"+versionList[i].versionName+"</option>");
+//						$("#selectStartVersionNumbers").append("<option value='"+versionList[i].version+"' selected='selected'>"+versionList[i].versionName+"</option>");
 					}
 				}
 			}
@@ -922,10 +922,10 @@ function infoRollback(){
 					var selectSecond = $("#selectVersionNumbers");
 					selectSecond.empty();
 					for(var i=0;i<versionList.length;i++){
-						var opt= new Option();
+						/*var opt= new Option();
 						opt.value=versionList[i].version;
 						opt.text = versionList[i].versionName;
-						selectSecond.options.add(opt);
+						selectSecond.options.add(opt);*/
 					}
 				}
 			}
