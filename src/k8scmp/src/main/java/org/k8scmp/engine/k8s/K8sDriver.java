@@ -116,7 +116,7 @@ public class K8sDriver implements RuntimeDriver {
             //loadBalancer
 //            if (serviceConfigInfo.getNetworkMode() != NetworkMode.HOST  && serviceConfigInfo.getUsedLoadBalancer() == 0) {
 //                List<LoadBalancer> lbs = loadBalancerBiz.getInnerAndExternalLoadBalancerByDeployId(serviceConfigInfo.getId());
-                checkLoadBalancer(client, serviceConfigInfo,appInfo);
+//               checkLoadBalancer(client, serviceConfigInfo,appInfo);
 //            }
             // create secret before the create of rc
             // judge the registry is belong to domeos or not

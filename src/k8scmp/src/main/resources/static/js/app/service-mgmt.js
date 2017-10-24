@@ -263,7 +263,12 @@ function scaleUpDown(){
 		success: function (data) {
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
+					console.log(data.result);
 					currentVersionNum = data.result.join(",");
+					$("#currentVersionNum").html(currentVersionNum==null?"":currentVersionNum);
+					
+					//set current instance number
+					$("#instanceNumber").html(instanceNumber);
 				}
 			}
 		},
@@ -273,10 +278,7 @@ function scaleUpDown(){
 	});
 	
 	//set current version number
-	$("#currentVersionNum").html(currentVersionNum==null?"":currentVersionNum);
 	
-	//set current instance number
-	$("#instanceNumber").html(instanceNumber);
 }
 
 //sacle up or down submit
@@ -300,7 +302,7 @@ $("#scaleSubmit").bind("click",function(event){
 		ajaxUrl = "/app/service/scaleDown?serviceId="+serviceId+"&version="+currentVersionNumer+"&replicas="+futureNumber;
 	}
 	$.ajax({
-		type: "GET",
+		type: "POST",
 		dataType: "json",
 		url: ajaxUrl,
 		contentType:"application/json",
@@ -340,7 +342,7 @@ $("#rollbackSubmit").bind("click",function(event){
 	}
 	*/
 	$.ajax({
-		type: "GET",
+		type: "POST",
 		dataType: "json",
 		url: ajaxUrl,
 		contentType:"application/json",

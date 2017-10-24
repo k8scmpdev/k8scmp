@@ -1051,7 +1051,7 @@ public class ServiceServiceImpl implements ServiceService {
 					e.printStackTrace();
 				}
 				String state = (String) map.get(serviceId);
-				if ((ServiceStatus.STOP.name().equals(state) || ServiceStatus.ERROR.name().equals(state)
+				if ((ServiceStatus.STOP.name().equals(state)
 						|| ServiceStatus.RUNNING.name().equals(state))) {
 					expire = true;
 				}
