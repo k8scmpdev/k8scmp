@@ -24,13 +24,100 @@ function deleteService(){
 	
 }
 
+//start service submit
+$("#startServiceSubmit").bind("click",function(event){
+	var selectedRow = getSelectedRow();
+	var serviceId = selectedRow[0]["id"];
+	var version = $("#selectStartVersionNumber").val();
+	var replicas = $("#wishStartInstanceNumber").val();
+	var AjaxURL = "/app/service/start?serviceId="+serviceId+"&version="+version+"&replicas="+replicas;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: AjaxURL,
+		contentType:"application/json",
+		success: function (data) {
+			//success
+			if(data.resultCode == 200){
+				
+			}else{
+				alert("启动服务异常！");
+			}
+		},
+		error: function(data) {
+			alert("启动服务异常！");
+		}
+	});
+});
+
+//hide start service
+$("#cancleStartService").bind("click",function(event){
+	$("#startServiceDisplay").modal("hide");
+});
+
+
 //stop service
 function stopService(){
-	
+	var selectedRow = getSelectedRow();
+	if(selectedRow == null || selectedRow.length !=1){
+		alert("请选择一条记录！");
+		return;
+	}
+	var serviceId = selectedRow[0]["id"];
+	var AjaxURL = "/app/service/stopService?serviceId="+serviceId;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: AjaxURL,
+		contentType:"application/json",
+		success: function (data) {
+			//success
+			if(data.resultCode == 200){
+				
+			}else{
+				alert("停止服务异常！");
+			}
+		},
+		error: function(data) {
+			alert("停止服务异常！");
+		}
+	});
 }
 
-//start service
+//start service check
 function startService(){
+	var selectedRow = getSelectedRow();
+	if(selectedRow == null || selectedRow.length !=1){
+		alert("请选择一条记录！");
+		return;
+	}
+	//clear start instance number
+	$("#wishStartInstanceNumber").val("");
+	
+	//init start version,get version names
+	var versionList = null;
+	AjaxURL = "/app/version/getVersionNames?serviceId="+serviceId;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: AjaxURL,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				if(data.result != null && data.result.length>0){
+					versionList = eval(data.result);
+					var selectSecond = $("#selectStartVersionNumber");
+					selectSecond.empty();
+					for(var i=0;i<versionList.length;i++){
+						$("#selectStartVersionNumber").append("<option value='"+versionList[i].version+"' selected='selected'>"+versionList[i].versionName+"</option>");
+					}
+				}
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
 	
 }
 
@@ -39,6 +126,10 @@ function startUpdateRollback(){
 	//get current version number
 	var currentVersionNum = "";
 	var selectedRow = getSelectedRow();
+	if(selectedRow == null || selectedRow.length !=1){
+		alert("请选择一条记录！");
+		return;
+	}
 	var serviceId = selectedRow[0]["id"];
 	var AjaxURL = "/app/service/getCurrentVersionNum?serviceId="+serviceId;
 	$.ajax({
@@ -125,12 +216,19 @@ $("#cancleModifyService").bind("click",function(event){
 	$("#modifyServiceModal").modal("hide");
 });
 
-//show sacle up or down
+//show scale up or down
 function scaleUpDown(){
 	var selectedRow = getSelectedRow();
+	if(selectedRow == null || selectedRow.length!=1){
+		alert("请选择一条记录！");
+		return;
+	}
 	var serviceId = selectedRow[0]["id"];
 	var AjaxURL = "/app/service/getReplicasByServiceId?serviceId="+serviceId;
 	var instanceNumber = 0;
+	var currentVersionNum = 0;
+	
+	//get current instance count
 	$.ajax({
 		type: "GET",
 		dataType: "json",
@@ -146,32 +244,56 @@ function scaleUpDown(){
 		}
 	});
 	
-	//set current instance number
-	$("#instanceNumber").val();
+	AjaxURL = "/app/service/getCurrentVersionNum?serviceId="+serviceId;
+	//get current version num
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: AjaxURL,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				if(data.result != null && data.result.length>0){
+					currentVersionNum = data.result.join(",");
+				}
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
 	
+	//set current version number
+	$("#currentVersionNum").html(currentVersionNum==null?"":currentVersionNum);
+	
+	//set current instance number
+	$("#instanceNumber").html(instanceNumber);
 }
 
 //sacle up or down submit
 $("#scaleSubmit").bind("click",function(event){
-	var currentNumber = $("#instanceNumber").val();
+	var selectedRow = getSelectedRow();
+	var serviceId = selectedRow[0]["id"];
+	var currentNumber = $("#instanceNumber").html();
 	var futureNumber = $("#futureNumber").val();
+	var currentVersionNumer = $("#currentVersionNum").html();
 	var ajaxUrl = "";
 	var paramData = {"serviceId":serviceId,"replicas":futureNumber};
 	if(futureNumber == currentNumber){
 		alert("期望实例个数与当前实例个数相等，无法进行扩容缩容！");
 	}
+	
 	//up
 	if(futureNumber>currentNumber){
-		ajaxUrl = "/app/service/scaleUp";
+		ajaxUrl = "/app/service/scaleUp?serviceId="+serviceId+"&version="+currentVersionNumer+"&replicas="+futureNumber;
 	//down
 	}else{
-		ajaxUrl = "/app/service/scaleDown";
+		ajaxUrl = "/app/service/scaleDown?serviceId="+serviceId+"&version="+currentVersionNumer+"&replicas="+futureNumber;
 	}
 	$.ajax({
 		type: "GET",
-		dataType: "html",
+		dataType: "json",
 		url: ajaxUrl,
-		data:JSON.stringify(paramData),
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
@@ -184,9 +306,45 @@ $("#scaleSubmit").bind("click",function(event){
 			alert("error!");
 		}
 	});
+});
+
+//roll back or upgrade submit
+$("#rollbackSubmit").bind("click",function(event){
+	var selectedRow = getSelectedRow();
+	var serviceId = selectedRow[0]["id"];
+	var currentVersionNumber = $("#currentVersionNumber").html();
+	var selectVersionNumber = $("#selectVersionNumber").val();
+	var wishReplies = $("#wishInstanceNumber").val();
+	var ajaxUrl = "";
 	
+	if(selectVersionNumber == currentVersionNumber){
+		alert("期望运行版本与当前版本相同，无法进行升级回滚！");
+		return;
+	}
 	
+	//upgrade
+	if(selectVersionNumber>currentVersionNumber){
+		ajaxUrl = "/app/service/startUpdate?serviceId="+serviceId+"&version="+selectVersionNumber+"&replicas="+wishReplies;
+	}else{
+		ajaxUrl = "/app/service/startRollback?serviceId="+serviceId+"&version="+selectVersionNumber+"&replicas="+wishReplies;
+	}
 	
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: ajaxUrl,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				alert("操作成功！");
+			}else{
+				alert("error!");
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
 });
 
 //get all checked rows
