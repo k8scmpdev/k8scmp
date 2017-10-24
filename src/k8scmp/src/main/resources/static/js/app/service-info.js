@@ -767,7 +767,7 @@ function getInstenceByServiceId(serviceId){
 					images += image;
 				})
 	 			var $tr = '<tr>'
-						+'<td style="text-align:center;">'+v.serviceCode+'</td>'
+						+'<td style="text-align:center;">'+v.instanceName+'</td>'
 						+'<td style="text-align:center;">'+v.status+'</td>'
 						+'<td style="text-align:center;">'+images+'</td>'
 						+'<td style="text-align:center;">'+v.startTime+'</td>'
@@ -907,6 +907,8 @@ function infoRollback(){
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
 					currentVersionNum = data.result.join(",");
+					//set init value
+					$("#currentVersionNumbers").html(currentVersionNum);
 				}
 			}
 		},
@@ -942,9 +944,6 @@ function infoRollback(){
 			alert("error!");
 		}
 	});
-	
-	//set init value
-	$("#currentVersionNumbers").html(currentVersionNum);
 }
 
 //sacle diaplay 
