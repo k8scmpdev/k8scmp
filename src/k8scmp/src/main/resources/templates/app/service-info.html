@@ -21,21 +21,28 @@
 					<div class="filletLi" style="float: left">
 					<ul>
 						<li style="list-style-type: none">实例数(个)</li>
-						<li id="infoInstanceNum" style="list-style-type: none"></li>
+						<li id="repliesCount" style="list-style-type: none"></li>
 					</ul>
 				</div>
 				<div class="filletLi" style="float: left">
 					<ul>
 						<li style="list-style-type: none">当前版本</li>
-						<li id="infoCurrentVersion" style="list-style-type: none"></li>
+						<li id="currentVersionNumber" style="list-style-type: none"></li>
 					</ul>
 				</div>
 				<div class="filletLi" style="float: left">
 					<ul>
 						<li style="list-style-type: none">状态</li>
-						<li  id="infoServicestate" style="list-style-type: none" th:text="${serviceInfo.state}"></li>
+						<li  id="serviceState" style="list-style-type: none" th:text="${serviceInfo.state}"></li>
 					</ul>
 				</div>
+				<div class="filletLi" style="float: left">
+					<ul>
+						<li style="list-style-type: none">服务地址</li>
+						<li  id="serviceUrls" style="list-style-type: none" th:text="${serviceInfo.state}"></li>
+					</ul>
+				</div>
+				
 				<div class="filletLi" style="float: left">
 					<a title="启动" class="btn btn-primary btn-mini tip-bottom" href="#startServiceDisplays" onclick="infoStartService();"><i class="icon-play"></i>启动</a>
 					<a title="升级/回滚" class="btn btn-primary btn-mini tip-bottom" href="#updateRollbacks" onclick="infoRollback();"><i class="icon-repeat"></i>升级/回滚</a>

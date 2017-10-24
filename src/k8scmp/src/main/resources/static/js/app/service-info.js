@@ -121,7 +121,7 @@ $(document).ready(function(){
 	$("#repliesCount").html(replies);//replies
 	$("#currentVersionNumber").html(versionNumers);//current version number
 	$("#serviceUrls").html(serviceUrls==null?"":serviceUrls.join(","));//service urls
-	$("#serviceState").html($("#hiddenServiceState").val());//service state
+
 	
 	
 	/***init port mapped value**/
@@ -227,7 +227,7 @@ function initCurrentVersionNum(serviceId){
 	var returnNumber = 0;
 	var AjaxURL= "/app/service/getCurrentVersionNum?serviceId="+serviceId;
 	$.ajax({
-		type: "GET",
+		type: "POST",
 		dataType: "json",
 		url: AjaxURL,
 		contentType:"application/json",
@@ -249,7 +249,7 @@ function initServiceAddress(serviceId){
 	var serviceUrls = [];
 	var AjaxURL= "/app/service/getServiceURLs?serviceId="+serviceId;
 	$.ajax({
-		type: "GET",
+		type: "POST",
 		dataType: "json",
 		url: AjaxURL,
 		contentType:"application/json",
@@ -968,6 +968,9 @@ function infoScale(){
 		success: function (data) {
 			if(data.resultCode == 200){
 				instanceNumber = data.result;
+				
+				//set current instance number
+				$("#instanceNumbers").html(instanceNumber);
 			}
 		},
 		error: function(data) {
@@ -986,6 +989,8 @@ function infoScale(){
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
 					currentVersionNum = data.result.join(",");
+					//set current version number
+					$("#currentVersionNums").html(currentVersionNum==null?"":currentVersionNum);
 				}
 			}
 		},
@@ -993,12 +998,6 @@ function infoScale(){
 			alert("error!");
 		}
 	});
-	
-	//set current version number
-	$("#currentVersionNums").html(currentVersionNum==null?"":currentVersionNum);
-	
-	//set current instance number
-	$("#instanceNumbers").html(instanceNumber);
 }
 
 //start service
