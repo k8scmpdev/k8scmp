@@ -170,13 +170,15 @@ function getServiceFormJson(){
 	var startSeq = $("#startSeq").val();
 	var serviceDescription = $("#serviceDescription").val();
 	var defaultReplicas = $("#defaultReplicas").val();
-	var versionType=$('input:radio[name="cfradios"]:checked').val();
+	
+	var versionType=$("span[class='checked']").children("input:radio[name='cfradios']").val();
 	//set serviceConfigInfo
 	serviceConfigInfo["serviceCode"] = serviceCode;
 	serviceConfigInfo["appId"] = appId;
 	serviceConfigInfo["startSeq"] = startSeq;
 	serviceConfigInfo["description"] = serviceDescription;
 	serviceConfigInfo["defaultReplicas"] = defaultReplicas;
+	serviceConfigInfo["versionType"] = versionType;
 	
 	//custom versions
 	if(versionType=="CUSTOM"){
