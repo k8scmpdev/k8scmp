@@ -19,10 +19,10 @@
 					<div class="span12">
 						<div class="buttons">
 							<a title="添加一个服务" id="addService" class="btn tip-bottom" th:href="@{/app/service/service-new(appId=${#httpServletRequest.getParameter('appId')})}"><i class="icon-plus"></i>添加服务</a>
-							<a title="启动服务" id="startService" class="btn tip-bottom" href="#startServiceDisplay" onclick="startService();"><i class="icon-play"></i>启动</a>
+							<a title="启动服务" id="startService" data-toggle="modal" class="btn tip-bottom" href="#startServiceDisplay" onclick="startService();"><i class="icon-play"></i>启动</a>
 							<a title="停止服务" id="stopService" class="btn tip-bottom" href="javascript:void(0);" onclick="stopService();"><i class="icon-off"></i>停止</a>
-							<a title="升级/回滚" id="upService" class="btn tip-bottom" href="#updateRollback" onclick="startUpdateRollback();"><i class="icon-repeat"></i>升级/回滚</a>
-							<a title="扩容/缩容" id="extenService" class="btn tip-bottom" href="#scaleUpDown" onclick="scaleUpDown();"><i class="icon-resize-small"></i>扩容/缩容</a>
+							<a title="升级/回滚" id="upService" data-toggle="modal" class="btn tip-bottom" href="#updateRollback" onclick="startUpdateRollback();"><i class="icon-repeat"></i>升级/回滚</a>
+							<a title="扩容/缩容" id="extenService" data-toggle="modal" class="btn tip-bottom" href="#scaleUpDown" onclick="scaleUpDown();"><i class="icon-resize-small"></i>扩容/缩容</a>
 							<!-- <a title="删除" id="deleteService" class="btn tip-bottom" href="javascript:void(0);" onclick="deleteService();"><i class="icon-remove"></i>删除</a> -->
 							<!-- <div class="input-append" style="float:right">
 								<form id="serviceSearchForm">
