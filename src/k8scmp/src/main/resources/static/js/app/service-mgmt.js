@@ -113,11 +113,13 @@ function startService(){
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
 					versionList = eval(data.result);
-					var selectSecond = $("#selectStartVersionNumber");
-					selectSecond.empty();
-					for(var i=0;i<versionList.length;i++){
-						$("#selectStartVersionNumber").append("<option value='"+versionList[i].version+"' selected='selected'>"+versionList[i].versionName+"</option>");
-					}
+					console.log(versionList);
+//					var selectSecond = $("#selectStartVersionNumber");
+//					selectSecond.empty();
+//					for(var i=0;i<versionList.length;i++){
+//						$("#selectStartVersionNumber").append("<option value='"+versionList[i].version+"' selected='selected'>"+versionList[i].versionName+"</option>");
+//					}
+//					$("#selectStartVersionNumber").val();
 				}
 			}
 		},
