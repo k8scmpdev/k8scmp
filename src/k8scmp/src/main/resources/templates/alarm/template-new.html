@@ -23,17 +23,17 @@
 								<!-- <h5>请输入用户信息</h5> -->
 							</div>
 							<div class="widget-content nopadding">
-								<form class="form-horizontal" th:object="${TemplateInfo}" name="create_template" id="create_template" novalidate="novalidate">
+								<form class="form-horizontal" th:object="${templateBack}" name="create_template" id="create_template" novalidate="novalidate">
                                     <div class="control-group">
                                         <label class="control-label">报警规则名称</label>
                                         <div class="controls">
-                                            <input id="templateName" name="templateName" type="text" th:field="*{templateName}" placeholder="请输入规则名称" required="required"/>
+                                            <input id="templateName" name="templateName" type="text" placeholder="请输入规则名称" required="required"/>
                                         </div>
                                     </div>
                                     <div class="control-group">
                                         <label class="control-label">选择报警类型</label>
                                         <div class="controls">
-                                            <select id="templateType" onchange="getHostOrDeploy();" th:field="*{templateType}">
+                                            <select id="templateType" onchange="getHostOrDeploy();">
                                             	<option id="host" selected="selected" value="host">主机</option>
                                             	<option id="deploy" value="deploy">容器</option>
                                             </select>
@@ -43,7 +43,7 @@
 										<label class="control-label">选择报警主机组</label>
 										<div class="controls">
 											<select multiple="multiple" class="multiselect" name="hostGroup" id="hostGroup" style="width: 854px;" th:field="*{hostGroupList}">	
-												<option th:each="hostGroupBasic:${templateInfo.hostGroupList}" th:value="${hostGroupBasic.id}" 	
+												<option th:each="hostGroupBasic:${templateBack.hostGroupList}" th:value="${hostGroupBasic.id}" 	
 												th:selected="${#strings.contains(hostGroupBasic,hostGroupBasic.id)}"
 												th:text="${hostGroupBasic.hostGroupName}" ></option>	
 											</select>
@@ -51,17 +51,21 @@
 									</div>
 									<div class="control-group" id="selectPod" hidden="hide">
 											<label class="control-label">选择报警容器</label>
-											<div class="controls" id="deploymentInfo" th:field="*{deploymentInfo}">
-												<select id="clusterName" th:field="*{deploymentInfo.clusterName}">
-													<option th:value="${templateInfo.deploymentInfo.clusterName}" th:text="${templateInfo.deploymentInfo.clusterName}" ></option>
+											<!-- 联动 -->
+											<div class="controls" id="deploymentInfo">
+												<!-- <select id="clusterName" th:field="*{deploymentInfo.clusterName}">
+													<option th:value="${templateBack.deploymentInfo.clusterName}" th:text="${templateBack.deploymentInfo.clusterName}" ></option>
 												</select>
 												<select id="hostEnv" th:field="*{deploymentInfo.hostEnv}">
-													<option th:value="${templateInfo.deploymentInfo.hostEnv}" th:text="${templateInfo.deploymentInfo.hostEnv}"></option>
-												</select>
-												<select id="deploymentName" th:field="*{deploymentInfo.deploymentName}">
-													<option th:value="${templateInfo.deploymentInfo.deploymentName}" th:text="${templateInfo.deploymentInfo.deploymentName}"></option>
-												</select>
-											</div>
+													<option th:value="${templateBack.deploymentInfo.hostEnv}" th:text="${templateBack.deploymentInfo.hostEnv}"></option>
+												</select>-->
+												
+												<select name="deploymentName" id="deploymentName">	
+												<option th:each="deployment:${templateBack.deploymentInfos}" th:value="${deployment.deploymentName}" 	
+												th:selected="${#strings.contains(deployment,deployment.deploymentName)}"
+												th:text="${deployment.deploymentName}" ></option>	
+											</select>
+											</div> 
 									</div>
 									<div class="control-group">
 										<label class="control-label">添加报警逻辑</label>
@@ -76,7 +80,7 @@
                                         <label class="control-label">指定报警用户</label>
                                         <div class="controls">
                                             <select multiple="multiple" class="multiselect" name="users" id="users" style="width: 854px;" required="required">	
-												<option th:each="category:${templateInfo.userList}" th:value="${category.id}" 	
+												<option th:each="category:${templateBack.userList}" th:value="${category.id}" 	
 												th:selected="${#strings.contains(category,category.id)}"
 												th:text="${category.loginname}" ></option>	
 											</select>
@@ -159,11 +163,9 @@
 				//var strategyList = [];
 				var userList = [];
 				var hostGroupInfoBasic = new Object();
-				
 				var user = new Object();
 				var deploymentInfo = new Object();
 				var callback = new Object();
-				
 				var templateIn = new Object();
 				templateIn.templateName = templateName;
 				templateIn.templateType = templateType;
@@ -178,18 +180,13 @@
 					
 				}else{
 					//deployment
-					deploymentInfo.clusterName = $("#clusterName option:selected").text();
-					deploymentInfo.hostEnv = $("#hostEnv option:selected").text();
+					/* deploymentInfo.clusterName = $("#clusterName option:selected").text();
+					deploymentInfo.hostEnv = $("#hostEnv option:selected").text(); */
 					deploymentInfo.deploymentName = $("#deploymentName option:selected").text();
 					templateIn.deploymentInfo = deploymentInfo;
 				}
 				
 				//strategy
-				/* $.each($("#strategyList").children('div'),function(i,v){
-					alert(v.id);
-					$("#"+v.id).children('li').children('select').contents();
-					alert($("#"+v.id).children('li').next('select').val());
-				}) */
 				
 				var metricList = new Array();
 				$.each($("[name*=metric]"),function(i,v){

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.common.ApiController;
+import org.k8scmp.engine.k8s.util.NodeWrapper;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.login.service.UserService;
 import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
@@ -13,9 +14,11 @@ import org.k8scmp.monitormgmt.domain.alarm.HostEnv;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
+import org.k8scmp.monitormgmt.domain.alarm.TemplateBack;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateIn;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
+import org.k8scmp.monitormgmt.domain.monitor.PodInfo;
 import org.k8scmp.monitormgmt.service.alarm.HostGroupService;
 import org.k8scmp.monitormgmt.service.alarm.TemplateService;
 import org.k8scmp.util.AuthUtil;
@@ -30,6 +33,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodList;
 
 
 /**
@@ -67,7 +73,7 @@ public class TemplateController extends ApiController {
     @RequestMapping(value = "/templatenew")
     public String createTemplate(Model model) throws Exception {
     	
-    	TemplateInfo templateInfo = new TemplateInfo();
+    	TemplateBack templateBack = new TemplateBack();
     	//获取hostGroup
     	List<HostGroupInfo> hostGroupInfos = hostGropService.listHostGroupInfo();
     	List<HostGroupInfoBasic> hostGroupInfoList = new ArrayList<HostGroupInfoBasic>();
@@ -79,20 +85,21 @@ public class TemplateController extends ApiController {
 		}
     	//获取user
     	List<User> userList = userService.listAllUserInfo().getResult();
-    	
     	//获取deployment
-    	DeploymentInfo deploymentInfo = new DeploymentInfo();
-    	deploymentInfo.setClusterName("centos-k8s");
-    	deploymentInfo.setHostEnv(HostEnv.TEST);
-    	deploymentInfo.setDeploymentName("qazsw");
-    	deploymentInfo.setId(1);
-    	
-    	templateInfo.setHostGroupList(hostGroupInfoList);
-    	templateInfo.setUserList(userList);
-    	templateInfo.setDeploymentInfo(deploymentInfo);
-    	model.addAttribute("templateInfo", templateInfo);
-    	model.addAttribute("TemplateInfo", new TemplateInfo());
-    	
+    	NodeWrapper nodeWrapper = new NodeWrapper().init("default");
+    	PodList podList = nodeWrapper.getAllPods();
+    	List<Pod> items = podList.getItems();
+    	List<DeploymentInfo> deploymentList = new ArrayList<>();
+    	for (Pod pod : items) {
+    		DeploymentInfo deploymentInfo = new DeploymentInfo();
+    		deploymentInfo.setDeploymentName(pod.getMetadata().getName());
+    		deploymentList.add(deploymentInfo);
+		}
+    	templateBack.setHostGroupList(hostGroupInfoList);
+    	templateBack.setUserList(userList);
+    	templateBack.setDeploymentInfos(deploymentList);
+    	model.addAttribute("templateBack", templateBack);
+    	model.addAttribute("TemplateBack", new TemplateInfo());
         return "alarm/template-new";
     }
     
