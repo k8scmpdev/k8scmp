@@ -767,7 +767,7 @@ function getInstenceByServiceId(serviceId){
 					images += image;
 				})
 	 			var $tr = '<tr>'
-						+'<td style="text-align:center;">'+v.serviceCode+'</td>'
+						+'<td style="text-align:center;">'+v.instanceName+'</td>'
 						+'<td style="text-align:center;">'+v.status+'</td>'
 						+'<td style="text-align:center;">'+images+'</td>'
 						+'<td style="text-align:center;">'+v.startTime+'</td>'
