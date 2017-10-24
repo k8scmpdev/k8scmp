@@ -6,10 +6,10 @@ function showPortMapped(){
 }
 
 $(".radioItem").change(function(event){
-	var selectValue=$("input[name='publishRadios']:checked").val();
+	var selectValue=$("span[class='checked']").children("input:radio[name='publishRadios']").val();
 	if(selectValue == 1){
 		$(".portMappes").css("display","block");
-	}else{
+	}else if(selectValue == 2){
 		$(".portMappes").css("display","none");
 	}
 });
