@@ -26,41 +26,42 @@ $(document).ready(function(){
 	$.ajax({
 		type: "GET",
 		dataType: "json",
-		url: "/app/service/getCurrentVersion?serviceId="+serviceId,
-		contentType:"application/json",
-		success: function (data) {
-			if(data.resultCode == 200){
-				var currenttVersion = data.result;
-				if(currenttVersion!=null){
-					versionDetail = getContainerVolumes(currenttVersion);
-					loadsVersionDetail(versionDetail);
-					//console.log(oldContainers);
-				}
-			}else{
-				alert("error!");
-			}
-		},
-		error: function(data) {
-			alert("error!");
-		}
-	});
-	
-	$.ajax({
-		type: "GET",
-		dataType: "json",
-		url: "/app/version/getVersionNames?serviceId="+serviceId,
+		url: "/app/version/getVersionNames?serviceId="+$('#serviceID').val(),
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
 				var versionList = data.result;
-				var currentVersion = $('#currentVersion').val();
-				createVersionSelect(currentVersion,versionList);
+				
+				$.ajax({
+					type: "GET",
+					dataType: "json",
+					url: "/app/service/getCurrentVersion?serviceId="+$('#serviceID').val(),
+					contentType:"application/json",
+					success: function (data) {
+						if(data.resultCode == 200){
+							var currenttVersion = data.result;
+							if(currenttVersion!=null){
+								console.log(currenttVersion);
+								versionDetail = getContainerVolumes(currenttVersion);
+								loadsVersionDetail(versionDetail);
+								createVersionSelect(currenttVersion.version,versionList);
+							}
+						}else{
+							alert("获取当前版本详情失败!");
+						}
+					},
+					error: function(data) {
+						alert("获取当前版本详情失败!");
+					}
+				});
+				
+				
 			}else{
-				alert("error!");
+				alert("获取版本列表失败!");
 			}
 		},
 		error: function(data) {
-			alert("error!");
+			alert("获取版本列表失败!");
 		}
 	});
 	
@@ -650,19 +651,19 @@ function changeVersion(){
 					loadsVersionDetail(versionDetail);
 					//console.log(oldContainers);
 					if(currenttVersion.deprecate){
-						$('#fqbutton').attr('display','none');
-						$('#qybutton').attr('display','');
+						$('#fqbutton').attr('style','display:none');
+						$('#qybutton').attr("style","display:'';");
 					}else{
-						$('#fqbutton').attr('display','');
-						$('#qybutton').attr('display','none');
+						$('#fqbutton').attr("style","display:'';");
+						$('#qybutton').attr('style','display:none');
 					}
 				}
 			}else{
-				alert("error!");
+				alert("获取版本详情失败!");
 			}
 		},
 		error: function(data) {
-			alert("error!");
+			alert("获取版本详情失败!");
 		}
 	});
 }
@@ -675,75 +676,82 @@ function createVersionSelect(currentVersion,versionList){
 		var versionname = version.versionName;
 		if(versionid==currentVersion){
 			$('#depVersion').append("<option value='"+versionid+"' selected='selected'>"+versionname+"</option>");
-			$('#depVersion').prev().children().find('span').html(versionname)
+			$('#depVersion').prev().children().find('span').html(versionname);
 		}else{
 			$('#depVersion').append("<option value='"+versionid+"'>"+versionname+"</option>");
 		}
+		changeVersion();
     }
 
 }
 
 function deprecate(){
-	var version = $('#depVersion option:selected').val();
-	$.ajax({
-		type: "GET",
-		dataType: "json",
-		url: "/app/service/deprecateVersion?serviceId="+$('#serviceID').val()+"&version="+version,
-		contentType:"application/json",
-		success: function (data) {
-			if(data.resultCode == 200){
-				alert("废除成功!");
-				changeVersion();
-			}else{
-				alert("error!");
+	if(confirm('确认废除？')){
+		var version = $('#depVersion option:selected').val();
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "/app/version/deprecateVersion?serviceId="+$('#serviceID').val()+"&version="+version,
+			contentType:"application/json",
+			success: function (data) {
+				if(data.resultCode == 200){
+					alert("废除成功!");
+					changeVersion();
+				}else{
+					alert("废除版本失败!");
+				}
+			},
+			error: function(data) {
+				alert("废除版本失败!");
 			}
-		},
-		error: function(data) {
-			alert("error!");
-		}
-	});
+		});
+	}
 }
 
 function enableVersion(){
-	var version = $('#depVersion option:selected').val();
-	$.ajax({
-		type: "GET",
-		dataType: "json",
-		url: "/app/service/enableVersion?serviceId="+$('#serviceID').val()+"&version="+version,
-		contentType:"application/json",
-		success: function (data) {
-			if(data.resultCode == 200){
-				alert("启用成功!");
-				changeVersion();
-			}else{
-				alert("error!");
+	if(confirm('确认启用？')){
+		var version = $('#depVersion option:selected').val();
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "/app/version/enableVersion?serviceId="+$('#serviceID').val()+"&version="+version,
+			contentType:"application/json",
+			success: function (data) {
+				if(data.resultCode == 200){
+					alert("启用成功!");
+					changeVersion();
+				}else{
+					alert("启用版本失败!");
+				}
+			},
+			error: function(data) {
+				alert("启用版本失败!");
 			}
-		},
-		error: function(data) {
-			alert("error!");
-		}
-	});
+		});
+	}
 }
 
 function deleteVersion(){
-	var version = $('#depVersion option:selected').val();
-	$.ajax({
-		type: "GET",
-		dataType: "json",
-		url: "/app/service/deprecateVersion?serviceId="+$('#serviceID').val()+"&version="+version,
-		contentType:"application/json",
-		success: function (data) {
-			if(data.resultCode == 200){
-				alert("删除成功!");
-				changeVersion();
-			}else{
-				alert("error!");
+	if(confirm('确认删除？')){
+		var version = $('#depVersion option:selected').val();
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "/app/version/deleteVersion?serviceId="+$('#serviceID').val()+"&version="+version,
+			contentType:"application/json",
+			success: function (data) {
+				if(data.resultCode == 200){
+					alert("删除成功!");
+					changeVersion();
+				}else{
+					alert("删除版本失败!");
+				}
+			},
+			error: function(data) {
+				alert("删除版本失败!");
 			}
-		},
-		error: function(data) {
-			alert("error!");
-		}
-	});
+		});
+	}
 }
 
 //服务实例列表
