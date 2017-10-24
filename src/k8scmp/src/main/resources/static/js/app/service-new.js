@@ -481,12 +481,14 @@ $("#btnnew3pre").bind("click", function(event) {
 	
 	var tag = $("#tagConfig").val();
 	var commands = null;
-	if($("#startCommands").val() == ""){
-		commands = null;
-	}else{
-		commands = $("#startCommands").val().split(",");
+	if($("#startCommands").val() != null){
+		if($("#startCommands").val() == ""){
+			commands = null;
+		}else{
+			commands = $("#startCommands").val().split(",");
+		}
+		
 	}
-	
 	var envs = getEnvsToArray($("#envvar").val());
 	var cpu = $("#cpus").val();
 	var mem = $("#mems").val();

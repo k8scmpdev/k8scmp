@@ -458,7 +458,15 @@ $("#btnnew3pre").bind("click", function(event) {
 	var image = $("#imageConfig").val();
 	
 	var tag = $("#tagConfig").val();
-	var commands = $("#startCommands").val().split(",");
+	
+	var commands = null;
+	if($("#startCommands").val() != null){
+		if($("#startCommands").val() == ""){
+			commands = null;
+		}else{
+			commands = $("#startCommands").val().split(",");
+		}
+	}
 	var envs = getEnvsToArray($("#envvar").val());
 	var cpu = $("#cpus").val();
 	var mem = $("#mems").val();
