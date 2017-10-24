@@ -26,6 +26,7 @@ function deleteService(){
 
 //start service submit
 $("#startServiceSubmit").bind("click",function(event){
+	boolean startFlag = false;
 	var selectedRow = getSelectedRow();
 	var serviceId = selectedRow[0]["id"];
 	var version = $("#selectStartVersionNumber").val();
@@ -39,7 +40,7 @@ $("#startServiceSubmit").bind("click",function(event){
 		success: function (data) {
 			//success
 			if(data.resultCode == 200){
-				
+				startFlag = true;
 			}else{
 				alert("启动服务异常！");
 			}
@@ -48,6 +49,11 @@ $("#startServiceSubmit").bind("click",function(event){
 			alert("启动服务异常！");
 		}
 	});
+	if(startFlag){
+		refreshServices();
+		alert("启动服务成功！");
+	}
+	
 });
 
 //hide start service
@@ -91,6 +97,7 @@ function startService(){
 		alert("请选择一条记录！");
 		return;
 	}
+	var serviceId = selectedRow[0]["id"];
 	//clear start instance number
 	$("#wishStartInstanceNumber").val("");
 	
