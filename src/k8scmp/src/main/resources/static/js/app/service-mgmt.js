@@ -26,7 +26,7 @@ function deleteService(){
 
 //start service submit
 $("#startServiceSubmit").bind("click",function(event){
-	boolean startFlag = false;
+	var startFlag = false;
 	var selectedRow = getSelectedRow();
 	var serviceId = selectedRow[0]["id"];
 	var version = $("#selectStartVersionNumber").val();
