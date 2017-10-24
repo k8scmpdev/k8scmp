@@ -150,6 +150,8 @@ function startUpdateRollback(){
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
 					currentVersionNum = data.result.join(",");
+					//set init value
+					$("#currentVersionNumber").html(currentVersionNum);
 				}
 			}
 		},
@@ -185,9 +187,6 @@ function startUpdateRollback(){
 			alert("error!");
 		}
 	});
-	
-	//set init value
-	$("#currentVersionNumber").html(currentVersionNum);
 }
 
 //show service modify page
@@ -263,7 +262,6 @@ function scaleUpDown(){
 		success: function (data) {
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
-					console.log(data.result);
 					currentVersionNum = data.result.join(",");
 					$("#currentVersionNum").html(currentVersionNum==null?"":currentVersionNum);
 					
@@ -334,13 +332,13 @@ $("#rollbackSubmit").bind("click",function(event){
 	}
 	
 	//upgrade
-	ajaxUrl = "/app/service/startUpdate?serviceId="+serviceId+"&version="+selectVersionNumber+"&replicas="+wishReplies;
-	/*if(selectVersionNumber>currentVersionNumber){
+	//ajaxUrl = "/app/service/startUpdate?serviceId="+serviceId+"&version="+selectVersionNumber+"&replicas="+wishReplies;
+	if(selectVersionNumber>currentVersionNumber){
 		ajaxUrl = "/app/service/startUpdate?serviceId="+serviceId+"&version="+selectVersionNumber+"&replicas="+wishReplies;
 	}else{
 		ajaxUrl = "/app/service/startRollback?serviceId="+serviceId+"&version="+selectVersionNumber+"&replicas="+wishReplies;
 	}
-	*/
+	
 	$.ajax({
 		type: "POST",
 		dataType: "json",
@@ -378,7 +376,7 @@ function getSelectedRow(){
 function deleteSingleService(serviceId,obj){
 	var AjaxURL= "/app/service/delete/"+serviceId;
 	$.ajax({
-		type: "GET",
+		type: "POST",
 		dataType: "html",
 		url: AjaxURL,
 		contentType:"application/json",
