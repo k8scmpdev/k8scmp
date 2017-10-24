@@ -907,6 +907,8 @@ function infoRollback(){
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
 					currentVersionNum = data.result.join(",");
+					//set init value
+					$("#currentVersionNumbers").html(currentVersionNum);
 				}
 			}
 		},
@@ -942,9 +944,6 @@ function infoRollback(){
 			alert("error!");
 		}
 	});
-	
-	//set init value
-	$("#currentVersionNumbers").html(currentVersionNum);
 }
 
 //sacle diaplay 
