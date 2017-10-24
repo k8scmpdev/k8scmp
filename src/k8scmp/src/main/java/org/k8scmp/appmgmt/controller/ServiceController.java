@@ -151,7 +151,8 @@ public class ServiceController {
     	return ResultStat.OK.wrap(serviceService.getServiceURLs(serviceId));
     }
     
-    @RequestMapping(value = "/createLoadBalancer")
+    @ResponseBody
+    @RequestMapping(value = "/createLoadBalancer", method = RequestMethod.POST)
     public HttpResponseTemp<Object> createLoadBalancer(@RequestParam(value = "serviceId", required = true) String serviceId,
     							@RequestBody List<NodePortDraft> nodePorts) throws Exception {
     	serviceService.createLoadBalancer(serviceId, nodePorts);
