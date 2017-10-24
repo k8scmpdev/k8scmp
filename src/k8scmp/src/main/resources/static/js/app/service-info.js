@@ -21,12 +21,12 @@ var volumeDraftsMap = {};
 
 var containerDrafts = [];
 var currentContainerMap = {};
+var serviceId = $('#serviceID').val();
 $(document).ready(function(){
-	
 	$.ajax({
 		type: "GET",
 		dataType: "json",
-		url: "/app/service/getCurrentVersion?serviceId="+$('#serviceID').val(),
+		url: "/app/service/getCurrentVersion?serviceId="+serviceId,
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
@@ -48,7 +48,7 @@ $(document).ready(function(){
 	$.ajax({
 		type: "GET",
 		dataType: "json",
-		url: "/app/version/getVersionNames?serviceId="+$('#serviceID').val(),
+		url: "/app/version/getVersionNames?serviceId="+serviceId,
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
@@ -89,15 +89,10 @@ $(document).ready(function(){
 	    }
 	});
 	
-	
-	
-	
-	var paramData={};
-	paramData["serviceId"] = "7623bcc8b3734e71a91604db5a66f96b";
 	$.ajax({
 		type: "GET",
 		dataType: "json",
-		url: "/app/version/getMaxVersion?serviceId=7623bcc8b3734e71a91604db5a66f96b",
+		url: "/app/version/getMaxVersion?serviceId="+serviceId,
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
@@ -105,7 +100,6 @@ $(document).ready(function(){
 				if(newestVersion!=null){
 					oldContainers = getContainerVolumes(newestVersion);
 					loadsUpgradeDatas(oldContainers);
-					//console.log(oldContainers);
 				}
 			}else{
 				alert("error!");
@@ -117,7 +111,6 @@ $(document).ready(function(){
 	});
 	
 	$("#dirs").change(function(){
-		alert(11);
 		var currentSelect = $(this).val();
 		if(currentSelect == "HOSTPATH"){
 			$(this).parent().children("input[name='insPath']").hide();
@@ -130,25 +123,161 @@ $(document).ready(function(){
 			$(this).parent().children("input[name='hostPath']").hide();
 		}
 	});
+	
+	//init service info common data
+	/**get init**/
+	var replies = initReplicasByServiceId(serviceId);//replies
+	var versionNumers = initCurrentVersionNum(serviceId);//current version number
+	var serviceUrls = initServiceAddress(serviceId);//service urls
+	
+	/**set init**/
+	$("#repliesCount").html(replies);//replies
+	$("#currentVersionNumber").html(versionNumers);//current version number
+	$("#serviceUrls").html(serviceUrls==null?"":serviceUrls.join(","));//service urls
+	$("#serviceState").html($("#hiddenServiceState").val());//service state
+	
+	
+	/***init port mapped value**/
+	var hiddenNodePorts = $("hiddenNodePorts").val();////???????
+	if(hiddenNodePorts != null && hiddenNodePorts.length>0){
+		//hide create new load banlance button
+		$("#createLoadBalancer").css("display","none");
+		
+		//display load balancer
+		var nodePortItem = hiddenNodePorts[0];
+		var childdiv=$('<div></div>');  
+		childdiv.attr("id","id" + new Date().getTime());
+		$("#ports").append(childdiv);
+		childdiv.load("/js/statichtml/app/portMappedTemplate.html #portDisplay",function(responseTxt,statusTxt,xhr){
+			//set value
+			$(this).find("span[name='iNodePort']").html(nodePortItem["nodePort"]);
+			$(this).find("span[name='iTargetPort']").html(nodePortItem["targetPort"]);
+			$(this).find("span[name='iProtocol']").html(nodePortItem["protocol"]);
+			$(this).find("span[name='description']").html(nodePortItem["description"]);
+		});
+	}
 });
 
 $("#btnnew2pre").bind("click",function(event){
 	//show port mapped detail into sPort tab
+	var nodePorts = [];
+	//save ports
+	$("#portMapped >div").each(function(){
+		var nodePortItem = {};
+		
+		/****show port mapped detail into sPort tab***/
+		var nodePort = $("input[name='nodePort']").val();
+		var targetPort = $("input[name='targetPort']").val();
+		var protocol = $("select[name='protocol']").val();
+		var description = $("input[name='description']").val();
+		var isExternal = true;
+		
+		//load html
+		var childdiv=$('<div></div>');  
+		childdiv.attr("id","id" + new Date().getTime());
+		$("#ports").append(childdiv);
+		childdiv.load("/js/statichtml/app/portMappedTemplate.html #portDisplay",function(responseTxt,statusTxt,xhr){
+			//set value
+			$(this).find("span[name='iNodePort']").html(nodePort);
+			$(this).find("span[name='iTargetPort']").html(targetPort);
+			$(this).find("span[name='iProtocol']").html(protocol);
+			$(this).find("span[name='description']").html(description);
+		});
+		
+		//package value going to save into db
+		nodePortItem["nodePort"] = nodePort;
+		nodePortItem["targetPort"] = targetPort;
+		nodePortItem["protocol"] = protocol;
+		nodePortItem["description"] = description;
+		nodePorts.push(nodePortItem);
+	});
+	
+	//save into db
+	var ajaxUrl = "/app/service/createLoadBalancer?serviceId="+serviceId;
+	var paramData = nodePorts;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: ajaxUrl,
+		data: JSON.stringify(paramData),
+		contentType:"application/json",
+		success: function (data) {
+			//do some notification
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
 	
 	//close this window
 	$("#sPortMappedModel").modal("hide");
 });
 
+//get replies when document ready
+function initReplicasByServiceId(serviceId){
+	var returnCount = 0;
+	var AjaxURL= "/app/service/getReplicasByServiceId?serviceId="+serviceId;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: AjaxURL,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				returnCount = data.result;
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+	
+	return returnCount;
+}
 
+//get current version num when document ready
+function initCurrentVersionNum(serviceId){
+	var returnNumber = 0;
+	var AjaxURL= "/app/service/getCurrentVersionNum?serviceId="+serviceId;
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: AjaxURL,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				returnCount = data.result;
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+	
+	return returnNumber;
+}
 
-
-
-
-
-
-
-
-
+//get service address when document ready
+function initServiceAddress(serviceId){
+	var serviceUrls = [];
+	var AjaxURL= "/app/service/getServiceURLs?serviceId="+serviceId;
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: AjaxURL,
+		contentType:"application/json",
+		success: function (data) {
+			if(data.resultCode == 200){
+				serviceUrls = data.result;
+			}
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+	
+	return serviceUrls;
+}
 
 function loadsUpgradeDatas(containers){
 	var htmlContent = "";
@@ -399,7 +528,6 @@ $("#versionUpdate").bind("click", function(event) {
 	version.serviceId = $('#serviceID').val();
 	var paramData={};
 	paramData = version;
-	console.log(JSON.stringify(paramData));
 	var AjaxURL= "/app/version/createVersion?serviceId="+$('#serviceID').val();
 	$.ajax({
 		type: "POST",
