@@ -145,11 +145,13 @@ $(document).ready(function(){
 	}
 });
 
+//create load balancer
 $("#btnnew2pre").bind("click",function(event){
+	var nodePortItem = {};
 	//show port mapped detail into sPort tab
-	var nodePorts = [];
 	//save ports
 	$("#portMapped >div").each(function(){
+		$("#showLoadBalancer").css("display","none");
 		var nodePortItem = {};
 		
 		/****show port mapped detail into sPort tab***/
@@ -159,10 +161,11 @@ $("#btnnew2pre").bind("click",function(event){
 		var description = $("input[name='description']").val();
 		var isExternal = true;
 		
+		
+		
 		//load html
 		var childdiv=$('<div></div>');  
 		childdiv.attr("id","id" + new Date().getTime());
-		$("#ports").append(childdiv);
 		childdiv.load("/js/statichtml/app/portMappedTemplate.html #portDisplay",function(responseTxt,statusTxt,xhr){
 			//set value
 			$(this).find("span[name='iNodePort']").html(nodePort);
@@ -176,7 +179,7 @@ $("#btnnew2pre").bind("click",function(event){
 		nodePortItem["targetPort"] = targetPort;
 		nodePortItem["protocol"] = protocol;
 		nodePortItem["description"] = description;
-		nodePorts.push(nodePortItem);
+		
 	});
 	
 	//save into db
@@ -1002,6 +1005,7 @@ function infoScale(){
 
 //start service
 $("#startServiceSubmits").bind("click",function(event){
+	var startFlag = false;
 	var version = $("#selectStartVersionNumbers").val();
 	var replicas = $("#wishStartInstanceNumbers").val();
 	var AjaxURL = "/app/service/start?serviceId="+serviceId+"&version="+version+"&replicas="+replicas;
@@ -1022,6 +1026,10 @@ $("#startServiceSubmits").bind("click",function(event){
 			alert("启动服务异常！");
 		}
 	});
+	
+	if(startFlag){
+		//re
+	}
 });
 
 //rollback or upgrade
@@ -1123,3 +1131,51 @@ function infoStopService(){
 	});
 }
 
+//show node port eidt page
+function showLoadBalancer(){
+	$("#portDisplay").css("display","block");
+	$("input[class='disen']").attr("disabled",false);
+	$("#pros").removeProp("disabled");//recovery select
+	$("#pros").select2();
+}
+
+//save node ports into db
+function saveNodePort(){
+	var ajaxUrl = "/app/service/createLoadBalancer?serviceId="+serviceId;
+	var paramData = [];
+	var paramDataItem = {};
+	paramDataItem["nodePort"] = $("input[name='iNodePort']").val();
+	paramDataItem["targetPort"] = $("input[name='iTargetPort']").val();
+	paramDataItem["protocol"] = $("select[name='iProtocol']").val();
+	paramDataItem["description"] = $("input[name='description']").val();
+	paramData.push(paramDataItem);
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: ajaxUrl,
+		data: JSON.stringify(paramData),
+		contentType:"application/json",
+		success: function (data) {
+			alert("操作成功！");
+			disableNodePort();
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+}
+
+//disable
+function disableNodePort(){
+	$("input[class='disen']").attr("disabled",true);//disabled input
+	$("#pros").prop("disabled","disabled");
+	$("#pros").select2();
+}
+
+//delete node port
+function deleteNodePort(){
+	$("#portDisplay").css("display","none");//hide
+	$("input[class='disen']").val("");//clear
+	//delete from db
+	
+}

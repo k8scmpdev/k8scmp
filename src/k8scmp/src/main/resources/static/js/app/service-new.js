@@ -320,7 +320,7 @@ function loadsUpgradeDatas(containers){
 					"<td class='i20' style='width: 30%;min-width:30%;max-width:30%;text-align: center;'>"+registry+"</td>" +
 					"<td class='i30' style='width: 10%;min-width:10%;max-width:10%;text-align: center;'>"+tag+"</td>" +
 					"<td class='i40' style='width: 30%;min-width:30%;max-width:30%;text-align: center;'><a title='配置' class='tip-bottom iconOperation' data-target='#service-new3' data-toggle='modal' onclick='showImageConfiguration(\""+id+"\");'><i class='icon-edit'></i><span>配置</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
-					"<a title='删除' class='tip-bottom iconOperation' href='javascript:void(0);' onclick='deleteImage(this);'><i class='icon-trash'></i><span>删除</span></a></td>" +
+					"<a title='删除' class='tip-bottom iconOperation' href='javascript:void(0);' onclick='deleteImage(this,\""+id+"\");'><i class='icon-trash'></i><span>删除</span></a></td>" +
 					"</tr>";
 			htmlContent = htmlContent.concat(trRow);
 			currentContainerMap[id]= container;
@@ -355,10 +355,11 @@ function getSelectedRow(){
 }
 
 //remove image tr from image list table
-function deleteImage(obj){
+function deleteImage(obj,id){
 	var tr=obj.parentNode.parentNode;
 	var tbody=tr.parentNode;
 	tbody.removeChild(tr);
+	delete currentContainerMap[id];
 }
 
 function showImageConfiguration(id){

@@ -41,6 +41,7 @@ $("#startServiceSubmit").bind("click",function(event){
 			//success
 			if(data.resultCode == 200){
 				startFlag = true;
+				alert("启动服务成功！");
 			}else{
 				alert("启动服务异常！");
 			}
@@ -49,11 +50,11 @@ $("#startServiceSubmit").bind("click",function(event){
 			alert("启动服务异常！");
 		}
 	});
+	
+	$("#startServiceDisplay").modal("hide");
 	if(startFlag){
 		refreshServices();
-		alert("启动服务成功！");
 	}
-	
 });
 
 //hide start service
@@ -281,6 +282,7 @@ function scaleUpDown(){
 
 //sacle up or down submit
 $("#scaleSubmit").bind("click",function(event){
+	var scaleFlag = false;
 	var selectedRow = getSelectedRow();
 	var serviceId = selectedRow[0]["id"];
 	var currentNumber = $("#instanceNumber").html();
@@ -306,6 +308,7 @@ $("#scaleSubmit").bind("click",function(event){
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
+				scaleFlag = true;
 				alert("操作成功！");
 			}else{
 				alert("error!");
@@ -315,10 +318,16 @@ $("#scaleSubmit").bind("click",function(event){
 			alert("error!");
 		}
 	});
+	
+	$("#scaleUpDown").modal("hide");
+	if(scaleFlag){
+		refreshServices();
+	}
 });
 
 //roll back or upgrade submit
 $("#rollbackSubmit").bind("click",function(event){
+	var rollFlag = false;
 	var selectedRow = getSelectedRow();
 	var serviceId = selectedRow[0]["id"];
 	var currentVersionNumber = $("#currentVersionNumber").html();
@@ -346,6 +355,7 @@ $("#rollbackSubmit").bind("click",function(event){
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
+				rollFlag = true;
 				alert("操作成功！");
 			}else{
 				alert("error!");
@@ -355,6 +365,11 @@ $("#rollbackSubmit").bind("click",function(event){
 			alert("error!");
 		}
 	});
+	
+	$("#updateRollback").modal("hide");
+	if(rollFlag){
+		refreshServices();
+	}
 });
 
 //get all checked rows

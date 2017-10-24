@@ -213,9 +213,13 @@
 	padding-bottom: 50%;
 }
 
+.filleButtontLi{
+	padding-left: 10%;
+}
+
 .filletDiv .filletLi{
 	padding-top: 0;
-	padding-left: 8%;
+	padding-left: 4%;
 }
 
 .deploySpan{
