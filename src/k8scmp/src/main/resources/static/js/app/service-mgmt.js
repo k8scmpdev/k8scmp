@@ -173,10 +173,10 @@ function startUpdateRollback(){
 					var selectSecond = $("#selectVersionNumber");
 					selectSecond.empty();
 					for(var i=0;i<versionList.length;i++){
-						var opt= new Option();
+						/*var opt= new Option();
 						opt.value=versionList[i].version;
 						opt.text = versionList[i].versionName;
-						selectSecond.options.add(opt);
+						selectSecond.options.add(opt);*/
 					}
 				}
 			}
@@ -332,12 +332,13 @@ $("#rollbackSubmit").bind("click",function(event){
 	}
 	
 	//upgrade
-	if(selectVersionNumber>currentVersionNumber){
+	ajaxUrl = "/app/service/startUpdate?serviceId="+serviceId+"&version="+selectVersionNumber+"&replicas="+wishReplies;
+	/*if(selectVersionNumber>currentVersionNumber){
 		ajaxUrl = "/app/service/startUpdate?serviceId="+serviceId+"&version="+selectVersionNumber+"&replicas="+wishReplies;
 	}else{
 		ajaxUrl = "/app/service/startRollback?serviceId="+serviceId+"&version="+selectVersionNumber+"&replicas="+wishReplies;
 	}
-	
+	*/
 	$.ajax({
 		type: "GET",
 		dataType: "json",
