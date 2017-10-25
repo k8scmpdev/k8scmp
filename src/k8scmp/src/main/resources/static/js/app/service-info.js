@@ -118,30 +118,36 @@ $(document).ready(function(){
 	initServiceAddress(serviceId);//service urls
 	
 	/***init port mapped value**/
-	var hiddenNodePorts = $("infoNodePorts").val();////???????
+	var hiddenNodePorts = $("infoNodePorts").val();
+	$("#portMapped").html("");
+	$("#nodeOperation").css("display","none");
 	if(hiddenNodePorts != null && hiddenNodePorts.length>0){
-		boolean eachFlag = false;
-		for(var k=0;k<hiddenNodePorts.length;k++){
-			if(k == 0 || eachFlag){
-				//display load balancer
-				var nodePortItem = hiddenNodePorts[k];
-				var childdiv=$('<div></div>');  
-				childdiv.attr("id","id" + new Date().getTime());
-				$("#portMapped").append(childdiv);
-				childdiv.load("/js/statichtml/app/portMappedTemplate.html #portDisplay",function(responseTxt,statusTxt,xhr){
-					//set value
-					$(this).find("input[name='iNodePort']").val(nodePortItem["nodePort"]);
-					$(this).find("input[name='iTargetPort']").val(nodePortItem["targetPort"]);
-					//set select2 select value
-					var iprotocal = $(this).find("select[name='iProtocol']").select2();
-					iprotocal.val(nodePortItem["protocol"]).trigger("change");
-					$(this).find("input[name='description']").val(nodePortItem["description"]);
-					eachFlag = true;
-				});
-			}
-		}
+		$("#nodeOperation").css("display","block");
+		var portLength = hiddenNodePorts.length;
+		loadNodePorts(hiddenNodePorts,portLength-1);
 	}
 });
+
+//init port mapped
+function loadNodePorts(hiddenNodePorts,portLength){
+	var childdiv=$('<div></div>');  
+	childdiv.attr("id","id" + new Date().getTime());
+	$("#portMapped").append(childdiv);
+	childdiv.load("/js/statichtml/app/portMappedTemplate.html #portDisplay",function(responseTxt,statusTxt,xhr){
+		var nodePortItem = hiddenNodePorts[portLength];
+		//set value
+		$(this).find("input[name='iNodePort']").val(nodePortItem["nodePort"]);
+		$(this).find("input[name='iTargetPort']").val(nodePortItem["targetPort"]);
+		//set select2 select value
+		var iprotocal = $(this).find("select[name='iProtocol']").select2();
+		iprotocal.val(nodePortItem["protocol"]).trigger("change");
+		$(this).find("input[name='description']").val(nodePortItem["description"]);
+		portLength--;
+		if(portLength>=0){
+			loadNodePorts(hiddenNodePorts,portLength);
+		}
+	});
+}
 
 //create load balancer
 /*$("#btnnew2pre").bind("click",function(event){
@@ -1215,6 +1221,7 @@ function deleteNodePort(){
 			contentType:"application/json",
 			success: function (data) {
 				alert("操作成功！");
+				$("#nodeOperation").css("display","none");
 			},
 			error: function(data) {
 				alert("error!");
