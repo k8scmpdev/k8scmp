@@ -17,12 +17,21 @@ $(".scroll-table tbody").on("change","input[type='checkbox']",function(){
 	}
 });
 */
+$(document).ready(function(){
+	
+	$('body').everyTime('1s',test);
+});
+
 
 //delete multi services
 function deleteService(){
 	
 	
 }
+function test(){
+	alert("hhhh");
+}
+
 
 //start service submit
 $("#startServiceSubmit").bind("click",function(event){
@@ -409,6 +418,8 @@ function deleteSingleService(serviceId,obj){
 //refresh service mgmt
 function refreshServices(){
 	var appId = $("#appId").val();
-	var AjaxURL= "/app/service/"+appId;
+	var hostLabel = $("#serviceHostLabel").html();
+	var namespace = $("#serviceNamespace").html();
+	var AjaxURL= "/app/service/"+appId+"?appId="+appId+"&hostLabel="+serviceHostLabel+"&namespace="+namespace;
 	window.location.href = AjaxURL;
 } 

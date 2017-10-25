@@ -32,8 +32,8 @@
 						</div>	
 						<div class="widget-box">
 							<div class="widget-title">
-								<h5>所属集群：<span th:text="${#httpServletRequest.getParameter('hostLabel')}"></span>&nbsp;&nbsp;
-									namespace：<span th:text="${#httpServletRequest.getParameter('namespace')}"></span></h5>
+								<h5>所属集群：<span id="serviceHostLabel" th:text="${#httpServletRequest.getParameter('hostLabel')}"></span>&nbsp;&nbsp;
+									namespace：<span id="serviceNamespace" th:text="${#httpServletRequest.getParameter('namespace')}"></span></h5>
 							</div>
 							<div class="widget-content nopadding">
 							<input type="hidden" id="appId" th:value="${#httpServletRequest.getParameter('appId')}"/>
