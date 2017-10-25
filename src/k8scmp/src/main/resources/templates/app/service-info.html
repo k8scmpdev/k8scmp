@@ -206,9 +206,16 @@
 						
 							<div class="tab-pane fade" id="sPort"> 
 								<div id="showLoadBalancer">
-									<a class="btn" href="javascript:void(0)" onclick="showLoadBalancer();"><span style="font-size: 13px;">编辑负载均衡器</span></a>
+									<a class="btn" href="javascript:void(0)" onclick="showPortMapped();"><span style="font-size: 13px;">创建负载均衡器</span></a>
 								</div>
-								<div id="portDisplay" style="padding-top: 10px;display: none;float: left;padding-left: 30%;">
+								<div id="portMapped">
+                           		
+                           		</div>
+                           		<div>
+									<a title="确定添加" href="javascript:void(0);" onclick="saveNodePort();" class="btn btn-primary btn-mini"><i class="icon-edit"></i>完成</a>
+									<a title="删除" class="tip-bottom" href="javascript:void(0);" onclick="deleteNodePort();"><i class="icon-trash"></i></a>
+								</div>
+								<!-- <div id="portDisplay" style="padding-top: 10px;display: none;float: left;padding-left: 30%;">
 									<div>
 										<span style="width: 120px;float:left">对外访问服务端口:</span>
 										<input class="disen" type="text" name="iNodePort"/>
@@ -230,7 +237,7 @@
 										<a title="确定添加" href="javascript:void(0);" onclick="saveNodePort();" class="btn btn-primary btn-mini"><i class="icon-edit"></i>完成</a>
 										<a title="删除" href="javascript:void(0);" onclick="deleteNodePort();" class="btn btn-primary btn-mini"><i class="icon-trash"></i>删除</a>
 									</div>
-								</div>
+								</div> -->
 						    </div>
 						</div>	
 						
