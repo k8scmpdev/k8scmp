@@ -334,21 +334,26 @@ public class ServiceServiceImpl implements ServiceService {
 		refreshServiceState(serviceId);
 		return serviceId;
 	}
-	
+
+	/**
+	 * 创建负载均衡器，如果为空，则删除旧的负载均衡
+	 */
 	@Override
 	public String createLoadBalancer(String serviceId,List<NodePortDraft> nodePorts) throws Exception{
-		if(nodePorts == null || nodePorts.size()==0){
-			return null;
-		}
-		
 		ServiceInfo serviceInfo = serviceDao.getService(serviceId);
 		if(serviceInfo == null){
 			throw ApiException.wrapMessage(ResultStat.PARAM_ERROR, "no such service:" + serviceId);
 		}
 		
 		ServiceConfigInfo service = serviceInfo.toModel(ServiceConfigInfo.class);
-		service.setExternal(true);
-		service.setNodePorts(nodePorts);
+		
+		if(nodePorts == null || nodePorts.size()==0){
+			service.setExternal(false);
+			service.setNodePorts(null);
+		}else{
+			service.setExternal(true);
+			service.setNodePorts(nodePorts);
+		}
 		
 		serviceInfo.setData(service.toString());
 		
@@ -364,23 +369,29 @@ public class ServiceServiceImpl implements ServiceService {
         }
 		
 		AppInfo appInfo = appDao.getApp(serviceInfo.getAppId());
-		try {
-            driver.createLoadBalancer(appInfo, service);
-            // add operation record
-            operationLog.insertRecord(new OperationRecord(
-            		serviceId, 
-    				ResourceType.SERVICE,
-    				OperationType.STARTLOADBALANCER, 
-    				AuthUtil.getCurrentLoginName(), 
-    				AuthUtil.getUserName(),
-    				"OK", 
-    				"创建负载", 
-    				DateUtil.dateFormatToMillis(new Date())
-    		));
-        } catch (DriverException e) {
-            throw ApiException.wrapMessage(ResultStat.LOADBALANCER_START_FAILED, e.getMessage());
-        }
-		
+
+		if (nodePorts == null || nodePorts.size() == 0) {
+			try {
+				driver.stopLoadBalancer(appInfo, service);
+				// add operation record
+				operationLog.insertRecord(new OperationRecord(serviceId, ResourceType.SERVICE,
+						OperationType.STOPLOADBALANCER, AuthUtil.getCurrentLoginName(), AuthUtil.getUserName(), "OK",
+						"删除负载", DateUtil.dateFormatToMillis(new Date())));
+			} catch (DriverException e) {
+				throw ApiException.wrapMessage(ResultStat.LOADBALANCER_STOP_FAILED, e.getMessage());
+			}
+		} else {
+			try {
+				driver.createLoadBalancer(appInfo, service);
+				// add operation record
+				operationLog.insertRecord(new OperationRecord(serviceId, ResourceType.SERVICE,
+						OperationType.STARTLOADBALANCER, AuthUtil.getCurrentLoginName(), AuthUtil.getUserName(), "OK",
+						"创建负载", DateUtil.dateFormatToMillis(new Date())));
+			} catch (DriverException e) {
+				throw ApiException.wrapMessage(ResultStat.LOADBALANCER_START_FAILED, e.getMessage());
+			}
+		}
+
 		return serviceId;
 	}
 	
