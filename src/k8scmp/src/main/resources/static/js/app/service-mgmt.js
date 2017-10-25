@@ -17,10 +17,7 @@ $(".scroll-table tbody").on("change","input[type='checkbox']",function(){
 	}
 });
 */
-$(document).ready(function(){
-	
-	$('body').everyTime('1s',test);
-});
+
 
 
 //delete multi services
