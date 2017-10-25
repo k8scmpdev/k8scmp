@@ -404,7 +404,7 @@ public class ServiceServiceImpl implements ServiceService {
 		checkStartSeq(serviceInfo.getAppId(),serviceInfo.getStartSeq());
 		
 		
-		serviceStatusManager.checkStateAvailable(ServiceStatus.valueOf(serviceInfo.getState()), ServiceStatus.STOP);
+		serviceStatusManager.checkStateAvailable(ServiceStatus.valueOf(serviceInfo.getState()), ServiceStatus.STOPPING);
 		
 		serviceInfo.setState(ServiceStatus.STOPPING.name());
 		serviceInfo.setLastModifierId(AuthUtil.getCurrentLoginName());

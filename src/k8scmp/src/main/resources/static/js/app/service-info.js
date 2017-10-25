@@ -1020,7 +1020,7 @@ $("#startServiceSubmits").bind("click",function(event){
 
 //refresh service info
 function refreshServiceInfo(){
-	window.location.href="/app/service/service-info/"+${service.id};
+	window.location.href="/app/service/service-info/"+serviceId;
 }
 
 //rollback or upgrade
