@@ -2,16 +2,17 @@ function showPortMapped(){
 	/***init port mapped value**/
 	var hiddenNodePorts = $("infoNodePorts").val();
 	$("#portMapped").html("");
-	$("#nodeOperation").css("display","none");
+/*	$("#nodeOperation").css("display","none");
 	if(hiddenNodePorts != null && hiddenNodePorts.length>0){
 		$("#nodeOperation").css("display","block");
 		var portLength = hiddenNodePorts.length;
 		loadNodePorts(hiddenNodePorts,portLength-1);
-	}
-    /*var childdiv=$('<div></div>');
+	}*/
+    var childdiv=$('<div></div>');
 	childdiv.attr("id","id" + new Date().getTime());
+	childdiv.load("/js/statichtml/app/portMappedTemplate.html #portMappedTemplate");
 	$("#portMapped").append(childdiv);
-	childdiv.load("/js/statichtml/app/portMappedTemplate.html #portMappedTemplate");*/
+	$("#nodeOperation").css("display","block");
 }
 
 $(".radioItem").change(function(event){
