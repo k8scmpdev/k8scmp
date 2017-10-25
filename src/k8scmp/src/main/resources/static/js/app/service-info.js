@@ -127,6 +127,10 @@ $(document).ready(function(){
 	initCurrentVersionNum(serviceId);//current version number
 	initServiceAddress(serviceId);//service urls
 
+	//判断是否有端口映射
+	if($("#portDisplay").length>0){
+		$("#nodeOperation").css("display","block");
+	}
 });
 
 //init port mapped
