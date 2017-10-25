@@ -213,11 +213,11 @@
 										<div id="portDisplay" style="padding-top: 10px;">
 											<div>
 												<span style="width: 120px;float:left">对外访问服务端口:</span>
-												<input name="iNodePort" th:value="${node.nodePort}"/>
+												<input name="iNodePort" th:value="${node.nodePort}" type="text"/>
 											</div>
 											<div>
 												<span style="width: 120px;float:left">容器端口:</span>
-												<input name="iTargetPort" th:value="${node.targetPort}"/>
+												<input name="iTargetPort" th:value="${node.targetPort}" type="text"/>
 											</div>
 											<div>
 												<span style="width: 120px;float:left">协议:</span>
@@ -228,7 +228,7 @@
 											</div>
 											<div>
 												<span style="width: 120px;float:left">描述:</span>
-												<input name="description" th:value="${node.description}"/>
+												<input name="description" th:value="${node.description}" type="text"/>
 												<span style="float:right;padding-right: 50%;">
 													<a title="编辑" class="tip-bottom" href="javascript:void(0);" onclick="editPortMapped(this);"><i class="icon-edit"></i></a>
 												</span>
