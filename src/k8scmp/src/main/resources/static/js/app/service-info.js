@@ -125,7 +125,7 @@ $(document).ready(function(){
 	
 	
 	/***init port mapped value**/
-	var hiddenNodePorts = $("hiddenNodePorts").val();////???????
+/*	var hiddenNodePorts = $("hiddenNodePorts").val();////???????
 	if(hiddenNodePorts != null && hiddenNodePorts.length>0){
 		//hide create new load banlance button
 		$("#createLoadBalancer").css("display","none");
@@ -142,7 +142,7 @@ $(document).ready(function(){
 			$(this).find("span[name='iProtocol']").html(nodePortItem["protocol"]);
 			$(this).find("span[name='description']").html(nodePortItem["description"]);
 		});
-	}
+	}*/
 });
 
 //create load balancer
