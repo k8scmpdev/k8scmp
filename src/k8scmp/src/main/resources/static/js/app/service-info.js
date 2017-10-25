@@ -112,17 +112,10 @@ $(document).ready(function(){
 	});
 	
 	//init service info common data
-	/**get init**/
-	var replies = initReplicasByServiceId(serviceId);//replies
-	var versionNumers = initCurrentVersionNum(serviceId);//current version number
-	var serviceUrls = initServiceAddress(serviceId);//service urls
-	
-	/**set init**/
-	$("#repliesCount").html(replies);//replies
-	$("#currentVersionNumber").html(versionNumers);//current version number
-	$("#serviceUrls").html(serviceUrls==null?"":serviceUrls.join(","));//service urls
-
-	
+	/**init**/
+	initReplicasByServiceId(serviceId);//replies
+	initCurrentVersionNum(serviceId);//current version number
+	initServiceAddress(serviceId);//service urls
 	
 	/***init port mapped value**/
 /*	var hiddenNodePorts = $("hiddenNodePorts").val();////???????
@@ -146,7 +139,7 @@ $(document).ready(function(){
 });
 
 //create load balancer
-$("#btnnew2pre").bind("click",function(event){
+/*$("#btnnew2pre").bind("click",function(event){
 	var nodePortItem = {};
 	//show port mapped detail into sPort tab
 	//save ports
@@ -154,7 +147,7 @@ $("#btnnew2pre").bind("click",function(event){
 		$("#showLoadBalancer").css("display","none");
 		var nodePortItem = {};
 		
-		/****show port mapped detail into sPort tab***/
+		*//****show port mapped detail into sPort tab***//*
 		var nodePort = $("input[name='nodePort']").val();
 		var targetPort = $("input[name='targetPort']").val();
 		var protocol = $("select[name='protocol']").val();
@@ -201,9 +194,9 @@ $("#btnnew2pre").bind("click",function(event){
 	
 	//close this window
 	$("#sPortMappedModel").modal("hide");
-});
+});*/
 
-//get replies when document ready
+//get set replies when document ready
 function initReplicasByServiceId(serviceId){
 	var returnCount = 0;
 	var AjaxURL= "/app/service/getReplicasByServiceId?serviceId="+serviceId;
@@ -215,17 +208,16 @@ function initReplicasByServiceId(serviceId){
 		success: function (data) {
 			if(data.resultCode == 200){
 				returnCount = data.result;
+				$("#repliesCount").html(returnCount==null?"":returnCount);//replies
 			}
 		},
 		error: function(data) {
 			alert("error!");
 		}
 	});
-	
-	return returnCount;
 }
 
-//get current version num when document ready
+//get set current version num when document ready
 function initCurrentVersionNum(serviceId){
 	var returnNumber = 0;
 	var AjaxURL= "/app/service/getCurrentVersionNum?serviceId="+serviceId;
@@ -236,18 +228,17 @@ function initCurrentVersionNum(serviceId){
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
-				returnCount = data.result;
+				returnNumber = data.result;
+				$("#currentVersionNumber").html(returnNumber==null?"":returnNumber);
 			}
 		},
 		error: function(data) {
 			alert("error!");
 		}
 	});
-	
-	return returnNumber;
 }
 
-//get service address when document ready
+//get set service address when document ready
 function initServiceAddress(serviceId){
 	var serviceUrls = [];
 	var AjaxURL= "/app/service/getServiceURLs?serviceId="+serviceId;
@@ -259,14 +250,13 @@ function initServiceAddress(serviceId){
 		success: function (data) {
 			if(data.resultCode == 200){
 				serviceUrls = data.result;
+				$("#serviceUrls").html(serviceUrls==null?"":serviceUrls.join(","));//service urls
 			}
 		},
 		error: function(data) {
 			alert("error!");
 		}
 	});
-	
-	return serviceUrls;
 }
 
 function loadsUpgradeDatas(containers){
