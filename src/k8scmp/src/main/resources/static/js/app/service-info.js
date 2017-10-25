@@ -1176,6 +1176,35 @@ function disableNodePort(){
 function deleteNodePort(){
 	$("#portDisplay").css("display","none");//hide
 	$("input[class='disen']").val("");//clear
-	//delete from db
 	
+	//delete from db means save null
+	var ajaxUrl = "/app/service/createLoadBalancer?serviceId="+serviceId;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: ajaxUrl,
+		contentType:"application/json",
+		success: function (data) {
+			alert("操作成功！");
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
+}
+
+//display node ports info when click the loadbalancer tab
+function initLoadBalancer(){
+	var nodePorts = $("#infoNodePorts").val();
+	var disPlayNodePort = {};
+	if(nodePorts != null && infoNodePorts.length>0){
+		disPlayNodePort = nodePorts[0];
+		$("input[name='iNodePort']").val(disPlayNodePort==null?"":disPlayNodePort["nodePort"]);
+		$("input[name='iTargetPort']").val(disPlayNodePort==null?"":disPlayNodePort["targetPort"]);
+		$("input[name='description']").val(disPlayNodePort==null?"":disPlayNodePort["description"]);
+		
+		//make select2 default select
+		var iprotocal = $("#pros").select2();
+		iprotocal.val(disPlayNodePort["protocol"]).trigger("change");
+	}
 }

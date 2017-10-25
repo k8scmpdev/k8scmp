@@ -15,6 +15,7 @@
 				<a href="#" class="current" th:text="${serviceInfo.serviceCode}"></a>
 				<input type="hidden" id="serviceID" th:value="${serviceInfo.id}" />
 				<input type="hidden" id="currentVersion" th:value="${serviceInfo.ver}" />
+				<input type="hidden" id="infoNodePorts" th:value="${serviceInfo.nodePorts}"/>
 			</div>
 			<div class="filletDiv">
 				<div class="upFillet">
@@ -67,7 +68,7 @@
 									<a href="#sEvent" data-toggle="tab" class="fontSizeControl" th:onclick="'getEventByServiceId(\''+${serviceInfo.id}+'\')'">服务事件</a>
 								</li>
 								<li><a href="#sUpgrade" data-toggle="tab" class="fontSizeControl">升级配置</a></li>
-								<li><a href="#sPort" data-toggle="tab" class="fontSizeControl">负载</a></li>
+								<li><a href="#sPort" data-toggle="tab" class="fontSizeControl" onclick="initLoadBalancer();">负载</a></li>
 							</ul> 
 						  
 						<div id="myTabContent" class="tab-content">  
@@ -383,7 +384,7 @@
 								</div>		
 					</div>
 				</div>
-				<div id="sPortMappedModel" class="modal hide">
+<!-- 				<div id="sPortMappedModel" class="modal hide">
 					<div class="modal-header">
 						<button data-dismiss="modal" class="close" type="button">×</button>
 						<h3>创建负载均衡器</h3>
@@ -412,7 +413,7 @@
 							</div>
 				    	</div>
 	               	</div>
-	            </div>
+	            </div> -->
 	            
 	            <div class="modal hide" id="startServiceDisplays">
 					<div class="modal-header">
