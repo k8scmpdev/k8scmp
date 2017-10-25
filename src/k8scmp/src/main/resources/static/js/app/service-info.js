@@ -1005,7 +1005,6 @@ function infoScale(){
 
 //start service
 $("#startServiceSubmits").bind("click",function(event){
-	var startFlag = false;
 	var version = $("#selectStartVersionNumbers").val();
 	var replicas = $("#wishStartInstanceNumbers").val();
 	var AjaxURL = "/app/service/start?serviceId="+serviceId+"&version="+version+"&replicas="+replicas;
@@ -1017,7 +1016,8 @@ $("#startServiceSubmits").bind("click",function(event){
 		success: function (data) {
 			//success
 			if(data.resultCode == 200){
-				
+				//refresh service info
+				refreshServiceInfo();
 			}else{
 				alert("启动服务异常！");
 			}
@@ -1026,11 +1026,12 @@ $("#startServiceSubmits").bind("click",function(event){
 			alert("启动服务异常！");
 		}
 	});
-	
-	if(startFlag){
-		//re
-	}
 });
+
+//refresh service info
+function refreshServiceInfo(){
+	window.location.href="/app/service/service-info/"+${service.id};
+}
 
 //rollback or upgrade
 $("#upgradeSubmits").bind("click",function(event){
@@ -1059,6 +1060,8 @@ $("#upgradeSubmits").bind("click",function(event){
 		success: function (data) {
 			if(data.resultCode == 200){
 				alert("操作成功！");
+				//refresh service info
+				refreshServiceInfo();
 			}else{
 				alert("error!");
 			}
@@ -1094,6 +1097,8 @@ $("#scaleSubmits").bind("click",function(event){
 		success: function (data) {
 			if(data.resultCode == 200){
 				alert("操作成功！");
+				//refresh service info
+				refreshServiceInfo();
 			}else{
 				alert("error!");
 			}
@@ -1120,7 +1125,8 @@ function infoStopService(){
 		success: function (data) {
 			//success
 			if(data.resultCode == 200){
-				
+				//refresh service info
+				refreshServiceInfo();
 			}else{
 				alert("停止服务异常！");
 			}
