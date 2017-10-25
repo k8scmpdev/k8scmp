@@ -1,8 +1,17 @@
 function showPortMapped(){
-    var childdiv=$('<div></div>');
+	/***init port mapped value**/
+	var hiddenNodePorts = $("infoNodePorts").val();
+	$("#portMapped").html("");
+	$("#nodeOperation").css("display","none");
+	if(hiddenNodePorts != null && hiddenNodePorts.length>0){
+		$("#nodeOperation").css("display","block");
+		var portLength = hiddenNodePorts.length;
+		loadNodePorts(hiddenNodePorts,portLength-1);
+	}
+    /*var childdiv=$('<div></div>');
 	childdiv.attr("id","id" + new Date().getTime());
 	$("#portMapped").append(childdiv);
-	childdiv.load("/js/statichtml/app/portMappedTemplate.html #portMappedTemplate");
+	childdiv.load("/js/statichtml/app/portMappedTemplate.html #portMappedTemplate");*/
 }
 
 $(".radioItem").change(function(event){
@@ -116,16 +125,7 @@ $(document).ready(function(){
 	initReplicasByServiceId(serviceId);//replies
 	initCurrentVersionNum(serviceId);//current version number
 	initServiceAddress(serviceId);//service urls
-	
-	/***init port mapped value**/
-	var hiddenNodePorts = $("infoNodePorts").val();
-	$("#portMapped").html("");
-	$("#nodeOperation").css("display","none");
-	if(hiddenNodePorts != null && hiddenNodePorts.length>0){
-		$("#nodeOperation").css("display","block");
-		var portLength = hiddenNodePorts.length;
-		loadNodePorts(hiddenNodePorts,portLength-1);
-	}
+
 });
 
 //init port mapped
