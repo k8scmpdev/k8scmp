@@ -314,6 +314,72 @@ public class MonitorServiceImpl implements MonitorService {
         return resultList;
     }
     
+    @Override
+    public Map<String,Map<Long,Double>> getMonitorDetailData(List<String> hostlist,String type, long startTime, long endTime, String dataSpec) {
+
+       // AuthUtil.verify(CurrentThreadInfo.getUserId(), cid, ResourceType.CLUSTER, OperationType.GET);
+        
+    	//根据type实时查询node\pod\container
+    	List<TargetInfo> targetInfos = getTargetInfos(type);
+    	List<TargetInfo> targetInfos_use = new ArrayList<TargetInfo>();
+    	
+    	//根据传过来的node列表筛选targetInfos
+    	for(TargetInfo targetInfo:targetInfos){
+    		if(hostlist.contains(targetInfo.getNode())){
+    			targetInfos_use.add(targetInfo);
+    		}
+    	}
+    	
+        MonitorDataRequest monitorDataRequest = new MonitorDataRequest(
+                startTime,
+                endTime,
+                dataSpec,
+                type,
+                targetInfos_use);
+
+        if (!StringUtils.isBlank(monitorDataRequest.checkLegality())) {
+            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_REQUEST_NOT_LEGAL, monitorDataRequest.checkLegality());
+        }
+
+        // preparation
+        GlobalInfo queryInfo = globalBiz.getGlobalInfoByType(GlobalType.MONITOR_QUERY);
+        if (queryInfo == null) {
+            throw ApiException.wrapMessage(ResultStat.MONITOR_DATA_QUERY_ERROR, "query is null");
+        }
+        String queryUrl = "http://" + queryInfo.getValue() + "/graph/history";
+
+        MonitorResult monitorResult = new MonitorResult();
+        monitorResult.setTargetType(monitorDataRequest.getTargetType());
+        monitorResult.setDataSpec(monitorDataRequest.getDataSpec());
+
+        // fetch data from query api
+        List<GraphHistoryResponse> graphHistoryResponses = new ArrayList<>();
+        // create graphHistoryRequest
+        GraphHistoryRequest graphHistoryRequest = getGraphHistoryRequest(monitorDataRequest);
+        List<EndpointCounter> endpointCounterList = graphHistoryRequest.getEndpoint_counters();
+        //Concurrent requests, sending 500 counters at a time
+        int max_size = 500;
+        int times = endpointCounterList.size() % max_size == 0 ? endpointCounterList.size() / max_size : endpointCounterList.size() / max_size + 1;
+        List<postJsonTask> tasks = new ArrayList<>(times);
+        for (int i = 0; i < times; i++) {
+            GraphHistoryRequest tmp = new GraphHistoryRequest();
+            tmp.setStart(graphHistoryRequest.getStart());
+            tmp.setEnd(graphHistoryRequest.getEnd());
+            tmp.setCf(graphHistoryRequest.getCf());
+            tmp.setEndpoint_counters(endpointCounterList.subList(i * max_size, Math.min((i + 1) * max_size, endpointCounterList.size())));
+            tasks.add(new postJsonTask(queryUrl, tmp));
+        }
+        List<List<GraphHistoryResponse>> taskResult = ClientConfigure.executeCompletionService(tasks);
+        for (List<GraphHistoryResponse> result : taskResult) {
+            if (result != null && result.size() > 0) {
+                graphHistoryResponses.addAll(result);
+            }
+        }
+        
+        Map<String,Map<Long,Double>> resultList = createDetailInfo(graphHistoryResponses);
+        return resultList;
+    }
+    
     private Map<String,Map<Long,Double>> createDetailInfo(List<GraphHistoryResponse> graphHistoryResponses){
     	Map<String,Map<Long,Double>> resultMap = new HashMap<String,Map<Long,Double>>();
     	for(GraphHistoryResponse gp :graphHistoryResponses){

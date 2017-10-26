@@ -38,7 +38,7 @@
 								<td th:text="${node.diskPercent}"></td>
 								<td th:text="${node.netin}"></td>
 								<td th:text="${node.netout}"></td>
-								<td><a title='单击查看主机详情' th:href="@{monitor/host}" class="tip-top">查看</a></td>
+								<td><a title='单击查看主机详情' th:href="@{monitor/host/detail(hostName=${node.hostName},logicCluster=${node.logicCluster})}" class="tip-top">查看</a></td>
 							</tr>
 						</tbody>
 					</table>  

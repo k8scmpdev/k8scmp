@@ -29,4 +29,7 @@ public interface MonitorService {
 
 	Map<String, Map<Long, Double>> getMonitorDetailData(String type, long startTime, long endTime, String dataSpec);
 
+	Map<String, Map<Long, Double>> getMonitorDetailData(List<String> hostlist, String type, long startTime,
+			long endTime, String dataSpec);
+
 }

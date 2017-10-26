@@ -12,7 +12,7 @@
 				<h2>主机监控</h2>
 			</div>
 			<div id="breadcrumb">
-					<a href="#" class="current tip-bottom" title="主机监控">主机监控</a>
+					<a href="/monitor" class="current tip-bottom" title="监控管理">监控管理</a>
 			</div>
 			<div class="container-fluid">
 				<div class="row-fluid">
@@ -21,12 +21,13 @@
 						<div class="control-group">
 						    <!-- <div class="col-lg-5  pull-right" style="float:right;border:1px"> -->
                                		<form action="#" method="post"> 
-							    集群：<strong><span class="text" th:text="cent-os-01"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							    主机：<strong><span class="text" th:text="node-dex003"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							    采样方式&nbsp;&nbsp;<select id="dataSpec" name="dataSpec" class="selectpicker show-tick form-control" data-live-search="false" onclick="javascript(0);">
-									<option value="max">最大值</option>
-							        <option value="average" selected="selected">平均值</option>
-							        <option value="min">最小值</option>
+							    集群：<strong><span class="text" th:text="${logicCluster}"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							    主机：<strong><span class="text" th:text="${hostName}"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							    <input type="hidden" id="hostname" th:value="${hostName}" />
+							    采样方式&nbsp;&nbsp;<select id="dataSpec" name="dataSpec" data-live-search="false" onchange="changeDataByKeys()">
+									<option value="MAX">最大值</option>
+							        <option value="AVERAGE" selected="selected">平均值</option>
+							        <option value="MIN">最小值</option>
 							    </select>
                                      	自定义&nbsp;&nbsp;<input id="date_begin" type="text" class="datepicker"/>
                                      	-&nbsp;<input id="date_end" type="text" class="datepicker"/>
@@ -81,7 +82,6 @@
         <script th:src="@{/js/bootstrap-colorpicker.js}"></script>
         <script th:src="@{/js/bootstrap-datepicker.js}"></script>
         
-        <script th:src="@{/js/unicorn.form_common.js}"></script>
  		
 	</body>
 </html>

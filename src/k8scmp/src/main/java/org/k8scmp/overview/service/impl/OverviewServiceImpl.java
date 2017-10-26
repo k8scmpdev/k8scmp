@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by jason on 17-9-8.
@@ -58,7 +59,7 @@ public class OverviewServiceImpl implements OverviewService {
 	}
 	
 	public Map<String, Integer> parseCountInfo(List<OverviewCountInfo> countInfoList){
-		Map<String, Integer> data = new HashMap<>();
+		Map<String, Integer> data = new TreeMap<String, Integer>();
      	int count_r = 0;
      	int count_s = 0;
      	int count_o = 0;
@@ -78,7 +79,7 @@ public class OverviewServiceImpl implements OverviewService {
 	public Map<String, Double> getMemoryInfo() {
 		//获取cpu、memory、node概览数据
      	ResourceOverview resourceOverviewInfo = getResourceOverview();
-     	Map<String, Double> data = new HashMap<>();
+     	Map<String, Double> data = new TreeMap<String, Double>();
      	data.put("使用："+parseDouble2Str(resourceOverviewInfo.getMemoryUsed()/1024/1024/1024)+"G", resourceOverviewInfo.getMemoryUsed());
      	data.put("可用："+parseDouble2Str((resourceOverviewInfo.getMemoryTotal()-resourceOverviewInfo.getMemoryUsed())/1024/1024/1024)+"G", resourceOverviewInfo.getMemoryTotal()-resourceOverviewInfo.getMemoryUsed());
      	return data;
@@ -88,7 +89,7 @@ public class OverviewServiceImpl implements OverviewService {
 	public Map<String, Double> getDiskInfo() {
 		//获取cpu、memory、node概览数据
      	ResourceOverview resourceOverviewInfo = getResourceOverview();
-     	Map<String, Double> data = new HashMap<>();
+     	Map<String, Double> data = new TreeMap<String, Double>();
      	data.put("使用："+parseDouble2Str((resourceOverviewInfo.getDiskTotal()-resourceOverviewInfo.getDiskRemain())/1024/1024/1024)+"G", resourceOverviewInfo.getDiskTotal()-resourceOverviewInfo.getDiskRemain());
      	data.put("可用："+parseDouble2Str(resourceOverviewInfo.getDiskRemain()/1024/1024/1024)+"G", resourceOverviewInfo.getDiskRemain());
      	return data;
@@ -98,7 +99,7 @@ public class OverviewServiceImpl implements OverviewService {
 	public Map<String, Integer> getCPUInfo() {
 		//获取cpu、memory、node概览数据
      	ResourceOverview resourceOverviewInfo = getResourceOverview();
-     	Map<String, Integer> data = new HashMap<>();
+     	Map<String, Integer> data = new TreeMap<String, Integer>();
      	data.put("0-25%："+resourceOverviewInfo.getCpu0To25()+"台", resourceOverviewInfo.getCpu0To25());
      	data.put("25-50%："+resourceOverviewInfo.getCpu25To50()+"台", resourceOverviewInfo.getCpu25To50());
      	data.put("50-75%："+resourceOverviewInfo.getCpu50To75()+"台", resourceOverviewInfo.getCpu50To75());
@@ -110,7 +111,7 @@ public class OverviewServiceImpl implements OverviewService {
 	public Map<String, Integer> getNodeInfo() {
 		//获取cpu、memory、node概览数据
      	ResourceOverview resourceOverviewInfo = getResourceOverview();
-     	Map<String, Integer> data = new HashMap<>();
+     	Map<String, Integer> data = new TreeMap<String, Integer>();
      	data.put("在线："+resourceOverviewInfo.getNodeOnline()+"台", resourceOverviewInfo.getNodeOnline());
      	data.put("离线："+resourceOverviewInfo.getNodeOffline()+"台", resourceOverviewInfo.getNodeOffline());
      	return data;

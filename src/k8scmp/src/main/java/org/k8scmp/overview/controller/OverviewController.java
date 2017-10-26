@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -102,7 +103,7 @@ public class OverviewController {
      	
     	ObjectMapper obj = new ObjectMapper();
 
-    	Map<String, Object> appinfo = new HashMap<>();
+    	Map<String, Object> appinfo = new TreeMap<String, Object>();
      	appinfo.put("type", "pie");
      	appinfo.put("name", "应用");
 
@@ -126,7 +127,7 @@ public class OverviewController {
      	
     	ObjectMapper obj = new ObjectMapper();
 
-    	Map<String, Object> appinfo = new HashMap<>();
+    	Map<String, Object> appinfo = new TreeMap<String, Object>();
      	appinfo.put("type", "pie");
      	appinfo.put("name", "服务");
 		appinfo.put("datalist", overviewService.getServiceInfo());

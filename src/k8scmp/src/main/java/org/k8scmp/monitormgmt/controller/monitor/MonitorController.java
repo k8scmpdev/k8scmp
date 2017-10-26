@@ -80,6 +80,14 @@ public class MonitorController {
         return "monitor/monitor-host";
     }
 	
+	@RequestMapping(value = "/host/detail", method = RequestMethod.GET)
+    public String getMonitorHostDetail(Model model,@RequestParam(value = "hostName", required = true) String hostName,@RequestParam(value = "logicCluster", required = true) String logicCluster) throws Exception {
+		model.addAttribute("logicCluster", logicCluster);
+		model.addAttribute("hostName", hostName);
+		
+        return "monitor/monitor-host";
+    }
+	
 	@ResponseBody
     @RequestMapping(value="/host/getDetailData", method=RequestMethod.GET)
     public String getDetailData() {
@@ -109,19 +117,50 @@ public class MonitorController {
     }
 	
 	@ResponseBody
-    @RequestMapping(value="/host/getDetailData1raw", method=RequestMethod.GET)
-    public String getDetailData1row() {
+    @RequestMapping(value="/host/getDetailDataByKeys", method=RequestMethod.GET)
+    public String getDetailDataByKeys(@RequestParam(value = "hostlist", required = true) List<String> hostlist,
+    		@RequestParam(value = "dataSpec", required = false ,defaultValue="AVERAGE") String dataSpec,
+    		@RequestParam(value = "startTime", required = false ,defaultValue="0") long startTime,
+    		@RequestParam(value = "endTime", required = false ,defaultValue="0") long endTime) {
      	
     	ObjectMapper obj = new ObjectMapper();
 
-		//默认监控当前时间半小时内的值  单个主机的指标展示
+		//根据参数获取  主机的指标展示
 		String type = "node";
 		Calendar current = Calendar.getInstance();
-		long endTime = current.getTimeInMillis();
-		current.set(Calendar.MILLISECOND, current.get(Calendar.MILLISECOND) - 30*1000);
-		long startTime = current.getTimeInMillis();
-		String dataSpec = "AVERAGE";
-		Map<String,Map<Long,Double>> monitorDetailDataList = monitorService.getMonitorDetailData(type,startTime,endTime,dataSpec);
+		if(endTime==0) endTime = current.getTimeInMillis();
+		current.set(Calendar.MILLISECOND, current.get(Calendar.MILLISECOND) - 30*60*1000);
+		if(startTime==0) startTime = current.getTimeInMillis();
+		Map<String,Map<Long,Double>> monitorDetailDataList = monitorService.getMonitorDetailData(hostlist,type,startTime,endTime,dataSpec);
+		
+		Map<String, Object> appinfo = new HashMap<>();
+		appinfo.put("datalist", monitorDetailDataList);
+		
+        try {
+        	return obj.writeValueAsString(appinfo);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
+    }
+	
+	@ResponseBody
+    @RequestMapping(value="/host/getDetailData1raw", method=RequestMethod.GET)
+    public String getDetailData1row(@RequestParam(value = "hostlist", required = true) List<String> hostlist,
+    		@RequestParam(value = "dataSpec", required = false ,defaultValue="AVERAGE") String dataSpec,
+    		@RequestParam(value = "startTime", required = false ,defaultValue="0") long startTime,
+    		@RequestParam(value = "endTime", required = false ,defaultValue="0") long endTime) {
+     	
+    	ObjectMapper obj = new ObjectMapper();
+
+    	//根据参数获取  主机的指标展示
+    	String type = "node";
+    	Calendar current = Calendar.getInstance();
+    	if(endTime==0) endTime = current.getTimeInMillis();
+    	current.set(Calendar.MILLISECOND, current.get(Calendar.MILLISECOND) - 30*1000);
+    	if(startTime==0) startTime = current.getTimeInMillis();
+    	Map<String,Map<Long,Double>> monitorDetailDataList = monitorService.getMonitorDetailData(hostlist,type,startTime,endTime,dataSpec);
 		
 		Map<String, Object> appinfo = new HashMap<>();
 		appinfo.put("datalist", monitorDetailDataList);
