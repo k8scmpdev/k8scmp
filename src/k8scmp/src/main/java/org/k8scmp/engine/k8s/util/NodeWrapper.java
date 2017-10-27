@@ -2,7 +2,11 @@ package org.k8scmp.engine.k8s.util;
 
 import io.fabric8.kubernetes.api.model.*;
 
+import org.k8scmp.appmgmt.dao.ServiceDao;
 import org.k8scmp.appmgmt.domain.Cluster;
+import org.k8scmp.appmgmt.domain.Container;
+import org.k8scmp.appmgmt.domain.Instance;
+import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.common.ClientConfigure;
 import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.exception.ApiException;
@@ -10,7 +14,10 @@ import org.k8scmp.exception.K8sDriverException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
+import org.k8scmp.mapper.appmgmt.ServiceMapper;
+import org.k8scmp.monitormgmt.domain.monitor.ContainerInfo;
 import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
+import org.k8scmp.monitormgmt.domain.monitor.PodInfo;
 import org.k8scmp.util.CommonUtil;
 import org.k8scmp.util.DateUtil;
 import org.k8scmp.util.StringUtils;
@@ -33,6 +40,9 @@ public class NodeWrapper {
     
     @Autowired
     GlobalBiz globalBiz;
+    
+    @Autowired
+    ServiceDao serviceDao;
 //    private static DeploymentBiz deploymentBiz;
 
 //    @Autowired
@@ -46,7 +56,7 @@ public class NodeWrapper {
     	Cluster cluster = new Cluster();
 //    	GlobalInfo globalInfo = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
 //    	cluster.setApi(globalInfo.getValue());
-    	cluster.setApi("192.168.80.137:8080");
+    	cluster.setApi("192.168.80.146:8080");
         this.init(cluster, namespace);
 
         return this;
@@ -101,7 +111,6 @@ public class NodeWrapper {
         if (nodeList != null && nodeList.getItems() != null) {
             for (Node node : nodeList.getItems()) {
                 NodeInfo nodeInfo = new NodeInfo();
-
                 if (node.getMetadata() != null) {
                     nodeInfo.setLabels(node.getMetadata().getLabels());
                     nodeInfo.setName(node.getMetadata().getName());
@@ -152,12 +161,240 @@ public class NodeWrapper {
         }
         return nodeInfoList;
     }
-
+    
+   /* public List<Map<String,List<PodInfo>>> getPodListByClusterNamespaceLabels(Cluster cluster,List<String> namespaces,List<Map<String,String>> labels){
+    	KubeUtils clientnew = null;
+    	List<Map<String,List<PodInfo>>> mapList = new ArrayList<>();
+    	Map<String,List<PodInfo>> podmap = new HashMap<>();
+    	try {
+	    	if(cluster == null){
+	    		GlobalInfo cluster_host = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
+	    		GlobalInfo cluster_name = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_NAME);
+	        	Cluster clusterNew = new Cluster();
+	        	clusterNew.setApi(cluster_host.getValue());
+	        	clusterNew.setId(cluster_host.getId()+"");
+	        	clusterNew.setName(cluster_name.getValue());
+				clientnew = Fabric8KubeUtils.buildKubeUtils(clusterNew, "default");
+	    	}else{
+	    		clientnew = Fabric8KubeUtils.buildKubeUtils(cluster, "default");
+	    	}
+	    	if(namespaces != null){
+				for (String namespace : namespaces) {
+					List<Namespace> items = clientnew.listAllNamespace().getItems();
+					for (Namespace namespace2 : items) {
+						if(namespace.equals(namespace2.getMetadata().getNamespace())){
+							if(labels != null){
+								List<GetPodTask> nodeTasks = new ArrayList<>(labels.size());
+	            			     nodeTasks.add(new GetPodTask(clientnew, labels));
+	            			     List<List<PodInfo>> podLists = ClientConfigure.executeCompletionService(nodeTasks);
+	            			     for (List<PodInfo> podList : podLists) {
+	            			         podmap.put(namespace, podList);
+	            			         mapList.add(podmap);
+	            			     }	
+							}else{
+								List<GetPodTask> nodeTasks = new ArrayList<>();
+	            			     nodeTasks.add(new GetPodTask(clientnew, null));
+	            			     List<List<PodInfo>> podLists = ClientConfigure.executeCompletionService(nodeTasks);
+	            			     for (List<PodInfo> podList : podLists) {
+	            			         podmap.put(namespace, podList);
+	            			         mapList.add(podmap);
+	            			     }
+							}
+						}
+					}
+				}
+			}else{
+				List<Namespace> items = clientnew.listAllNamespace().getItems();
+				for (Namespace namespace2 : items) {
+					if(labels != null){
+						 List<GetPodTask> nodeTasks = new ArrayList<>(labels.size());
+	       			     nodeTasks.add(new GetPodTask(clientnew, labels));
+	       			     List<List<PodInfo>> podLists = ClientConfigure.executeCompletionService(nodeTasks);
+	       			     for (List<PodInfo> podList : podLists) {
+	       			         podmap.put(namespace2.getMetadata().getNamespace(), podList);
+	       			         mapList.add(podmap);
+	       			     }	
+					}else{
+						List<GetPodTask> nodeTasks = new ArrayList<>();
+	       			     nodeTasks.add(new GetPodTask(clientnew, null));
+	       			     List<List<PodInfo>> podLists = ClientConfigure.executeCompletionService(nodeTasks);
+	       			     for (List<PodInfo> podList : podLists) {
+	       			         podmap.put(namespace2.getMetadata().getNamespace(), podList);
+	       			         mapList.add(podmap);
+	       			     }
+					}
+				}
+			}
+    	} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return null;
+    }
+    
+   private class GetPodTask  implements Callable<List<PodInfo>>{
+	   
+	   private KubeUtils client;
+	   private List<Map<String,String>> labels;
+	   
+	   GetPodTask(KubeUtils client,List<Map<String,String>> labels){
+		   this.client = client;
+		   this.labels = labels;
+	   }
+	   
+	  @Override
+	  public List<PodInfo> call() throws Exception {
+		List<PodInfo> podList = new ArrayList<>();
+		if(labels != null){
+			for (Map<String,String> label : labels) {
+				PodList listPod = client.listPod(label);
+				for(Pod pod:listPod.getItems()){
+					PodInfo podInfo = new PodInfo();
+					podInfo.setPodName(pod.getMetadata().getName());
+					List<ContainerInfo> containerList = new ArrayList<>();
+					List<ContainerStatus> containerStatuses = pod.getStatus().getContainerStatuses();
+					for (ContainerStatus containerStatus : containerStatuses) {
+						ContainerInfo containerInfo = new ContainerInfo();
+						containerInfo.setHostname(containerStatus.getName());
+						containerInfo.setContainerId(containerStatus.getContainerID());
+						containerList.add(containerInfo);
+					}
+					podInfo.setContainers(containerList);	
+					podList.add(podInfo);
+				}
+			}
+		}else{
+			PodList listPod = client.listPod();
+			for(Pod pod:listPod.getItems()){
+				PodInfo podInfo = new PodInfo();
+				podInfo.setPodName(pod.getMetadata().getName());
+				List<ContainerInfo> containerList = new ArrayList<>();
+				List<ContainerStatus> containerStatuses = pod.getStatus().getContainerStatuses();
+				for (ContainerStatus containerStatus : containerStatuses) {
+					ContainerInfo containerInfo = new ContainerInfo();
+					containerInfo.setHostname(containerStatus.getName());
+					containerInfo.setContainerId(containerStatus.getContainerID());
+					containerList.add(containerInfo);
+				}
+				podInfo.setContainers(containerList);	
+				podList.add(podInfo);
+			}
+		}
+		return podList;
+	  }
+   }
+    
+    *//**
+     * 根据cluster，namespace，labels查询node
+     * *//*
+    public List<Map<String,List<NodeInfo>>> getNodeListByClusterNamespaceLabels(Cluster clusters,List<String> namespaces,List<Map<String,String>> labels){
+    	//当cluster等于空时新建一个cluster
+    	KubeUtils clientnew = null;
+    	List<Map<String,List<NodeInfo>>> resultList = new ArrayList<>();
+    	Map<String,List<NodeInfo>> nodemap = new HashMap<>();
+    	try {
+    	if(clusters == null){
+			GlobalInfo cluster_host = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
+    		GlobalInfo cluster_name = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_NAME);
+        	Cluster clusterNew = new Cluster();
+        	clusterNew.setApi(cluster_host.getValue());
+        	clusterNew.setId(cluster_host.getId()+"");
+        	clusterNew.setName(cluster_name.getValue());
+			clientnew = Fabric8KubeUtils.buildKubeUtils(clusterNew, "default");
+    	}else{
+    		clientnew = Fabric8KubeUtils.buildKubeUtils(clusters, "default");
+        }
+		if(namespaces != null){
+    		for (String namespace : namespaces) {
+				List<Namespace> items = clientnew.listAllNamespace().getItems();
+				for (Namespace namespace2 : items) {
+					if(namespace.equals(namespace2.getMetadata().getNamespace())){
+						if(labels != null){
+            				 List<GetNodeTask> nodeTasks = new ArrayList<>(labels.size());
+            			     nodeTasks.add(new GetNodeTask(clientnew, labels));
+            			     List<List<NodeInfo>> nodeLists = ClientConfigure.executeCompletionService(nodeTasks);
+            			     for (List<NodeInfo> nodeList : nodeLists) {
+            			         nodemap.put(namespace, nodeList);
+            			         resultList.add(nodemap);
+            			     }	
+            			}else{
+            				List<GetNodeTask> nodeTasks = new ArrayList<>(labels.size());
+           			        nodeTasks.add(new GetNodeTask(clientnew, null));
+           			        List<List<NodeInfo>> nodeLists = ClientConfigure.executeCompletionService(nodeTasks);
+           			        for (List<NodeInfo> nodeList : nodeLists) {
+           			           nodemap.put(namespace, nodeList);
+           			           resultList.add(nodemap);
+           			       }	
+						}
+					}
+				}
+			}
+    	}else{
+    		NodeList listNode = clientnew.listNode();
+    		NamespaceList listAllNamespace = clientnew.listAllNamespace();
+			List<Namespace> items = clientnew.listAllNamespace().getItems();
+			for (Namespace namespace : items) {
+				if(labels != null){
+    				 List<GetNodeTask> nodeTasks = new ArrayList<>(labels.size());
+    			     nodeTasks.add(new GetNodeTask(clientnew, labels));
+    			     List<List<NodeInfo>> nodeLists = ClientConfigure.executeCompletionService(nodeTasks);
+    			     for (List<NodeInfo> nodeList : nodeLists) {
+    			         nodemap.put(namespace.getMetadata().getNamespace(), nodeList);
+    			         resultList.add(nodemap);
+    			     }	
+    			}else{
+    				 List<GetNodeTask> nodeTasks = new ArrayList<>(labels.size());
+    			     nodeTasks.add(new GetNodeTask(clientnew, null));
+    			     List<List<NodeInfo>> nodeLists = ClientConfigure.executeCompletionService(nodeTasks);
+    			     for (List<NodeInfo> nodeList : nodeLists) {
+    			         nodemap.put(namespace.getMetadata().getNamespace(), nodeList);
+    			         resultList.add(nodemap);
+    			     }	
+				}
+			}
+    	}
+    	} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return resultList;
+    }
+    
+    private class GetNodeTask implements Callable<List<NodeInfo>>{
+    	private KubeUtils<?> client;
+    	private List<Map<String,String>> labels;
+    	GetNodeTask(KubeUtils<?> client,List<Map<String,String>> labels){
+    		this.client = client;
+    		this.labels = labels;
+    	}
+		@Override
+		public List<NodeInfo> call() throws Exception {
+			List<NodeInfo> nodeList = new ArrayList<>();
+			if(labels != null){
+				for (Map<String,String> label : labels) {
+					NodeList listNode = client.listNode(label);
+					for(Node node:listNode.getItems()){
+						NodeInfo nodeInfo = new NodeInfo();
+						nodeInfo = generateNodeInfo(node);
+						nodeList.add(nodeInfo);
+					}
+				}
+			}else{
+				NodeList listNode = client.listNode();
+				for(Node node:listNode.getItems()){
+					NodeInfo nodeInfo = new NodeInfo();
+					nodeInfo = generateNodeInfo(node);
+					nodeList.add(nodeInfo);
+				}
+			}
+			return nodeList;
+		}
+    }*/
+    
     public NodeInfo getNodeInfo(String name) {
         NodeList nodeList = getNodeList();
         NodeInfo nodeInfo = null;
         if (nodeList != null && nodeList.getItems() != null) {
             for (Node node : nodeList.getItems()) {
+//            	node.getMetadata().getNamespace()
                 if (node.getMetadata() != null && name.equals(node.getMetadata().getName())) {
                     try {
                         nodeInfo = generateNodeInfo(node);
@@ -223,69 +460,67 @@ public class NodeWrapper {
 //        return new ArrayList<>(1);
 //    }
 
-//    public List<Instance> getInstance() throws ParseException {
-//        PodList podList = getAllPods();
-//        if (podList != null && !podList.getItems().isEmpty()) {
-//            List<Instance> instances = new ArrayList<>(podList.getItems().size());
-//            for (Pod pod : podList.getItems()) {
-//                try {
-//                    Instance instance = transferPodToInstance(pod);
-//                    if (instance != null && !instance.getStatus().equalsIgnoreCase("Completed")) {
-//                        instances.add(instance);
-//                    }
-//                } catch (Exception ignored) {
-//                }
-//            }
-//            return instances;
-//        }
-//        return new ArrayList<>(1);
-//    }
+    public List<Instance> getInstance() throws ParseException {
+        PodList podList = getAllPods();
+        if (podList != null && !podList.getItems().isEmpty()) {
+            List<Instance> instances = new ArrayList<>(podList.getItems().size());
+            for (Pod pod : podList.getItems()) {
+                try {
+                    Instance instance = transferPodToInstance(pod);
+                    if (instance != null && !instance.getStatus().equalsIgnoreCase("Completed")) {
+                        instances.add(instance);
+                    }
+                } catch (Exception ignored) {
+                	ignored.printStackTrace();
+                }
+            }
+            return instances;
+        }
+        return new ArrayList<>(1);
+    }
 
-//    private Instance transferPodToInstance(Pod pod) throws ParseException {
-//        if (pod == null) {
-//            return null;
-//        }
-//
-//        Instance instance = new Instance();
-//        instance.setHostName(pod.getSpec().getNodeName());
-//        if (pod.getMetadata() != null) {
-//            instance.setInstanceName(pod.getMetadata().getName());
-//            instance.setNamespace(pod.getMetadata().getNamespace());
-//            if (pod.getMetadata().getLabels() != null) {
-//                if (pod.getMetadata().getLabels().containsKey(GlobalConstant.DEPLOY_ID_STR) &&
-//                        pod.getMetadata().getLabels().containsKey(GlobalConstant.VERSION_STR)) {
-//                    int deployId = Integer.valueOf(pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR));
+    private Instance transferPodToInstance(Pod pod) throws ParseException {
+        if (pod == null) {
+            return null;
+        }
+
+        Instance instance = new Instance();
+        instance.setHostName(pod.getSpec().getNodeName());
+        if (pod.getMetadata() != null) {
+            instance.setInstanceName(pod.getMetadata().getName());
+            instance.setNamespace(pod.getMetadata().getNamespace());
+            if (pod.getMetadata().getLabels() != null) {
+                if (pod.getMetadata().getLabels().containsKey(GlobalConstant.DEPLOY_ID_STR) &&
+                        pod.getMetadata().getLabels().containsKey(GlobalConstant.VERSION_STR)) {
+                    String serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
 //                    int versionId = Integer.valueOf(pod.getMetadata().getLabels().get(GlobalConstant.VERSION_STR));
-//                    // todo: deployment update
-//                    Deployment deployment = deploymentBiz.getDeployment(deployId);
-//                    if (deployment != null) {
-//                        instance.setDeloyId(deployId);
-//                        instance.setDeployName(deployment.getName());
-//                        instance.setVersionId(versionId);
-//                    }
-//                }
-//            }
-//        }
+                    instance.setServiceId(serviceId);
+                    ServiceInfo service = serviceDao.getService(serviceId);
+                    instance.setServiceCode(service.getServiceCode());
+//                    instance.setVersion(versionId);
+                }
+            }
+        }
 
-//        if (pod.getStatus() != null) {
-//            instance.setStartTime(DateUtil.string2timestamp(pod.getStatus().getStartTime(), TimeZone.getTimeZone(GlobalConstant.UTC_TIME)));
-//            instance.setPodIp(pod.getStatus().getPodIP());
-//            instance.setHostIp(pod.getStatus().getHostIP());
-//            if (pod.getStatus().getContainerStatuses() != null) {
-//                for (ContainerStatus containerStatus : pod.getStatus().getContainerStatuses()) {
-//                    if (StringUtils.isBlank(containerStatus.getContainerID())) {
-//                        continue;
-//                    }
-//                    String containerId = containerStatus.getContainerID().split("docker://")[1];
-//                    instance.addContainer(new org.domeos.framework.api.model.deployment.related.Container(containerId,
-//                            containerStatus.getName(), containerStatus.getImage()));
-//                }
-//            }
-//        }
-//        instance.setStatus(PodUtils.getPodStatus(pod));
-//
-//        return instance;
-//    }
+        if (pod.getStatus() != null) {
+            instance.setStartTime(pod.getStatus().getStartTime());
+            instance.setPodIp(pod.getStatus().getPodIP());
+            instance.setHostIp(pod.getStatus().getHostIP());
+            if (pod.getStatus().getContainerStatuses() != null) {
+                for (ContainerStatus containerStatus : pod.getStatus().getContainerStatuses()) {
+                    if (StringUtils.isBlank(containerStatus.getContainerID())) {
+                        continue;
+                    }
+                    String containerId = containerStatus.getContainerID().split("docker://")[1];
+                    instance.addContainer(new org.k8scmp.appmgmt.domain.Container(containerId,
+                            containerStatus.getName(), containerStatus.getImage()));
+                }
+            }
+        }
+        instance.setStatus(PodUtils.getPodStatus(pod));
+
+        return instance;
+    }
 
 
 //    public Map<String, String> getClusterLabels() {

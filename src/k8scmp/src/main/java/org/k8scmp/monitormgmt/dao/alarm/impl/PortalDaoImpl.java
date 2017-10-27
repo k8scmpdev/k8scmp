@@ -3,10 +3,16 @@ package org.k8scmp.monitormgmt.dao.alarm.impl;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.k8scmp.appmgmt.domain.Container;
+import org.k8scmp.appmgmt.domain.Instance;
 import org.k8scmp.common.GlobalConstant;
+import org.k8scmp.common.SpringContextManager;
+import org.k8scmp.engine.k8s.util.NodeWrapper;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.mapper.alarm.AlarmEventInfoMapper;
 import org.k8scmp.monitormapper.portal.PortalActionMapper;
@@ -31,6 +37,7 @@ import org.k8scmp.monitormgmt.domain.alarm.falcon.GroupTemplate;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Mockcfg;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Strategy;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Template;
+import org.k8scmp.monitormgmt.service.alarm.AlarmEventService;
 import org.k8scmp.util.DateUtil;
 import org.k8scmp.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,23 +97,27 @@ public class PortalDaoImpl implements PortalDao {
                 createStrategyForHost(strategyInfo, templateInfo.getId());
             }
         } else if (templateInfo.getTemplateType().equals(TemplateType.deploy.name())) {
-           /* // get all instances
+           // get all instances
             List<Instance> instances;
             try {
-                instances = instanceService.getInstances(templateInfo.getDeploymentInfo().getId());
+//                instances = instanceService.getInstances(templateInfo.getDeploymentInfo().getId());
+//                NodeWrapper nodeWrapper = new NodeWrapper().init("default");
+            	NodeWrapper nodeWrapper = (NodeWrapper) SpringContextManager.getBean(NodeWrapper.class).init("default");
+                instances = nodeWrapper.getInstance();
+                
             } catch (Exception e) {
-                logger.warn("get instances for deployment " + templateInfo.getDeploymentInfo().getDeploymentName() + " error: " + e.getMessage());
+//                logger.warn("get instances for deployment " + templateInfo.getDeploymentInfo().getDeploymentName() + " error: " + e.getMessage());
                 instances = new ArrayList<>(1);
             }
             // create host group for deployment
-            long groupId = createHostGroupForDeploy(instances, templateInfo);
+            int groupId = createHostGroupForDeploy(instances, templateInfo);
             // create group-bind
             createGroupTemplateBind(groupId, templateInfo.getId(), templateInfo.getCreatorName());
             // create strategy
             List<String> containerIdList = getContainerIdListFromInstanceList(instances);
             for (StrategyInfo strategyInfo : templateInfo.getStrategyList()) {
                 createStrategyForDeploy(strategyInfo, templateInfo.getId(), containerIdList);
-            }*/
+            }
         }
         
         // create action
@@ -149,6 +160,53 @@ public class PortalDaoImpl implements PortalDao {
         return action.getId();
     }
 	
+	private Integer createHostGroupForDeploy(List<Instance> instances, TemplateInfo templateInfo) {
+
+        List<String> hostnameList = getHostnameListFromInstanceList(instances);
+
+        Group group = new Group();
+        group.setGrp_name("k8scmp_deploy_" + templateInfo.getDeploymentInfo().getDeploymentName() + "_" + String.valueOf(templateInfo.getId()));
+        group.setCreate_user(templateInfo.getCreatorName());
+        try {
+			group.setCreate_at(Timestamp.valueOf(templateInfo.getCreateTime()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        group.setCome_from(1);
+        portalGroupMapper.insertHostGroup(group);
+
+        for (String hostname : hostnameList) {
+            Integer id = portalHostMapper.getHostIdByHostname(hostname);
+            if (id == null) {
+                continue;
+            }
+            GroupHost groupHost = new GroupHost(group.getId(), id.longValue());
+            portalGroupHostMapper.insertGroupHostBind(groupHost);
+        }
+
+        return group.getId();
+    }
+	
+	private List<String> getContainerIdListFromInstanceList(List<Instance> instanceList) {
+
+        List<String> containerIdList = new LinkedList<>();
+        for (Instance instance : instanceList) {
+            for (Container container : instance.getContainers()) {
+                containerIdList.add(container.getContainerId());
+            }
+        }
+        return containerIdList;
+    }
+	
+	 private List<String> getHostnameListFromInstanceList(List<Instance> instanceList) {
+
+	        List<String> hostnameList = new LinkedList<>();
+	        for (Instance instance : instanceList) {
+	            hostnameList.add(instance.getHostName());
+	        }
+	        return hostnameList;
+	    }
+	
 	 private void createGroupTemplateBind(int hostGroupId, int templateId, String creatorName) {
         GroupTemplate groupTemplate = new GroupTemplate();
         groupTemplate.setGrp_id(hostGroupId);
@@ -160,7 +218,7 @@ public class PortalDaoImpl implements PortalDao {
 	 private void createStrategyForHost(StrategyInfo strategyInfo, int templateId) {
 
 	        Strategy strategy = new Strategy();
-	        // strategy.setId(strategyInfo.getId());
+	        strategy.setId(strategyInfo.getId());
 	        strategy.setMetric(convertMetricForHost(strategyInfo.getMetric()));
 	        strategy.setTags(fixNullString(strategyInfo.getTag()));
 	        strategy.setMax_step(strategyInfo.getMaxStep());
@@ -172,6 +230,38 @@ public class PortalDaoImpl implements PortalDao {
 	        strategy.setTpl_id(templateId);
 	        portalStrategyMapper.insertStrategy(strategy);
 	 	}
+	 
+	 private void createStrategyForDeploy(StrategyInfo strategyInfo, long templateId, List<String> containerIdList) {
+
+	        for (String containerId : containerIdList) {
+	            Strategy strategy = new Strategy();
+	            strategy.setMetric(convertMetricForDeploy(strategyInfo.getMetric()));
+	            strategy.setTags("id=" + containerId);
+	            strategy.setMax_step(strategyInfo.getMaxStep());
+	            strategy.setPriority(0);
+	            strategy.setFunc(createFunc(strategyInfo.getAggregateType(), strategyInfo.getPointNum()));
+	            strategy.setOp(strategyInfo.getOperator());
+	            strategy.setRight_value(String.valueOf(strategyInfo.getRightValue()));
+	            strategy.setNote(strategyInfo.getNote());
+	            strategy.setTpl_id(templateId);
+	            portalStrategyMapper.insertStrategy(strategy);
+	        }
+	    }
+	 
+	 private static String convertMetricForDeploy(String metric) {
+	        switch (metric) {
+	            case "cpu_percent":
+	                return "container.cpu.usage.busy";
+	            case "memory_percent":
+	                return "container.mem.usage.percent";
+	            case "network_in":
+	                return "container.net.if.in.bytes";
+	            case "network_out":
+	                return "container.net.if.out.bytes";
+	            default:
+	                return "";
+	        }
+	    }
 	 
 	 private static String convertMetricForHost(String metric) {
 	        switch (metric) {
@@ -246,13 +336,13 @@ public class PortalDaoImpl implements PortalDao {
 
 	        // delete action & strategy & group-bind
 	        portalActionMapper.deleteActionById(template.getAction_id());
-	        List<String> alarmEventIds = alarmEventInfoMapper.listAlarmEventInfoIdByTemplateId(template.getId());
-	        String alarmString = "";
-	        if (alarmEventIds != null) {
-	            for (String alarmEventId : alarmEventIds) {
-	                alarmString = alarmString + alarmEventId + ",,";
-	            }
-	        }
+//	        List<String> alarmEventIds = alarmEventInfoMapper.listAlarmEventInfoIdByTemplateId(template.getId());
+//	        String alarmString = "";
+//	        if (alarmEventIds != null) {
+//	            for (String alarmEventId : alarmEventIds) {
+//	                alarmString = alarmString + alarmEventId + ",,";
+//	            }
+//	        }
 //	        if (!StringUtils.isBlank(alarmString)) {
 //	            alarmString = alarmString.substring(0, alarmString.length() - 2);
 //	            alarmEventService.ignoreAlarmsInside(alarmString);

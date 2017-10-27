@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
+import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ApiController;
 import org.k8scmp.engine.k8s.util.NodeWrapper;
 import org.k8scmp.login.domain.User;
@@ -33,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.alibaba.druid.support.json.JSONParser;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
@@ -105,64 +108,46 @@ public class TemplateController extends ApiController {
     
     @ResponseBody
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public HttpResponseTemp<?> createTemplate(@RequestBody TemplateIn templateIn) {
-    	TemplateInfo templateInfo = new TemplateInfo();
-    	templateInfo.setTemplateName(templateIn.getTemplateName());
-    	templateInfo.setTemplateType(templateIn.getTemplateType());
-    	templateInfo.setCreateTime(DateUtil.dateFormat(new Date()));
-    	templateInfo.setCreatorId(AuthUtil.getUserId());
-    	templateInfo.setCreatorName(AuthUtil.getCurrentLoginName());
-    	templateInfo.setDeploymentInfo(templateIn.getDeploymentInfo());
-    	templateInfo.setHostGroupList(templateIn.getHostGroupList());
-    	templateInfo.setUserList(templateIn.getUserList());
-    	templateInfo.setCallback(templateIn.getCallback());
-    	templateInfo.setUpdateTime(DateUtil.dateFormat(new Date()));
-    	List<StrategyInfo> strategyInfolist = new ArrayList<StrategyInfo>();
-    	for (int i=0;i<templateIn.getMetricList().length;i++) {
-    		StrategyInfo strategyInfo = new StrategyInfo();
-    		strategyInfo.setAggregateType(templateIn.getAggregateTypeList()[i]);
-    		strategyInfo.setMaxStep(templateIn.getMaxStepList()[i]);
-    		strategyInfo.setMetric(templateIn.getMetricList()[i]);
-    		strategyInfo.setNote(templateIn.getNoteValueList()[i]);
-    		strategyInfo.setOperator(templateIn.getOperatorList()[i]);
-    		strategyInfo.setPointNum(templateIn.getPointNumList()[i]);
-    		strategyInfo.setRightValue(templateIn.getRightValueList()[i]);
-    		strategyInfolist.add(strategyInfo);
-		}
-    	templateInfo.setStrategyList(strategyInfolist);
+    public HttpResponseTemp<?> createTemplate(@RequestBody TemplateInfo templateInfo) {
         return templateService.createTemplate(templateInfo);
     }
     
     @RequestMapping(value = "/edit", method=RequestMethod.GET)
-    public String editTemplate(Model model, @RequestParam("templateId") int templateId, @RequestParam("templateType") String templateType) {
-    	//int id = Integer.parseInt(templateId);
+    public String editTemplate(Model model, @RequestParam(value="templateId") int templateId, @RequestParam("templateType") String templateType) {
     	TemplateInfo templateInfo = (TemplateInfo)templateService.getTemplateInfo(templateId).getResult();
+    	List<HostGroupInfo> hostGroupInfoList = hostGropService.listHostGroupInfo();
+    	List<User> userList = userService.listAllUserInfo().getResult();
+    	model.addAttribute("hostGroupInfoList", hostGroupInfoList);
+    	model.addAttribute("userList", userList);
     	model.addAttribute("templateInfo", templateInfo);
     	if(templateType.equals("host")){
     		return "alarm/template-hostEdit";
     	}else{
     		 return "alarm/template-deployEdit";
     	}
-       
     }
     
     @ResponseBody
-    @RequestMapping(value = "/modify", method = RequestMethod.PUT)
+    @RequestMapping(value = "/getTemp", method=RequestMethod.GET)
+    public HttpResponseTemp<?> getTemplate(@RequestParam(value="templateId") int templateId){
+    	return templateService.getTemplateInfo(templateId);
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/modify", method = RequestMethod.POST)
     public HttpResponseTemp<?> modifyTemplate(@RequestBody TemplateInfo templateInfo) {
         return templateService.modifyTemplate(templateInfo);
     }
 
     @ResponseBody
     @RequestMapping(value = "/template/{id}", method = RequestMethod.GET)
-    public HttpResponseTemp<?> getTemplateInfo(@PathVariable String id) {
-    	int ID = Integer.parseInt(id);
-        return templateService.getTemplateInfo(ID);
+    public HttpResponseTemp<?> getTemplateInfo(@PathVariable int id) {
+        return templateService.getTemplateInfo(id);
     }
 
     @ResponseBody
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public HttpResponseTemp<?> deleteTemplate(@PathVariable String id) {
-    	int ID = Integer.parseInt(id);
-        return templateService.deleteTemplate(ID);
+    public HttpResponseTemp<?> deleteTemplate(@PathVariable int id) {
+        return templateService.deleteTemplate(id);
     }
 }

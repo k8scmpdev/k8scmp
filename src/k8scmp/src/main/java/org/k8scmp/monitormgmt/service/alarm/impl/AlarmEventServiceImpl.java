@@ -211,7 +211,7 @@ public class AlarmEventServiceImpl implements AlarmEventService {
         }
     }*/
 
-    private static String convertMetricByCounter(String counter) {
+    /*private static String convertMetricByCounter(String counter) {
 
         String metricWithEndpoint = counter.substring(0, counter.indexOf(" "));
 
@@ -263,7 +263,7 @@ public class AlarmEventServiceImpl implements AlarmEventService {
             }
         }
         return null;
-    }
+    }*/
 
 
 }
