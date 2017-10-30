@@ -3,9 +3,11 @@ package org.k8scmp.engine.k8s.util;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
@@ -13,11 +15,10 @@ import org.k8scmp.appmgmt.domain.Cluster;
 import org.k8scmp.common.ClientConfigure;
 import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
+import org.k8scmp.globalmgmt.domain.ClusterInfo;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
-import org.k8scmp.monitormgmt.domain.monitor.ContainerInfo;
 import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
-import org.k8scmp.monitormgmt.domain.monitor.PodInfo;
 import org.k8scmp.util.CommonUtil;
 import org.k8scmp.util.DateUtil;
 import org.k8scmp.util.StringUtils;
@@ -26,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceList;
 import io.fabric8.kubernetes.api.model.Node;
@@ -44,6 +44,100 @@ public class NodeWrapperNew {
 	 
 	@Autowired
     GlobalBiz globalBiz;
+	
+	public String createLabels(KubeUtils<?> client, String nodeName, Map<String,String> label){
+		try {
+			Node node = client.labelNode(nodeName, label);
+			Map<String, String> labels = node.getMetadata().getLabels();
+			if(labels != null){
+				return "SUCCESS";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public String removeLabels(KubeUtils<?> client, String nodeName,List<String> labels){
+		try {
+			Node node = client.deleteNodeLabel(nodeName, labels);
+			Map<String, String> nodeLabel = node.getMetadata().getLabels();
+			for (String label : nodeLabel.keySet()) {
+				for (String str : labels) {
+					if(!str.equals(label)){
+						return "SUCCESS";
+					}
+				}
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public List<LabelInfo> getAllLabels(){
+		KubeUtils<?> client;
+		try {
+			GlobalInfo cluster_host = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
+    		GlobalInfo cluster_name = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_NAME);
+        	Cluster clusterNew = new Cluster();
+        	clusterNew.setApi(cluster_host.getValue());
+        	clusterNew.setId(cluster_host.getId()+"");
+        	clusterNew.setName(cluster_name.getValue());
+			client = Fabric8KubeUtils.buildKubeUtils(clusterNew, null);
+			NamespaceList namespaceList = client.listAllNamespace();
+			List<LabelInfo> labelInfos = new ArrayList<>();
+			for(Namespace namespace : namespaceList.getItems()){
+				NodeList nodeList = client.listNode();
+				Map<String,Set<String>> labelnodes = new HashMap<>();
+				Set<String> set = new HashSet<>();
+				for (Node node : nodeList.getItems()) {
+					if(node.getMetadata().getNamespace().equals(namespace)){
+						Map<String, String> labels = node.getMetadata().getLabels();
+						for(String labelkey : labels.keySet()){
+							KubeUtils<?> clientnew = Fabric8KubeUtils.buildKubeUtils(clusterNew, namespace.getMetadata().getName());
+							NodeList listNode = clientnew.listNode(labels);
+							if(labelnodes.get(labelkey) == null){
+								for (Node ne : listNode.getItems()) {
+									set.add(ne.getMetadata().getName());
+								}
+								labelnodes.put(labelkey, set);
+							}else{
+								for (Node ne : listNode.getItems()) {
+									labelnodes.get(labelkey).add(ne.getMetadata().getName());
+								}
+							}
+						}
+					}
+				}
+				for (String labelName : labelnodes.keySet()) {
+					LabelInfo labelInfo = new LabelInfo();
+					labelInfo.setNamespace(namespace.getMetadata().getName());
+					labelInfo.setLabelName(labelName);
+					ClusterInfo clusterInfo = new ClusterInfo();
+					clusterInfo.setApiserver(clusterNew.getApi());
+					clusterInfo.setName(clusterNew.getName());
+					labelInfo.setClusterInfo(clusterInfo);
+					Set<String> labelset = labelnodes.get(labelName);
+					List<String> nodeNames = new ArrayList<>();
+					int count = 0;
+					for (String nodeName : labelset) {
+						nodeNames.add(nodeName);
+						count++;
+					}
+					labelInfo.setNodeName(nodeNames);
+					labelInfo.setHostCount(count);
+					labelInfos.add(labelInfo);
+				}
+			}
+			return labelInfos;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	/*public List<Map<String,List<PodInfo>>> getPodListByClusterNamespaceLabels(Cluster cluster,List<String> namespaces,List<Map<String,String>> labels){
     	List<Map<String,List<PodInfo>>> mapList = new ArrayList<>();
@@ -168,82 +262,103 @@ public class NodeWrapperNew {
     /**
      * 根据cluster，namespace，labels查询node
      * */
-    public List<Map<String,List<NodeInfo>>> getNodeListByClusterNamespaceLabels(Cluster clusters,List<String> namespaces,List<Map<String,String>> labels){
-    	//当cluster等于空时新建一个cluster
-    	KubeUtils client = null;
-    	List<Map<String,List<NodeInfo>>> resultList = new ArrayList<>();
-    	Map<String,List<NodeInfo>> nodemap = new HashMap<>();
+    public List<NodeInfo> getNodeListByClusterNamespaceLabels(Cluster cluster,List<String> namespaces,List<Map<String,String>> labels){
+    	
     	try {
-    	if(clusters == null){
-			GlobalInfo cluster_host = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
-    		GlobalInfo cluster_name = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_NAME);
-        	Cluster clusterNew = new Cluster();
-        	clusterNew.setApi(cluster_host.getValue());
-        	clusterNew.setId(cluster_host.getId()+"");
-        	clusterNew.setName(cluster_name.getValue());
-			client= Fabric8KubeUtils.buildKubeUtils(clusterNew, "default");
-    	}else{
-    		client = Fabric8KubeUtils.buildKubeUtils(clusters, "default");
-        }
-		if(namespaces != null){
-    		for (String namespace : namespaces) {
-				List<Namespace> items = client.listAllNamespace().getItems();
-				for (Namespace namespace2 : items) {
-					if(namespace.equals(namespace2.getMetadata().getNamespace())){
-						if(labels != null){
-            				 List<GetNodeTask> nodeTasks = new ArrayList<>(labels.size());
-            			     nodeTasks.add(new GetNodeTask(client, labels));
-            			     List<List<NodeInfo>> nodeLists = ClientConfigure.executeCompletionService(nodeTasks);
-            			     for (List<NodeInfo> nodeList : nodeLists) {
-            			         nodemap.put(namespace, nodeList);
-            			         resultList.add(nodemap);
-            			     }	
-            			}else{
-            				List<GetNodeTask> nodeTasks = new ArrayList<>();
-           			        nodeTasks.add(new GetNodeTask(client, null));
-           			        List<List<NodeInfo>> nodeLists = ClientConfigure.executeCompletionService(nodeTasks);
-           			        for (List<NodeInfo> nodeList : nodeLists) {
-           			           nodemap.put(namespace, nodeList);
-           			           resultList.add(nodemap);
-           			       }	
+    		List<NodeInfo> nodeInfoList = new ArrayList<>();
+    		Map<String,Set<NodeInfo>> nodeInfoMap = new HashMap<>();
+    		Set<NodeInfo> nodeInfoSet = new HashSet<>();
+	    	if(cluster == null){
+				GlobalInfo cluster_host = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
+	    		GlobalInfo cluster_name = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_NAME);
+	        	Cluster clusterNew = new Cluster();
+	        	clusterNew.setApi(cluster_host.getValue());
+	        	clusterNew.setId(cluster_host.getId()+"");
+	        	clusterNew.setName(cluster_name.getValue());
+	        	if(namespaces != null){
+	        		for (String namespace : namespaces) {
+	        			nodeInfoSet.clear();
+	        			List<GetNodeTask> infoTasks = new LinkedList<>();
+	        			infoTasks.add(new GetNodeTask(labels, clusterNew, namespace));
+	        			List<List<NodeInfo>> list = ClientConfigure.executeCompletionService(infoTasks);
+	        			for (List<NodeInfo> nodeList : list) {
+							for (NodeInfo nodeInfo : nodeList) {
+								nodeInfoSet.add(nodeInfo);
+							}
 						}
+	        			nodeInfoMap.put(namespace, nodeInfoSet);
 					}
+	        	}else{
+	        		//namespace == null
+	        		KubeUtils<?> client= Fabric8KubeUtils.buildKubeUtils(clusterNew, null);
+	        		NamespaceList namespaceList = client.listAllNamespace();
+	        		for(Namespace namespace : namespaceList.getItems()){
+	        			nodeInfoSet.clear();
+	        			List<GetNodeTask> infoTasks = new LinkedList<>();
+	        			infoTasks.add(new GetNodeTask(labels, clusterNew, namespace.getMetadata().getName()));
+	        			List<List<NodeInfo>> list = ClientConfigure.executeCompletionService(infoTasks);
+	        			for (List<NodeInfo> nodeList : list) {
+							for (NodeInfo nodeInfo : nodeList) {
+								nodeInfoSet.add(nodeInfo);
+							}
+						}
+	        			nodeInfoMap.put(namespace.getMetadata().getName(), nodeInfoSet);
+	        		}
+	        	}
+	    	}else{
+	    		//cluster != null
+	        	if(namespaces != null){
+	        		for (String namespace : namespaces) {
+	        			nodeInfoSet.clear();
+	        			List<GetNodeTask> infoTasks = new LinkedList<>();
+	        			infoTasks.add(new GetNodeTask(labels, cluster, namespace));
+	        			List<List<NodeInfo>> list = ClientConfigure.executeCompletionService(infoTasks);
+	        			for (List<NodeInfo> nodeList : list) {
+							for (NodeInfo nodeInfo : nodeList) {
+								nodeInfoSet.add(nodeInfo);
+							}
+						}
+	        			nodeInfoMap.put(namespace, nodeInfoSet);
+					}
+	        	}else{
+	        		//namespace == null
+	        		KubeUtils<?> client= Fabric8KubeUtils.buildKubeUtils(cluster, null);
+	        		NamespaceList namespaceList = client.listAllNamespace();
+	        		for(Namespace namespace : namespaceList.getItems()){
+	        			nodeInfoSet.clear();
+	        			List<GetNodeTask> infoTasks = new LinkedList<>();
+	        			infoTasks.add(new GetNodeTask(labels, cluster, namespace.getMetadata().getName()));
+	        			List<List<NodeInfo>> list = ClientConfigure.executeCompletionService(infoTasks);
+	        			for (List<NodeInfo> nodeList : list) {
+							for (NodeInfo nodeInfo : nodeList) {
+								nodeInfoSet.add(nodeInfo);
+							}
+						}
+	        			nodeInfoMap.put(namespace.getMetadata().getName(), nodeInfoSet);
+	        		}
+	        	}
+	    	}
+	    	for(String namespace : nodeInfoMap.keySet()){
+	   			Set<NodeInfo> nodeInfos = nodeInfoMap.get(namespace);
+	   			for (NodeInfo nodeInfo : nodeInfos) {
+					nodeInfo.setNamespace(namespace);
+					nodeInfo.setCluster(cluster);
+					nodeInfoList.add(nodeInfo);
 				}
-			}
-    	}else{
-    		NamespaceList listAllNamespace = client.listAllNamespace();
-			List<Namespace> items = client.listAllNamespace().getItems();
-			for (Namespace namespace : items) {
-				if(labels != null){
-    				 List<GetNodeTask> nodeTasks = new ArrayList<>(labels.size());
-    			     nodeTasks.add(new GetNodeTask(client, labels));
-    			     List<List<NodeInfo>> nodeLists = ClientConfigure.executeCompletionService(nodeTasks);
-    			     for (List<NodeInfo> nodeList : nodeLists) {
-    			         nodemap.put(namespace.getMetadata().getName(), nodeList);
-    			         resultList.add(nodemap);
-    			     }	
-    			}else{
-    				 List<GetNodeTask> nodeTasks = new ArrayList<>();
-    			     nodeTasks.add(new GetNodeTask(client, null));
-    			     List<List<NodeInfo>> nodeLists = ClientConfigure.executeCompletionService(nodeTasks);
-    			     for (List<NodeInfo> nodeList : nodeLists) {
-    			         nodemap.put(namespace.getMetadata().getName(), nodeList);
-    			         resultList.add(nodemap);
-    			     }	
-				}
-			}
-    	}
+	   		}
+	    	return nodeInfoList;
+	    	
     	} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	return resultList;
+    	return null;
     }
     
     private class GetNodeTask implements Callable<List<NodeInfo>>{
-    	private KubeUtils client;
-    	private List<Map<String,String>> labels;
-    	GetNodeTask(KubeUtils<?> client,List<Map<String,String>> labels){
-    		this.client = client;
+    	KubeUtils<?> client;
+    	List<Map<String,String>> labels;
+    	GetNodeTask(List<Map<String,String>> labels, Cluster clusterNew, String namespace) throws Exception{
+			this.client = Fabric8KubeUtils.buildKubeUtils(clusterNew, namespace);
     		this.labels = labels;
     	}
 		@Override
@@ -270,7 +385,7 @@ public class NodeWrapperNew {
 		}
     }
     
-    private List<Pod> getPodListByNode(String nodeName,KubeUtils client) {
+    private List<Pod> getPodListByNode(String nodeName,KubeUtils<?> client) {
         try {
             PodList podList = client.listAllPod();
             List<Pod> pods = new LinkedList<>();
@@ -296,7 +411,7 @@ public class NodeWrapperNew {
         }
     }
     
-    private NodeInfo generateNodeInfo(Node node,KubeUtils client) throws ParseException {
+    private NodeInfo generateNodeInfo(Node node,KubeUtils<?> client) throws ParseException {
         NodeInfo nodeInfo = new NodeInfo();
         if (node.getMetadata() != null) {
             nodeInfo.setLabels(node.getMetadata().getLabels());

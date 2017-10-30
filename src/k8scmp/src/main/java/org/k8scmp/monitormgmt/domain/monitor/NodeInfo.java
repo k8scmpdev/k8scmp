@@ -3,6 +3,7 @@ package org.k8scmp.monitormgmt.domain.monitor;
 import java.util.Comparator;
 import java.util.Map;
 
+import org.k8scmp.appmgmt.domain.Cluster;
 
 import io.fabric8.kubernetes.api.model.Quantity;
 
@@ -20,8 +21,26 @@ public class NodeInfo {
     private String kubeletVersion;
     private String kernelVersion;
     private String osVersion;
+    private String namespace;
+    private Cluster cluster;
 
-    public String getName() {
+    public String getNamespace() {
+		return namespace;
+	}
+
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
+
+	public Cluster getCluster() {
+		return cluster;
+	}
+
+	public void setCluster(Cluster cluster) {
+		this.cluster = cluster;
+	}
+
+	public String getName() {
         return name;
     }
 
