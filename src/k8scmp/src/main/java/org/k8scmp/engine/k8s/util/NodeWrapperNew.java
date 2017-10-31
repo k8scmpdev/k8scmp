@@ -47,11 +47,22 @@ public class NodeWrapperNew {
 	@Autowired
     GlobalBiz globalBiz;
 	
-	public String createLabels(KubeUtils<?> client, String nodeName, Map<String,String> label){
+	public String createLabels(KubeUtils<?> client, List<String> nodeNames, Map<String,String> label){
 		try {
-			Node node = client.labelNode(nodeName, label);
-			Map<String, String> labels = node.getMetadata().getLabels();
-			if(labels != null){
+			if(label != null && label.size() != 0){
+				for(Node node:client.listNode().getItems()){
+					Map<String, String> labels = node.getMetadata().getLabels();
+					for(String key:labels.keySet()){
+						for(String k:label.keySet()){
+							if(k.equals(key)){
+								return "label is alredy exit";
+							}
+						}
+					}
+				}
+				for (String nodeName : nodeNames) {
+					client.labelNode(nodeName, label);
+				}
 				return "SUCCESS";
 			}
 		} catch (Exception e) {
@@ -249,7 +260,7 @@ public class NodeWrapperNew {
 	  @Override
 	  public List<PodInfo> call() throws Exception {
 		List<PodInfo> podList = new ArrayList<>();
-		if(labels != null){
+		if(labels != null || labels.size() != 0){
 			for (Map<String,String> label : labels) {
 				PodList listPod = client.listPod(label);
 				for(Pod pod:listPod.getItems()){
@@ -393,7 +404,7 @@ public class NodeWrapperNew {
 		@Override
 		public List<NodeInfo> call() throws Exception {
 			List<NodeInfo> nodeList = new ArrayList<>();
-			if(labels != null){
+			if(labels != null || labels.size() != 0){
 				for (Map<String,String> label : labels) {
 					NodeList listNode = client.listNode(label);
 					for(Node node:listNode.getItems()){
