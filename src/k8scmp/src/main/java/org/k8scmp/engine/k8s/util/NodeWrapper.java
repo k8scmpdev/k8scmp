@@ -49,17 +49,23 @@ public class NodeWrapper {
     private static GlobalBiz globalBiz;
     
     @Autowired
-    ServiceDao serviceDao;
+    private static ServiceDao serviceDao;
 //    private static DeploymentBiz deploymentBiz;
 //
 //    @Autowired
 //    public void setProjectBiz(DeploymentBiz deploymentBiz) {
 //        NodeWrapper.deploymentBiz = deploymentBiz;
 //    }
+    @Autowired
     public void setGlobalBiz(GlobalBiz globalBiz){
     	NodeWrapper.globalBiz = globalBiz;
     }
 
+    @Autowired
+    public void setServiceDao(ServiceDao serviceDao){
+    	NodeWrapper.serviceDao = serviceDao;
+    }
+    
     public NodeWrapper init(String namespace) throws K8sDriverException {
     	//cluster 需要自定义
 //        Cluster cluster = KubeServiceInfo.getClusterBasicById(clusterId);
@@ -277,11 +283,11 @@ public class NodeWrapper {
                 if (pod.getMetadata().getLabels().containsKey(GlobalConstant.DEPLOY_ID_STR) &&
                         pod.getMetadata().getLabels().containsKey(GlobalConstant.VERSION_STR)) {
                     String serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
-                    int versionId = Integer.valueOf(pod.getMetadata().getLabels().get(GlobalConstant.VERSION_STR));
+//                    int versionId = Integer.valueOf(pod.getMetadata().getLabels().get(GlobalConstant.VERSION_STR));
                     instance.setServiceId(serviceId);
                     ServiceInfo service = serviceDao.getService(serviceId);
                     instance.setServiceCode(service.getServiceCode());
-                    instance.setVersion(versionId);
+//                    instance.setVersion(versionId);
                 }
             }
         }
@@ -398,7 +404,7 @@ public class NodeWrapper {
         }
     }
 
-    public PodList getAllPods() {
+    private PodList getAllPods() {
         try {
             return client.listAllPod();
         } catch (Exception e) {

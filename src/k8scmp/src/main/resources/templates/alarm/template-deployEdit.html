@@ -70,7 +70,8 @@
 											</select>
                                         	</div>
                                             <select multiple="multiple" class="multiselect" name="users" id="users" style="width: 854px;" required="required">	
-												<option th:each="category:${userList}" th:value="${category.id}" 	
+												<option th:each="category:${userList}" th:value="${category.id}"
+												th:selected="${#strings.contains(category,category.loginname)}" 	
 												th:text="${category.loginname}" ></option>	
 											</select>
                                         </div>
@@ -124,13 +125,13 @@
 				
 				var templateId = $("#templateId").val();
 				$("select[name='userhiden']").find('option').attr("selected","selected").each(function(){
-					alert($(this).val());
+					//alert($(this).val());
 					var hideval = $(this).val();
 					$("#users").children('option').each(function(){
 						if(hideval == $(this).val()){
-							alert($(this).val());
+							//alert($(this).val());
 							$("select[name='users']").find("option[value='"+$(this).val()+"']").attr("selected","selected");
-							alert($(this).text());
+							//alert($(this).text());
 						}
 					})
 				})

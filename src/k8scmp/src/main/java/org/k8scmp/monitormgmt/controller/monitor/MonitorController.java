@@ -9,7 +9,6 @@ import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.monitormgmt.domain.monitor.InstenceInfoBack;
 import org.k8scmp.monitormgmt.domain.monitor.NodeInfoBack;
-import org.k8scmp.monitormgmt.domain.monitor.falcon.GraphHistoryResponse;
 import org.k8scmp.monitormgmt.service.monitor.MonitorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -109,7 +107,6 @@ public class MonitorController {
         try {
         	return obj.writeValueAsString(appinfo);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "";
 		}
