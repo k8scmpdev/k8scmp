@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.k8scmp.appmgmt.domain.Cluster;
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
@@ -18,6 +19,7 @@ import org.k8scmp.globalmgmt.domain.LogicClusterInfo;
 import org.k8scmp.globalmgmt.domain.MonitorInfo;
 import org.k8scmp.globalmgmt.domain.RegisterInfo;
 import org.k8scmp.globalmgmt.service.GlobalService;
+import org.k8scmp.globalmgmt.service.impl.GlobalServiceImpl;
 import org.k8scmp.login.domain.ChangeUserPassword;
 import org.k8scmp.login.domain.LoginType;
 import org.k8scmp.login.domain.User;
@@ -45,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import io.fabric8.kubernetes.api.model.NamespaceList;
 import io.fabric8.kubernetes.api.model.Node;
 
 /**
@@ -98,6 +101,9 @@ public class GlobalController {
         LogicClusterInfo lci = new LogicClusterInfo();
         lci.setName("基础平台部-逻辑集群1");
         lci.setHostNum(2);
+        lci.setClustername("k8scmp");
+        lci.setApiserver("172.20.10.10:8080");
+        lci.setNamespace("default");
         logicClusterInfos.add(lci);
 
         model.addAttribute("logicClusterInfos",logicClusterInfos);
@@ -105,9 +111,10 @@ public class GlobalController {
     }
     
     @RequestMapping(value = "/cluster/logic/create", method = RequestMethod.GET)
-    public String createLogicCluster(Model model) {
-//        HttpResponseTemp<?> resp = globalService.listLogicCluster();
-//        List<LogicClusterInfo> logicClusterInfos = (List<LogicClusterInfo>) resp.getResult();
+    public String createLogicCluster(Model model,
+    		@RequestParam(value = "clustername", required = false ,defaultValue="") String clustername,
+    		@RequestParam(value = "apiserver", required = false ,defaultValue="") String apiserver,
+    		@RequestParam(value = "namespace", required = false ,defaultValue="default") String namespace) {
         LogicClusterInfo lci = new LogicClusterInfo();
 		try {
 			NodeWrapper nodeWrapper = new NodeWrapper().init("default");
@@ -117,13 +124,39 @@ public class GlobalController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
+		
+		List<String> nslist = new ArrayList<String>();
+		List<Cluster> clusters = globalService.getAllCluster();
+		if("".equals(clustername)){
+			//根据第一个cluster查询对应的namespace
+			nslist = globalService.getAllNamesapceNameByCluster(clusters.get(0));
+			model.addAttribute("clustername",clusters.get(0).getName());
+			model.addAttribute("namespace",nslist.get(0));
+		}else{
+			Cluster cluster = new Cluster(); 
+	    	cluster.setName(clustername);
+	    	cluster.setApi(apiserver);
+	    	nslist = globalService.getAllNamesapceNameByCluster(cluster);
+	    	model.addAttribute("clustername",clustername);
+			model.addAttribute("namespace",namespace);
+		}
+		//根据第一个cluster和ns查询对于的node
+		
+		
+		
+        model.addAttribute("clusters",clusters);
+        model.addAttribute("namespaces",nslist);
         model.addAttribute("logicClusterDetail",lci);
+        
         return "/global/cluster-logic-new";
     }
     
     @RequestMapping(value = "/cluster/logic/edit", method = RequestMethod.GET)
-    public String editLogicCluster(Model model) {
+    public String editLogicCluster(Model model,
+    		@RequestParam(value = "logicname", required = true ) String logicname,
+    		@RequestParam(value = "clustername", required = true ) String clustername,
+    		@RequestParam(value = "apiserver", required = true ) String apiserver,
+    		@RequestParam(value = "namespace", required = false ,defaultValue="default") String namespace) {
 //        HttpResponseTemp<?> resp = globalService.listLogicCluster();
 //        List<LogicClusterInfo> logicClusterInfos = (List<LogicClusterInfo>) resp.getResult();
         LogicClusterInfo lci = new LogicClusterInfo();
@@ -137,8 +170,26 @@ public class GlobalController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		//获取点击逻辑集群对于的物理集群、namespace及其列表
+		List<Cluster> clusters = globalService.getAllCluster();
+		List<String> nslist = new ArrayList<String>();
+		Cluster cluster = new Cluster(); 
+	    cluster.setName(clustername);
+	    cluster.setApi(apiserver);
+	    nslist = globalService.getAllNamesapceNameByCluster(cluster);
+		
+		//根据第一个cluster和ns查询对于的node
         
+
+        model.addAttribute("clusters",clusters);
+        model.addAttribute("namespaces",nslist);
         model.addAttribute("logicClusterDetail",lci);
+        //设置默认选中的值
+        model.addAttribute("logicname",logicname);
+        model.addAttribute("clustername",clustername);
+        model.addAttribute("namespace",namespace);
+        
         return "/global/cluster-logic-edit";
     }
     
@@ -284,4 +335,31 @@ public class GlobalController {
 		));
     	return showMonitor(model);
     }
+    
+    @ResponseBody
+    @RequestMapping(value="/cluster/allNamespace", method = RequestMethod.GET)
+    public List<NamespaceList> getAllNamespace(Model model,@ModelAttribute MonitorInfo monitorinfo) {
+    	List<NamespaceList> namespaces = globalService.getAllNamesapce();
+    	return namespaces;
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/cluster/allNsNamesByCluster", method = RequestMethod.GET)
+    public List<String> getAllNamespaceNameByCluster(Model model,
+    		@RequestParam(value = "clustername", required = true ) String clustername,
+    		@RequestParam(value = "apiserver", required = false ,defaultValue="default") String apiserver) {
+    	Cluster cluster = new Cluster(); 
+    	cluster.setName(clustername);
+    	cluster.setApi(apiserver);
+    	List<String> namespaces = globalService.getAllNamesapceNameByCluster(cluster);
+    	return namespaces;
+    }
+    
+    @ResponseBody
+    @RequestMapping(value="/cluster/allCluster", method = RequestMethod.GET)
+    public List<Cluster> getAllCluster(Model model,@ModelAttribute MonitorInfo monitorinfo) {
+    	List<Cluster> namespaces = globalService.getAllCluster();
+    	return namespaces;
+    }
+    
 }

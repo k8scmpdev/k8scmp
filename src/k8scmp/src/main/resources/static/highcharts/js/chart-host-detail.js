@@ -14,12 +14,12 @@ function initData(isReInit,type){
 	var hostname = $('#hostname').val();
 	var hostlist = [hostname];
 	var dataSpec = $('#dataSpec').val();
-	var date_begin = $('#date_begin').val();
-	var date_end = $('#date_end').val();
+	var startTime = Number($('#startTime').val().replace(/\-/g,''));
+	var endTime = Number($('#endTime').val().replace(/\-/g,''));
 	$.ajaxSettings.async = false;
 //	if(isReInit){
 //		$.getJSON("/monitor/host/getDetailData",function(data){//获取Json文件,并创建Json对象
-		$.getJSON("/monitor/host/getDetailDataByKeys?hostlist="+hostlist,function(data){//获取Json文件,并创建Json对象
+		$.getJSON("/monitor/host/getDetailDataByKeys?hostlist="+hostlist+"&dataSpec="+dataSpec+"&startTime="+startTime+"&endTime="+endTime,function(data){//获取Json文件,并创建Json对象
 			if(type=='cpu'){
 				arr = createArr(data.datalist['cpu.busy']);
 			}else if(type=='mem'){
@@ -38,8 +38,11 @@ function refreshDate(series,chart,type){
 	var y =  0;
 	var hostname = $('#hostname').val();
 	var hostlist = [hostname];
+	var dataSpec = $('#dataSpec').val();
+	var startTime = Number($('#startTime').val().replace(/\-/g,''));
+	var endTime = Number($('#endTime').val().replace(/\-/g,''));
 //	if(isRefresh){
-		$.getJSON("/monitor/host/getDetailData1raw?hostlist="+hostlist,function(data){//获取Json文件,并创建Json对象
+		$.getJSON("/monitor/host/getDetailData1raw?hostlist="+hostlist+"&dataSpec="+dataSpec+"&startTime="+startTime+"&endTime="+endTime,function(data){//获取Json文件,并创建Json对象
 			if(type=='cpu'){
 				createRefreshData(series,chart,data.datalist['cpu.busy']);
 			}else if(type=='mem'){
@@ -53,12 +56,15 @@ function refreshDate(series,chart,type){
 
 function changeDataByKeys(){
 	//重新刷新详情页面
+	var logicCluster = $('#logicCluster').val();
 	var hostname = $('#hostname').val();
 	var hostlist = [hostname];
 	var dataSpec = $('#dataSpec').val();
-	var date_begin = $('#date_begin').val();
-	var date_end = $('#date_end').val();
-	location.herf='/monitor/host/getDetailDataByKeys?hostlist='+hostlist+"&dataSpec="+dataSpec;
+	var startTime = Number($('#startTime').val().replace(/\-/g,'').replace(/\//g,''));
+	var endTime = Number($('#endTime').val().replace(/\-/g,'').replace(/\//g,''));
+	var timeft = $('input[name=timeft]:checked').val();
+	window.location.href="/monitor/host/detail?logicCluster="+logicCluster+"&hostName="+hostname+"&dataSpec="+dataSpec+"&startTime="+startTime+"&endTime="+endTime+"&timeft="+timeft;
+//	window.location.href="/monitor/host/getDetailData";
 }
 
 function createArr(datalist){
@@ -105,6 +111,21 @@ function createRefreshData(series,chart,datalist){
 	}
 }
 
+function setTime(){
+//	$('name=[timeft:selected]').val();
+	var curDate = new Date();
+	var preDate = new Date(curDate.getTime() - 24*60*60*1000); //前一天
+	var nextDate = new Date(curDate.getTime() + 24*60*60*1000); //后一天
+	if($('input[name=timeft]:checked').val()=='0'){
+		$('#startTime').val('');
+		$('#endTime').val('');
+	}else if($('input[name=timeft]:checked').val()=='1'){
+		$('#startTime').val(curDate.toLocaleDateString());
+		$('#endTime').val(nextDate.toLocaleDateString());
+	}
+	changeDataByKeys();
+}
+
 $('#hostCPU').highcharts({
     chart: {
         type: 'spline',
@@ -117,7 +138,7 @@ $('#hostCPU').highcharts({
                     chart = this;
                 setInterval(function () {
                 	refreshDate(series,chart,'cpu')
-                }, 10000);
+                }, $('#intervalStep').val());//定时器时间间隔
             }
         }
     },
@@ -174,7 +195,7 @@ $('#hostDisk').highcharts({
                     chart = this;
                 setInterval(function () {
                 	refreshDate(series,chart,'disk')
-                }, 10000);
+                }, $('#intervalStep').val());
             }
         }
     },
@@ -231,7 +252,7 @@ $('#hostMemory').highcharts({
                     chart = this;
                 setInterval(function () {
                 	refreshDate(series,chart,'mem')
-                }, 10000);
+                }, $('#intervalStep').val());
             }
         }
     },

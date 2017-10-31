@@ -41,18 +41,18 @@
                                     </div>
                                     
                                     <div class="control-group">
-                                        <label class="control-label">选择所属物理主机</label>
+                                        <label class="control-label">选择所属物理集群</label>
                                         <div class="controls">
-				                            <select class="combine" style="width:170px" id="status">
-												<option value="ok" >k8scmp</option>
+				                            <select class="combine" style="width:170px" id="cluster" th:each="cluster:${clusters}"  >
+												<option th:value="${cluster.api}" th:text="${cluster.name}" th:selected="${clustername==cluster.name}"></option>
 											</select>
 										</div>
                                     </div>
                                     <div class="control-group">
                                         <label class="control-label">选择所属namespace</label>
                                         <div class="controls">
-			                            <select class="combine" style="width:170px" id="status">
-											<option value="ok" >default</option>
+			                            <select class="combine" style="width:170px" id="ns"  >
+											<option th:each="ns:${namespaces}" th:value="${ns}" th:text="${ns}" th:selected="${namespace==ns}" ></option>
 										</select>
 										</div>
                                     </div>
@@ -93,6 +93,8 @@
             <script th:src="@{/js/unicorn.js}"></script>
             <script th:src="@{/js/unicorn.form_validation.js}"></script>
             <script th:src="@{/js/commonDisplay.js}"></script>
+            
+            <script th:src="@{/js/global/cluster-logic.js}"></script>
 	
 	</body>
 </html>

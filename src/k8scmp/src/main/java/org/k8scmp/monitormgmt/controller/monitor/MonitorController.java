@@ -1,5 +1,7 @@
 package org.k8scmp.monitormgmt.controller.monitor;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -79,10 +81,32 @@ public class MonitorController {
     }
 	
 	@RequestMapping(value = "/host/detail", method = RequestMethod.GET)
-    public String getMonitorHostDetail(Model model,@RequestParam(value = "hostName", required = true) String hostName,@RequestParam(value = "logicCluster", required = true) String logicCluster) throws Exception {
+    public String getMonitorHostDetail(Model model,@RequestParam(value = "hostName", required = true) String hostName,
+    		@RequestParam(value = "logicCluster", required = true) String logicCluster,
+    		@RequestParam(value = "dataSpec", required = false ,defaultValue="AVERAGE") String dataSpec,
+    		@RequestParam(value = "startTime", required = false ,defaultValue="0") long startTime,
+    		@RequestParam(value = "endTime", required = false ,defaultValue="0") long endTime,
+    		@RequestParam(value = "timeft", required = false ,defaultValue="0") int timeft) throws Exception {
 		model.addAttribute("logicCluster", logicCluster);
 		model.addAttribute("hostName", hostName);
-		
+		model.addAttribute("dataSpec", dataSpec);
+		model.addAttribute("startTime", startTime==0?"":(startTime+"").substring(0, 4)+"-"+(startTime+"").substring(4, 6)+"-"+(startTime+"").substring(6, 8));
+		model.addAttribute("endTime", endTime==0?"":(endTime+"").substring(0, 4)+"-"+(endTime+"").substring(4, 6)+"-"+(endTime+"").substring(6, 8));
+		model.addAttribute("timeft", timeft);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		//定时器时间间隔设置逻辑： 30分钟则定时刷新间隔为10s
+		if(startTime==0||endTime==0) {
+			model.addAttribute("intervalStep", 10*1000);
+		}else{
+			try {
+				endTime = sdf.parse(endTime+"").getTime();
+				startTime = sdf.parse(startTime+"").getTime();
+				long intervalStep = (endTime-startTime)/180;
+				model.addAttribute("intervalStep", intervalStep);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}//毫秒
+		}
         return "monitor/monitor-host";
     }
 	
@@ -107,6 +131,7 @@ public class MonitorController {
         try {
         	return obj.writeValueAsString(appinfo);
 		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "";
 		}
@@ -125,9 +150,26 @@ public class MonitorController {
 		//根据参数获取  主机的指标展示
 		String type = "node";
 		Calendar current = Calendar.getInstance();
-		if(endTime==0) endTime = current.getTimeInMillis();
-		current.set(Calendar.MILLISECOND, current.get(Calendar.MILLISECOND) - 30*60*1000);
-		if(startTime==0) startTime = current.getTimeInMillis();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		if(endTime==0) {
+			endTime = current.getTimeInMillis();
+		}else{
+			try {
+				endTime = sdf.parse(endTime+"").getTime();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}//毫秒
+		}
+		if(startTime==0){
+			current.set(Calendar.MILLISECOND, current.get(Calendar.MILLISECOND) - 30*60*1000);
+			startTime = current.getTimeInMillis();
+		}else{
+			try {
+				startTime = sdf.parse(startTime+"").getTime();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}//毫秒
+		}
 		Map<String,Map<Long,Double>> monitorDetailDataList = monitorService.getMonitorDetailData(hostlist,type,startTime,endTime,dataSpec);
 		
 		Map<String, Object> appinfo = new HashMap<>();

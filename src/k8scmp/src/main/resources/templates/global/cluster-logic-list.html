@@ -68,9 +68,9 @@
 									</thead>
 									<tbody >
 										<tr class="gradeX" th:each="logicClusterInfo : ${logicClusterInfos}" th:object="${logicClusterInfo}">
-											<td><a th:href="'/cluster/logic/edit'"><span th:text="*{name}"></span></a></td>
-											<td><span th:text="'demok8s'"></span></td>
-											<td><span th:text="'default'"></span></td>
+											<td><a th:href="@{/cluster/logic/edit(clustername=*{clustername},apiserver=*{apiserver},namespace=*{namespace},logicname=*{name})}"><span th:text="*{name}"></span></a></td>
+											<td><span th:text="*{clustername}"></span></td>
+											<td><span th:text="*{namespace}"></span></td>
 											<td><span th:text="*{hostNum}"></span></td>
 											<td style="text-align:center">
 												<button title="修改" class="btn btn-primary" th:onclick="'changePwd(\''+*{name}+'\')'"><i class="icon-pencil icon-white"></i></button>

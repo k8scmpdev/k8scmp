@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head th:include="/public/commonframe :: cssScript" />
-	<!-- <link rel="stylesheet" th:href="@{/css/datepicker.css}" />
-    <link rel="stylesheet" th:href="@{/css/colorpicker.css}" /> -->
+	<link rel="stylesheet" th:href="@{/css/datepicker.css}" />
+    <link rel="stylesheet" th:href="@{/css/colorpicker.css}" />
 	<body>
 		<div id="common-header">
 			<div th:include="/public/commonframe :: app-header"></div>
@@ -20,19 +20,23 @@
 					<br/>
 						<div class="control-group">
 						    <!-- <div class="col-lg-5  pull-right" style="float:right;border:1px"> -->
-                               		<form action="#" method="post"> 
 							    集群：<strong><span class="text" th:text="${logicCluster}"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							    主机：<strong><span class="text" th:text="${hostName}"></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							    <input type="hidden" id="logicCluster" th:value="${logicCluster}" />
 							    <input type="hidden" id="hostname" th:value="${hostName}" />
-							    采样方式&nbsp;&nbsp;<select id="dataSpec" name="dataSpec" data-live-search="false" onchange="changeDataByKeys()">
-									<option value="MAX">最大值</option>
-							        <option value="AVERAGE" selected="selected">平均值</option>
-							        <option value="MIN">最小值</option>
-							    </select>
-                                     	自定义&nbsp;&nbsp;<input id="date_begin" type="text" class="datepicker"/>
-                                     	-&nbsp;<input id="date_end" type="text" class="datepicker"/>
-                                     	<button type="submit" class="tip-top" title="Search" ><i class="icon-search"></i></button>
-                                   	</form>
+							    <input type="hidden" id="intervalStep" th:value="${intervalStep}" />
+							    
+							    采样方式:<select id="dataSpec" name="dataSpec" data-live-search="false" onchange="changeDataByKeys()">
+									<option value="MAX" th:selected="${'MAX'==dataSpec}">最大值</option>
+							        <option value="AVERAGE" th:selected="${'AVERAGE'==dataSpec}">平均值</option>
+							        <option value="MIN" th:selected="${'MIN'==dataSpec}">最小值</option>
+							    </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							    <input type="radio" name="timeft" value="0" th:checked="${0==timeft}" onclick="setTime()"/>实时
+							    <input type="radio" name="timeft" value="1" th:checked="${1==timeft}" onclick="setTime()"/>今天
+							    <input type="radio" name="timeft" value="2" th:checked="${2==timeft}" onclick="setTime()"/>自定义
+							    <input id="startTime" type="text" class="datepicker" th:value="${startTime==0?'':startTime}"/>
+                                     	-&nbsp;<input id="endTime" type="text" class="datepicker" th:value="${endTime==0?'':endTime}"/>
+                                     	<button type="button" class="tip-top" title="Search" onclick="setTime()" ><i class="icon-search"></i></button>
 						    <!-- </div> -->
 					    </div>
 					</div>
@@ -74,13 +78,13 @@
 		</div>
 		<div th:include="/public/commonframe::jsScript(activeMenuNumber=42)" ></div>
 
-		<script th:src="@{/js/excanvas.min.js}"></script>
- 		<script th:src="@{/highcharts/js/jquery-1.7.2.min.js}"></script>
 		<script th:src="@{/highcharts/js/highcharts.js}"></script>
         <script th:src="@{/highcharts/js/chart-host-detail.js}"></script>
         
         <script th:src="@{/js/bootstrap-colorpicker.js}"></script>
         <script th:src="@{/js/bootstrap-datepicker.js}"></script>
+        <script th:src="@{/js/unicorn.js}"></script>
+        <script th:src="@{/js/unicorn.form_common.js}"></script>
         
  		
 	</body>

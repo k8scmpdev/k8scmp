@@ -10,10 +10,16 @@ import org.slf4j.LoggerFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.subject.Subject;
+import org.k8scmp.appmgmt.domain.Cluster;
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.CurrentThreadInfo;
+import org.k8scmp.engine.exception.DriverException;
+import org.k8scmp.engine.k8s.handler.DeployResourceHandler;
+import org.k8scmp.engine.k8s.util.Fabric8KubeUtils;
+import org.k8scmp.engine.k8s.util.KubeUtils;
 import org.k8scmp.exception.ApiException;
+import org.k8scmp.exception.K8sDriverException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.ClusterInfo;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
@@ -26,6 +32,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import io.fabric8.kubernetes.api.model.Namespace;
+import io.fabric8.kubernetes.api.model.NamespaceList;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -137,4 +147,98 @@ public class GlobalServiceImpl implements GlobalService {
 	public HttpResponseTemp<?> editMonitorInfo(MonitorInfo monitorInfo) {
 		return editMonitorInfo(monitorInfo,true);
 	}
+	
+	/*
+	 * 获取所有的物理集群
+	 */
+	@Override
+	public List<Cluster> getAllCluster() {
+		// TODO 后续会修改取数据的表
+    	GlobalInfo clustername =  getGlobalInfoByType(GlobalType.CI_CLUSTER_NAME);
+    	GlobalInfo clusterapi =  getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
+    	GlobalInfo clusterdesc =  getGlobalInfoByType(GlobalType.CI_CLUSTER_DESC);
+    	
+    	String clname = clustername==null?"":clustername.getValue();
+    	String clapi = clusterapi==null?"":clusterapi.getValue();
+    	String cldesc = clusterdesc==null?"":clusterdesc.getValue();
+    	
+    	Cluster clinfo = new Cluster(); 
+    	clinfo.setName(clname);
+    	clinfo.setApi(clapi);
+    	
+    	List<Cluster> clusters = new ArrayList<Cluster>();
+    	clusters.add(clinfo);
+        return clusters;
+    }
+	
+	
+	/*
+	 * 获取所有的namespace
+	 */
+	@Override
+	public List<NamespaceList> getAllNamesapce() {
+		// TODO 后续会修改取数据的表
+		List<Cluster> clusters = getAllCluster();
+		List<NamespaceList> namespaces = new ArrayList<NamespaceList>();
+		for(Cluster cluster : clusters){
+			KubeUtils client;
+	        try {
+	            client = Fabric8KubeUtils.buildKubeUtils(cluster, "default");
+	            NamespaceList namespaceList = client.listAllNamespace();
+	            namespaces.add(namespaceList);
+	        } catch (K8sDriverException e) {
+	            try {
+					throw new DriverException(e.getMessage());
+				} catch (DriverException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	        }
+		}
+        return namespaces;
+    }
+	
+	/*
+	 * 获取所有的namespace name
+	 */
+	@Override
+	public List<String> getAllNamesapceName() {
+		List<NamespaceList> nslist = getAllNamesapce();
+		List<String> nsnames = new ArrayList<String>();
+		for(NamespaceList namespcel:nslist){
+			List<Namespace> items = namespcel.getItems();
+			for(Namespace ns:items){
+				nsnames.add(ns.getMetadata().getName());
+			}
+		}
+        return nsnames;
+    }
+	
+	/*
+	 * 获取所有的namespace
+	 */
+	@Override
+	public List<String> getAllNamesapceNameByCluster(Cluster cluster) {
+		// TODO 后续会修改取数据的表
+		List<NamespaceList> namespaces = new ArrayList<NamespaceList>();
+		List<String> nsnames = new ArrayList<String>();
+		KubeUtils client;
+	    try {
+	        client = Fabric8KubeUtils.buildKubeUtils(cluster, "default");
+	        NamespaceList namespaceList = client.listAllNamespace();
+			List<Namespace> items = namespaceList.getItems();
+			for(Namespace ns:items){
+				nsnames.add(ns.getMetadata().getName());
+			}
+	    } catch (K8sDriverException e) {
+	        try {
+	        	throw new DriverException(e.getMessage());
+			} catch (DriverException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	    }
+        return nsnames;
+    }
+	
 }
