@@ -41,10 +41,9 @@
                                     </div>
                                     <div class="control-group" id="selectHost">
 										<label class="control-label">选择报警主机组</label>
-										<div class="controls">
+										<div class="controls"><!-- th:selected="${#strings.contains(hostGroupBasic,hostGroupBasic.id)}" -->
 											<select multiple="multiple" class="multiselect" name="hostGroup" id="hostGroup" style="width: 854px;" th:field="*{hostGroupList}">	
 												<option th:each="hostGroupBasic:${templateBack.hostGroupList}" th:value="${hostGroupBasic.id}" 	
-												th:selected="${#strings.contains(hostGroupBasic,hostGroupBasic.id)}"
 												th:text="${hostGroupBasic.hostGroupName}" ></option>	
 											</select>
 										</div>
@@ -78,10 +77,9 @@
 									
 									<div class="control-group">
                                         <label class="control-label">指定报警用户</label>
-                                        <div class="controls">
+                                        <div class="controls"><!-- th:selected="${#strings.contains(category,category.id)}" -->
                                             <select multiple="multiple" class="multiselect" name="users" id="users" style="width: 854px;" required="required">	
 												<option th:each="category:${templateBack.userList}" th:value="${category.id}" 	
-												th:selected="${#strings.contains(category,category.id)}"
 												th:text="${category.loginname}" ></option>	
 											</select>
                                         </div>
@@ -162,8 +160,8 @@
 				var hostGroupList = [];
 				var strategyList = [];
 				var userList = [];
-				var hostGroupInfoBasic = new Object();
-				var user = new Object();
+				
+				
 				var deploymentInfo = new Object();
 				var callback = new Object();
 				var templateInfo = new Object();
@@ -172,6 +170,7 @@
 				if(templateType == 'host'){
 					//hostGroup
 					$("#hostGroup option:selected").each(function(){ 
+						var hostGroupInfoBasic = new Object();
 						hostGroupInfoBasic.hostGroupName = $(this).text();
 						hostGroupInfoBasic.id = $(this).val();
 						hostGroupList.push(hostGroupInfoBasic);
@@ -230,11 +229,12 @@
 				 templateInfo.strategyList = strategyList; 
 				 
 				//user
-				$("#users option:selected").each(function(){ 
+				$.each($("#users option:selected"),function(i,v){
+					var user = new Object();
 					user.loginname = $(this).text();
 					user.id = $(this).val();
 					userList.push(user);
-					});
+				})
 				 templateInfo.userList = userList;
 				
 				//callback
