@@ -18,7 +18,9 @@ import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.ClusterInfo;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
+import org.k8scmp.monitormgmt.domain.monitor.ContainerInfo;
 import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
+import org.k8scmp.monitormgmt.domain.monitor.PodInfo;
 import org.k8scmp.util.CommonUtil;
 import org.k8scmp.util.DateUtil;
 import org.k8scmp.util.StringUtils;
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceList;
 import io.fabric8.kubernetes.api.model.Node;
@@ -40,7 +43,6 @@ import io.fabric8.kubernetes.api.model.Quantity;
 @Component("nodeWrapperNew")
 public class NodeWrapperNew {
 	private Logger logger = LoggerFactory.getLogger(NodeWrapper.class);
-//	private KubeUtils client;
 	 
 	@Autowired
     GlobalBiz globalBiz;
@@ -76,6 +78,9 @@ public class NodeWrapperNew {
 		return null;
 	}
 	
+	/*
+	 * 获取对应namespace下的所有labels
+	 * */
 	public List<LabelInfo> getAllLabels(){
 		KubeUtils<?> client;
 		try {
@@ -139,68 +144,92 @@ public class NodeWrapperNew {
 		return null;
 	}
 	
-	/*public List<Map<String,List<PodInfo>>> getPodListByClusterNamespaceLabels(Cluster cluster,List<String> namespaces,List<Map<String,String>> labels){
-    	List<Map<String,List<PodInfo>>> mapList = new ArrayList<>();
-    	Map<String,List<PodInfo>> podmap = new HashMap<>();
-    	try {
+	/**
+     * 根据cluster，namespace，labels查询node下的pod
+     * */
+	public List<PodInfo> getPodListByClusterNamespaceLabels(Cluster cluster,List<String> namespaces,List<Map<String,String>> labels){
+		try {
+    		List<PodInfo> podInfoList = new ArrayList<>();
+    		Map<String,Set<PodInfo>> podInfoMap = new HashMap<>();
+    		Set<PodInfo> podInfoSet = new HashSet<>();
 	    	if(cluster == null){
-	    		GlobalInfo cluster_host = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
+				GlobalInfo cluster_host = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
 	    		GlobalInfo cluster_name = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_NAME);
 	        	Cluster clusterNew = new Cluster();
 	        	clusterNew.setApi(cluster_host.getValue());
 	        	clusterNew.setId(cluster_host.getId()+"");
 	        	clusterNew.setName(cluster_name.getValue());
-				client = Fabric8KubeUtils.buildKubeUtils(clusterNew, "default");
-	    	}else{
-	    		client = Fabric8KubeUtils.buildKubeUtils(cluster, "default");
-	    	}
-	    	if(namespaces != null){
-				for (String namespace : namespaces) {
-					List<Namespace> items = client.listAllNamespace().getItems();
-					for (Namespace namespace2 : items) {
-						if(namespace.equals(namespace2.getMetadata().getNamespace())){
-							if(labels != null){
-								List<GetPodTask> nodeTasks = new ArrayList<>(labels.size());
-	            			     nodeTasks.add(new GetPodTask(client, labels));
-	            			     List<List<PodInfo>> podLists = ClientConfigure.executeCompletionService(nodeTasks);
-	            			     for (List<PodInfo> podList : podLists) {
-	            			         podmap.put(namespace, podList);
-	            			         mapList.add(podmap);
-	            			     }	
-							}else{
-								List<GetPodTask> nodeTasks = new ArrayList<>();
-	            			     nodeTasks.add(new GetPodTask(client, null));
-	            			     List<List<PodInfo>> podLists = ClientConfigure.executeCompletionService(nodeTasks);
-	            			     for (List<PodInfo> podList : podLists) {
-	            			         podmap.put(namespace, podList);
-	            			         mapList.add(podmap);
-	            			     }
+	        	if(namespaces != null){
+	        		for (String namespace : namespaces) {
+	        			podInfoSet.clear();
+	        			List<GetPodTask> infoTasks = new LinkedList<>();
+	        			infoTasks.add(new GetPodTask(labels, clusterNew, namespace));
+	        			List<List<PodInfo>> list = ClientConfigure.executeCompletionService(infoTasks);
+	        			for (List<PodInfo> podList : list) {
+							for (PodInfo podInfo : podList) {
+								podInfoSet.add(podInfo);
 							}
 						}
+	        			podInfoMap.put(namespace, podInfoSet);
 					}
-				}
-			}else{
-				List<Namespace> items = client.listAllNamespace().getItems();
-				for (Namespace namespace2 : items) {
-					if(labels != null){
-						 List<GetPodTask> nodeTasks = new ArrayList<>(labels.size());
-	       			     nodeTasks.add(new GetPodTask(client, labels));
-	       			     List<List<PodInfo>> podLists = ClientConfigure.executeCompletionService(nodeTasks);
-	       			     for (List<PodInfo> podList : podLists) {
-	       			         podmap.put(namespace2.getMetadata().getName(), podList);
-	       			         mapList.add(podmap);
-	       			     }	
-					}else{
-						List<GetPodTask> nodeTasks = new ArrayList<>();
-	       			     nodeTasks.add(new GetPodTask(client, null));
-	       			     List<List<PodInfo>> podLists = ClientConfigure.executeCompletionService(nodeTasks);
-	       			     for (List<PodInfo> podList : podLists) {
-	       			         podmap.put(namespace2.getMetadata().getName(), podList);
-	       			         mapList.add(podmap);
-	       			     }
+	        	}else{
+	        		//namespace == null
+	        		KubeUtils<?> client= Fabric8KubeUtils.buildKubeUtils(clusterNew, null);
+	        		NamespaceList namespaceList = client.listAllNamespace();
+	        		for(Namespace namespace : namespaceList.getItems()){
+	        			podInfoSet.clear();
+	        			List<GetPodTask> infoTasks = new LinkedList<>();
+	        			infoTasks.add(new GetPodTask(labels, clusterNew, namespace.getMetadata().getName()));
+	        			List<List<PodInfo>> list = ClientConfigure.executeCompletionService(infoTasks);
+	        			for (List<PodInfo> podList : list) {
+							for (PodInfo podInfo : podList) {
+								podInfoSet.add(podInfo);
+							}
+						}
+	        			podInfoMap.put(namespace.getMetadata().getName(), podInfoSet);
+	        		}
+	        	}
+	    	}else{
+	    		//cluster != null
+	        	if(namespaces != null){
+	        		for (String namespace : namespaces) {
+	        			podInfoSet.clear();
+	        			List<GetPodTask> infoTasks = new LinkedList<>();
+	        			infoTasks.add(new GetPodTask(labels, cluster, namespace));
+	        			List<List<PodInfo>> list = ClientConfigure.executeCompletionService(infoTasks);
+	        			for (List<PodInfo> podList : list) {
+							for (PodInfo podInfo : podList) {
+								podInfoSet.add(podInfo);
+							}
+						}
+	        			podInfoMap.put(namespace, podInfoSet);
 					}
+	        	}else{
+	        		//namespace == null
+	        		KubeUtils<?> client= Fabric8KubeUtils.buildKubeUtils(cluster, null);
+	        		NamespaceList namespaceList = client.listAllNamespace();
+	        		for(Namespace namespace : namespaceList.getItems()){
+	        			podInfoSet.clear();
+	        			List<GetPodTask> infoTasks = new LinkedList<>();
+	        			infoTasks.add(new GetPodTask(labels, cluster, namespace.getMetadata().getName()));
+	        			List<List<PodInfo>> list = ClientConfigure.executeCompletionService(infoTasks);
+	        			for (List<PodInfo> podList : list) {
+							for (PodInfo podInfo : podList) {
+								podInfoSet.add(podInfo);
+							}
+						}
+	        			podInfoMap.put(namespace.getMetadata().getName(), podInfoSet);
+	        		}
+	        	}
+	    	}
+	    	for(String namespace : podInfoMap.keySet()){
+	   			Set<PodInfo> podInfos = podInfoMap.get(namespace);
+	   			for (PodInfo podInfo : podInfos) {
+					podInfoList.add(podInfo);
 				}
-			}
+	   		}
+	    	return podInfoList;
+	    	
     	} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -209,11 +238,11 @@ public class NodeWrapperNew {
     
    private class GetPodTask  implements Callable<List<PodInfo>>{
 	   
-	   private KubeUtils client;
+	   private KubeUtils<?> client;
 	   private List<Map<String,String>> labels;
 	   
-	   GetPodTask(KubeUtils client,List<Map<String,String>> labels){
-		   this.client = client;
+	   GetPodTask(List<Map<String,String>> labels,Cluster cluster, String namespace) throws Exception{
+		   this.client = Fabric8KubeUtils.buildKubeUtils(cluster, namespace);
 		   this.labels = labels;
 	   }
 	   
@@ -257,7 +286,7 @@ public class NodeWrapperNew {
 		}
 		return podList;
 	  }
-   }*/
+   }
     
     /**
      * 根据cluster，namespace，labels查询node
