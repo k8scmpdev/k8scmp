@@ -2,21 +2,16 @@ package org.k8scmp.monitormgmt.service.monitor.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import io.fabric8.kubernetes.api.model.ContainerStatus;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodList;
-
 import org.k8scmp.appmgmt.dao.AppDao;
 import org.k8scmp.appmgmt.dao.ServiceDao;
 import org.k8scmp.appmgmt.domain.AppInfo;
-import org.k8scmp.appmgmt.domain.Cluster;
+import org.k8scmp.appmgmt.domain.Container;
+import org.k8scmp.appmgmt.domain.Instance;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ClientConfigure;
-import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.engine.k8s.util.NodeWrapper;
-import org.k8scmp.engine.k8s.util.NodeWrapperNew;
 import org.k8scmp.engine.model.CustomObjectMapper;
 import org.k8scmp.exception.ApiException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
@@ -146,7 +141,38 @@ public class MonitorServiceImpl implements MonitorService {
     	NodeWrapper nodeWrapper;
     	try {
 			nodeWrapper = new NodeWrapper().init("default");
-			List<Pod> podList = nodeWrapper.getAllPods().getItems();
+			List<Instance> instanceList = nodeWrapper.getInstance();
+			for (Instance instance : instanceList) {
+				InstenceInfoBack instenceInfoBack = new InstenceInfoBack();
+	    		String serviceId = instance.getServiceId();
+	    		if(serviceId != null && !serviceId.equals("")){
+		    		ServiceInfo service = serviceDao.getService(serviceId);
+		    		if(serviceName != null && !serviceName.equals("") && instance.getServiceCode().indexOf(serviceName)>=0 ){
+		    					AppInfo app = appDao.getApp(service.getAppId());
+		    					instenceInfoBack.setAppName(app.getAppCode());
+		    					instenceInfoBack.setServiceName(service.getServiceCode());
+		    					instenceInfoBack.setInstanceName(instance.getInstanceName());
+		    					instenceInfoBack.setCPUUsed(formatDouble(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(instance.getInstanceName())));
+		    					instenceInfoBack.setMemoryUsed(formatDouble(result.getCounterResults().get("container.mem.usage.percent").get(0).get(instance.getInstanceName())));
+		    					instenceInfoBack.setNetInput(formatDouble(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(instance.getInstanceName())));
+		    					instenceInfoBack.setNetOutput(formatDouble(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(instance.getInstanceName())));
+					}else if(serviceName != null && !serviceName.equals("") && instance.getServiceCode().indexOf(serviceName)<0){
+						continue;
+					}else{
+						AppInfo app = appDao.getApp(service.getAppId());
+						instenceInfoBack.setAppName(app.getAppCode());
+						instenceInfoBack.setServiceName(service.getServiceCode());
+						instenceInfoBack.setInstanceName(instance.getInstanceName());
+						instenceInfoBack.setCPUUsed(formatDouble(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(instance.getInstanceName())));
+						instenceInfoBack.setMemoryUsed(formatDouble(result.getCounterResults().get("container.mem.usage.percent").get(0).get(instance.getInstanceName())));
+						instenceInfoBack.setNetInput(formatDouble(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(instance.getInstanceName())));
+						instenceInfoBack.setNetOutput(formatDouble(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(instance.getInstanceName())));
+						
+					}
+	    		}
+	    		instenceList.add(instenceInfoBack);
+			}
+			/*List<Pod> podList = nodeWrapper.getAllPods().getItems();
 			//通过服务名搜索和获取所有的实例
 	    	for (Pod pod : podList) {
 	    		InstenceInfoBack instenceInfoBack = new InstenceInfoBack();
@@ -177,7 +203,7 @@ public class MonitorServiceImpl implements MonitorService {
 					}
 	    		}
 	    		instenceList.add(instenceInfoBack);
-			}
+			}*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -412,21 +438,9 @@ public class MonitorServiceImpl implements MonitorService {
     }
    
     private List<TargetInfo> getTargetInfos(String type) {
-    	
 		//获取node/pod/container
     	try {
 			List<TargetInfo> targetInfoList = new ArrayList<>();
-			
-//			Cluster clusters = new Cluster();
-//			clusters.setApi("192.168.80.137:8080");
-//			List<String> namespaces = new ArrayList<>();
-//			namespaces.add("default");
-//			namespaces.add("kube-system");
-//			List<Map<String,String>> labels = new ArrayList<>();
-//			Map<String,String> label = new HashMap<>();			
-			
-//			List<Map<String, List<NodeInfo>>> nodewapp = new NodeWrapperNew().getNodeListByClusterNamespaceLabels(clusters, null, null);
-			
 			NodeWrapper nodeWrapper = new NodeWrapper().init("default");
 			if(type.equals("node")){
 				List<NodeInfo> nodeInfoList = nodeWrapper.getNodeListByClusterId();
@@ -435,23 +449,37 @@ public class MonitorServiceImpl implements MonitorService {
 					targetInfo.setNode(nodeInfo.getName());
 					targetInfoList.add(targetInfo);
 				}
-			}else if(type.equals("pod") || type.equals("container")){
-				
-				PodList podList = nodeWrapper.getAllPods();
-				for (Pod pod : podList.getItems()) {
+			}else if(type.equals("pod")){
+				List<Instance> instanceList = nodeWrapper.getInstance();
+				for (Instance instance : instanceList) {
 					TargetInfo targetInfo = new TargetInfo();
 					PodInfo podInfo = new PodInfo();
-					podInfo.setPodName(pod.getMetadata().getName());
-					List<ContainerInfo> containers = new ArrayList<>();
-					List<ContainerStatus> containerStatuses = pod.getStatus().getContainerStatuses();
-					for (ContainerStatus containerStatus : containerStatuses) {
+					podInfo.setPodName(instance.getInstanceName());
+					List<ContainerInfo> containerInfoList = new ArrayList<>();
+					for(Container container:instance.getContainers()){
 						ContainerInfo containerInfo = new ContainerInfo();
-						containerInfo.setHostname(pod.getSpec().getNodeName());
-						containerInfo.setContainerId(containerStatus.getContainerID().substring(9));
-						containers.add(containerInfo);
+						containerInfo.setContainerId(container.getContainerId());
+						containerInfo.setHostname(instance.getHostName());
+						containerInfoList.add(containerInfo);
 					}
-					podInfo.setContainers(containers);
+					podInfo.setContainers(containerInfoList);
 					targetInfo.setPod(podInfo);
+					targetInfoList.add(targetInfo);
+				}
+			}else if(type.equals("container")){
+				List<Instance> instanceList = nodeWrapper.getInstance();
+				for (Instance instance : instanceList) {
+					TargetInfo targetInfo = new TargetInfo();
+					List<ContainerInfo> containerInfoList = new ArrayList<>();
+					for(Container container:instance.getContainers()){
+						ContainerInfo containerInfo = new ContainerInfo();
+						containerInfo.setContainerId(container.getContainerId());
+						containerInfo.setHostname(instance.getHostName());
+						containerInfoList.add(containerInfo);
+					}
+					for (ContainerInfo containerInfo : containerInfoList) {
+						targetInfo.setContainer(containerInfo);
+					}
 					targetInfoList.add(targetInfo);
 				}
 			}
@@ -459,9 +487,6 @@ public class MonitorServiceImpl implements MonitorService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	
-    	
-    	
 		return null;
 	}
 
@@ -515,7 +540,6 @@ public class MonitorServiceImpl implements MonitorService {
         }
 
         Set<String> endpoints = new HashSet<>();
-//        List<String> endpoints = new ArrayList<>();
         Set<String> containers = new HashSet<>();
 
         // collect endpoints and containers
@@ -543,15 +567,7 @@ public class MonitorServiceImpl implements MonitorService {
         // fetch counters from database
         switch (targetType) {
             case "node":
-//            	List<String> countsback = new ArrayList<>();
-//            	List<String> counts = new ArrayList<>();
-//            	for (String endpoint : endpoints) {
-//            		int id = monitorBiz.getEndpointId(endpoint);
-//            		countsback = monitorBiz.getNodeCounterByEndpointId(id);
-//            		counts.addAll(countsback);
-//				}
                 return monitorBiz.getNodeCountersByEndpoints(endpoints);
-//            	return counts;
             case "pod":
             case "container":
                 return monitorBiz.getContainerCountersByEndpoints(joinStringSet(endpoints, ","), joinStringSet(containers, ","));
