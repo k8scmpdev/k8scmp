@@ -32,7 +32,7 @@
 								<h5>请输入逻辑集群信息</h5>
 							</div>
 							<div class="widget-content nopadding">
-								<form class="form-horizontal" action="#" th:action="@{/cluster/logic/create}" th:object="${logicClusterDetail}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
+								<form class="form-horizontal" action="#" th:action="@{/cluster/logic/create/subform}" th:object="${logicClusterDetail}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
                                     <div class="control-group">
                                         <label class="control-label">*逻辑集群名</label>
                                         <div class="controls">
@@ -43,24 +43,25 @@
                                     <div class="control-group">
                                         <label class="control-label">选择所属物理集群</label>
                                         <div class="controls">
-				                            <select class="combine" style="width:170px" id="cluster" th:each="cluster:${clusters}"  >
-												<option th:value="${cluster.api}" th:text="${cluster.name}" th:selected="${clustername==cluster.name}"></option>
+				                            <select class="combine" style="width:170px" id="cluster"   th:field="*{clustername}">
+												<option th:each="cluster:${clusters}" th:value="${cluster.name+','+cluster.api}" th:text="${cluster.name}" th:selected="${clustername==cluster.name}"></option>
 											</select>
 										</div>
                                     </div>
+                                    <!-- 
                                     <div class="control-group">
                                         <label class="control-label">选择所属namespace</label>
                                         <div class="controls">
-			                            <select class="combine" style="width:170px" id="ns"  >
+			                            <select class="combine" style="width:170px" id="namespace" th:field="*{namespace}" >
 											<option th:each="ns:${namespaces}" th:value="${ns}" th:text="${ns}" th:selected="${namespace==ns}" ></option>
 										</select>
 										</div>
                                     </div>
-                                    
+                                     -->
 									<div class="control-group">
                                         <label class="control-label">选择关联主机</label>
                                         <div class="controls">
-                                            <select multiple="multiple" class="multiselect" name="nodelist" id="nodelist" style="width: 854px;" required="required">	
+                                            <select th:field="*{description}"  multiple="multiple" class="multiselect" name="nodelist" id="nodelist" style="width: 854px;" required="required" >	
 												<option th:each="node:*{nodeList}" th:value="${node.name}" 	
 												th:selected="${#strings.contains('',node.name)}"
 												th:text="${node.name}" ></option>	

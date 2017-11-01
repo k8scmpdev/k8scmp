@@ -44,7 +44,7 @@ public class GraphConfiguration {
         String mysqlPassword = System.getenv(GlobalConstant.GRAPH_MYSQL_PASSWORD);
         if (StringUtils.isBlank(mysqlPassword)) {
 //            mysqlPassword = System.getenv(GlobalConstant.k8scmp_MYSQL_PASSWORD);
-        	mysqlPassword = "1234";
+        	mysqlPassword = "123";
         }
         String mysqlDB = System.getenv(GlobalConstant.GRAPH_MYSQL_DB);
         if (StringUtils.isBlank(mysqlDB)) {

@@ -61,20 +61,18 @@
 										<tr>
 											<th>逻辑集群名</th>
 											<th>所属物理集群</th>
-											<th>所属namespace</th>
-											<th>在线主机个数</th>
+											<th>关联主机个数</th>
 											<th >操作</th>
 										</tr>
 									</thead>
 									<tbody >
-										<tr class="gradeX" th:each="logicClusterInfo : ${logicClusterInfos}" th:object="${logicClusterInfo}">
-											<td><a th:href="@{/cluster/logic/edit(clustername=*{clustername},apiserver=*{apiserver},namespace=*{namespace},logicname=*{name})}"><span th:text="*{name}"></span></a></td>
-											<td><span th:text="*{clustername}"></span></td>
-											<td><span th:text="*{namespace}"></span></td>
-											<td><span th:text="*{hostNum}"></span></td>
+										<tr class="gradeX" th:each="labelinfo : ${labelinfos}" th:object="${labelinfo}">
+											<td><a th:href="@{/cluster/logic/edit(clustername=*{clusterInfo.name},apiserver=*{clusterInfo.apiserver},logicname=*{labelName},nodeNames=*{nodeName.toString()})}"><span th:text="*{labelName}"></span></a></td>
+											<td><span th:text="*{clusterInfo.name}"></span></td>
+											<td  th:title="*{nodeName}"><span th:text="*{hostCount}"></span></td>
 											<td style="text-align:center">
-												<button title="修改" class="btn btn-primary" th:onclick="'changePwd(\''+*{name}+'\')'"><i class="icon-pencil icon-white"></i></button>
-												<button title="删除" class="btn btn-danger" th:onclick="'delUser(\''+*{name}+'\')'"><i class="icon-remove icon-white"></i></button>
+												<a title="修改" class="btn btn-primary" th:href="@{/cluster/logic/edit(clustername=*{clusterInfo.name},apiserver=*{clusterInfo.apiserver},logicname=*{labelName},nodeNames=*{nodeName.toString()})}"><i class="icon-pencil icon-white"></i></a>
+												<button title="删除" class="btn btn-danger" th:onclick="''"><i class="icon-remove icon-white"></i></button>
 												<form id="frm" name="frm" action="#"  method="get"></form>
 											</td>
 										</tr>

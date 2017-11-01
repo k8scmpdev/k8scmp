@@ -1,10 +1,10 @@
-$("#cluster,#ns").bind(
+$("#cluster").bind(
 		"change",
 		function(event) {
 			var clustername = $('#cluster option:selected').html();
 			var apiserver = $('#cluster option:selected').val();
-			var namespace = $('#ns option:selected').val();
-			location.href="/cluster/logic/create?clustername=" + clustername +"&apiserver=" + apiserver+"&namespace=" + namespace;
+//			var namespace = $('#ns option:selected').val();
+			location.href="/cluster/logic/create?clustername=" + clustername +"&apiserver=" + apiserver;
 			
 //			var clustername = $('#cluster option:selected').val();
 //			var apiserver = $('#cluster option:selected').html();

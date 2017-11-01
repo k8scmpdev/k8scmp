@@ -12,7 +12,9 @@ public class LogicClusterInfo {
     private String name;
     private String description;
     private int hostNum;
-    private List<NodeInfo> nodeList;
+
+	private List<NodeInfo> nodeList;
+    private List<String> nodenames;
     private String clustername;
     private String apiserver;
     private String namespace;
@@ -25,6 +27,13 @@ public class LogicClusterInfo {
 		this.clustername = clustername;
 	}
 
+	public List<String> getNodenames() {
+		return nodenames;
+	}
+	
+	public void setNodenames(List<String> nodenames) {
+		this.nodenames = nodenames;
+	}
 	public String getApiserver() {
 		return apiserver;
 	}
