@@ -1,38 +1,16 @@
-<div id="portMappedTemplate">
-	<input name="nodePort" type="text" class="combine tip-top" title="对外访问服务端口"/>
-	<input name="targetPort" type="text" class="combine tip-top" title="容器端口"/>
-	<select name="protocol" class="combine">
+<div id="portMappedTemplate" style="float: left">
+	<span>对外访问服务端口：</span>
+	<input name="nodePort" type="text" class="portMapped tip-top" title="对外访问服务端口"/>
+	<span>容器端口：</span>
+	<input name="targetPort" type="text" class="portMapped tip-top" title="容器端口"/>
+	<span>协议：</span>
+	<select name="protocol" class="portMapped">
 		<option>TCP</option>
 		<option>UDP</option>
 	</select>
-	<input name="description" type="text" class="combine tip-top" title="描述"/>
+	<span>描述：</span>
+	<input name="description" type="text" class="tip-top" title="描述"/>
 	<a title="删除" class="tip-bottom" href="javascript:void(0);" onclick="$(this).parent().remove();"><i class="icon-trash"></i></a>
-</div>
-
-<div id="portDisplay" style="padding-top: 10px;">
-	<div>
-		<span>对外访问服务端口:</span>
-		<input name="iNodePort"/>
-	</div>
-	<div>
-		<span>容器端口:</span>
-		<input name="iTargetPort" />
-	</div>
-	<div>
-		<span>协议:</span>
-		<select class="disen" name="iProtocol">
-			<option value="TCP">TCP</option>
-			<option value="UDP">UDP</option>
-		</select>
-	</div>
-	<div>
-		<span>描述:</span>
-		<input name="description" />
-		<span style="float:right;padding-right: 50%;">
-			<a title="编辑" class="tip-bottom" href="javascript:void(0);" onclick="editPortMapped(this);"><i class="icon-edit"></i></a>
-		</span>
-		
-	</div>
 </div>
 
 

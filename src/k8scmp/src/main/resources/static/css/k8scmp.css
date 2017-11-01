@@ -372,3 +372,5 @@
     max-width:15%;	
 }
 
+input[class*="portMapped"]{width:10% !important}
+

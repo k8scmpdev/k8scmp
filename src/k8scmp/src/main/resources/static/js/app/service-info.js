@@ -1,18 +1,10 @@
 function showPortMapped(){
-	/***init port mapped value**/
-	var hiddenNodePorts = $("infoNodePorts").val();
-	$("#portMapped").html("");
-/*	$("#nodeOperation").css("display","none");
-	if(hiddenNodePorts != null && hiddenNodePorts.length>0){
-		$("#nodeOperation").css("display","block");
-		var portLength = hiddenNodePorts.length;
-		loadNodePorts(hiddenNodePorts,portLength-1);
-	}*/
     var childdiv=$('<div></div>');
-	childdiv.attr("id","id" + new Date().getTime());
+	//childdiv.attr("id","id" + new Date().getTime());
+    childdiv.attr("class","newPort");
 	childdiv.load("/js/statichtml/app/portMappedTemplate.html #portMappedTemplate");
-	$("#portMapped").append(childdiv);
-	$("#nodeOperation").css("display","block");
+	$("#newPortMapped").append(childdiv);
+	$("#saveData").show();
 }
 
 $(".radioItem").change(function(event){
@@ -126,11 +118,11 @@ $(document).ready(function(){
 	initReplicasByServiceId(serviceId);//replies
 	initCurrentVersionNum(serviceId);//current version number
 	initServiceAddress(serviceId);//service urls
-
-	//判断是否有端口映射
-	if($("#portDisplay").length>0){
-		$("#nodeOperation").css("display","block");
-	}
+	
+	//add onchange event on input
+	$("#portMapped >div").find("input,select").bind("change",function(){
+		$("#saveData").show();
+	});
 });
 
 //init port mapped
@@ -832,6 +824,7 @@ function getEventByServiceId(serviceId){
 						+'<td style="text-align:center;">'+v.operation+'</td>'
 						+'<td style="text-align:center;">'+v.startTime+'</td>'
 						+'<td style="text-align:center;">'+v.expireTime+'</td>'
+						+'<td style="text-align:center;">'+v.lastModifiedTime+'</td>'
 						+'<td style="text-align:center;">'+v.state+'</td>'
 						+'<td style="text-align:center;">'+v.userName+'</td>'
 						+'<td style="text-align:center;">'+message+'</td>'
@@ -1145,54 +1138,92 @@ function infoStopService(){
 
 //save node ports into db
 function saveNodePort(){
+	var count = 0;
 	//check required
 	if(checkNodePortInfo()){
-		var ajaxUrl = "/app/service/createLoadBalancer?serviceId="+serviceId;
 		var paramData = [];
-		$("#portMapped >div").each(function(){
-			var nodePortItem = {};	
-			var nodePort = $(this).find("input[name='iNodePort']").val();
-			var targetPort = $(this).find("input[name='iTargetPort']").val();
-			var protocol = $(this).find("select[name='iProtocol']").val();
-			var description = $(this).find("input[name='description']").val();
-			
-			//package value going to save into db
-			nodePortItem["nodePort"] = nodePort;
-			nodePortItem["targetPort"] = targetPort;
-			nodePortItem["protocol"] = protocol;
-			nodePortItem["description"] = description;
-			paramData.push(nodePortItem);
-		});
-		$.ajax({
-			type: "POST",
-			dataType: "json",
-			url: ajaxUrl,
-			data: JSON.stringify(paramData),
-			contentType:"application/json",
-			success: function (data) {
-				alert("操作成功！");
-				disableNodePort();
-			},
-			error: function(data) {
-				alert("error!");
-			}
-		});
+		if($("#portMapped >div").find("input[name='nodePort']").length>0){
+			$("#portMapped >div").find("input[name='nodePort']").each(function(){
+				var nodePortItem = {};
+				var nodePort = $(this).val();
+				var targetPort = $(this).parent().find("input[name='targetPort']").val();
+				var protocol = $(this).parent().find("select[name='protocol']").val();
+				var description = $(this).parent().find("input[name='description']").val();
+				
+				//package value going to save into db
+				nodePortItem["nodePort"] = nodePort;
+				nodePortItem["targetPort"] = targetPort;
+				nodePortItem["protocol"] = protocol;
+				nodePortItem["description"] = description;
+				paramData.push(nodePortItem);
+				
+				//each complete,request for save
+				if(++count == $("#portMapped >div").find("input[name='nodePort']").length){
+					saveLoadBalancerAjax(paramData);
+				}
+			});
+		}else{
+			//empty loadbalancer
+			saveLoadBalancerAjax([]);
+		}
 	}else{
-		alert("请重新检查填写的数据，格式为数字！");
+		alert("请重新检查填写的数据，格式为非0开头[1~6]位数字！");
 	}
+}
+
+//ajax request to save loadbalancer into db
+function saveLoadBalancerAjax(data){
+	var paramData = JSON.stringify(data);
+	var ajaxUrl = "/app/service/createLoadBalancer?serviceId="+serviceId;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: ajaxUrl,
+		data: paramData,
+		contentType:"application/json",
+		success: function (data) {
+			alert("操作成功！");
+			$("#saveData").css("display","none");
+		},
+		error: function(data) {
+			alert("error!");
+		}
+	});
 }
 
 //check required field when save node ports
 function checkNodePortInfo(){
+	var flag = true;
 	$("#portMapped >div").each(function(){
-		var nodePort = $(this).find("input[name='iNodePort']").val();
-		var targetPort = $(this).find("input[name='iTargetPort']").val();
-		if(!checkNumberic(nodePort)){
-			$(this).find("input[name='iNodePort']").css("background-color","red");
-			return false;
+		if($(this).find("input[name='nodePort']").length>0){
+			var nodePort = $(this).find("input[name='nodePort']").val();
+			var targetPort = $(this).find("input[name='targetPort']").val();
+			/**any of nodeport or targertport is invalid,break this each***/
+			if(!checkNumberic(nodePort)){
+				$(this).find("input[name='nodePort']").css("background-color","red");
+				flag = false;
+				return false;
+			}else{
+				$(this).find("input[name='nodePort']").css("background-color","");
+			}
+			if(!checkNumberic(targetPort)){
+				$(this).find("input[name='targetPort']").css("background-color","red");
+				flag = false;
+				return false;
+			}else{
+				$(this).find("input[name='targetPort']").css("background-color","");
+			}
+			/**any of nodeport or targertport is invalid,break this each***/
+		}else{
+			return true;
 		}
 	});
-	return true;
+	return flag;
+}
+
+function deleteLoadBalancer(obj){
+	$(obj).parent().remove();
+	$("#saveData").show();
 }
 
 //numberic check
@@ -1200,7 +1231,8 @@ function checkNumberic(data){
 	if(data == null || data.trim()==""){
 		return false;
 	}
-	var reg=/^d+(.d+)?$/
+	//var reg=/^d+(.d+)?$/
+	var reg = /^[1-9][0-9]{0,5}$/;
 	return(reg.test(data));	
 }
 

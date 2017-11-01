@@ -140,7 +140,8 @@
 																		<tr>
 																			<th>操作类型</th>
 																			<th>起始时间</th>
-																			<th>更新时间</th>
+																			<th>状态超时时间</th>
+																			<th>最后更新时间</th>
 																			<th>操作结果</th>
 																			<th>操作用户</th>
 																			<!-- <th>地址</th> -->
@@ -207,64 +208,27 @@
 							<div class="tab-pane fade" id="sPort"> 
 								<div id="showLoadBalancer">
 									<a class="btn" href="javascript:void(0)" onclick="showPortMapped();"><span style="font-size: 13px;">创建负载均衡器</span></a>
+									<a class="btn btn-info" href="javascript:void(0)" onclick="saveNodePort();" id="saveData" style="display: none"><span style="font-size: 13px;">保存</span></a>
+									<span style="font-size: 13px;color: gray">创建和删除负载后，点击保存按钮保存设置</span>
 								</div>
 								<div id="portMapped">
-									<div th:each="node,itState:${serviceInfo.nodePorts}" style="padding-top: 10px;float: left;padding-left: 30%;">
-										<div id="portDisplay" style="padding-top: 10px;">
-											<div>
-												<span style="width: 120px;float:left">对外访问服务端口:</span>
-												<input name="iNodePort" th:value="${node.nodePort}" type="text"/>
-											</div>
-											<div>
-												<span style="width: 120px;float:left">容器端口:</span>
-												<input name="iTargetPort" th:value="${node.targetPort}" type="text"/>
-											</div>
-											<div>
-												<span style="width: 120px;float:left">协议:</span>
-												<select class="disen" name="iProtocol">
-													<option value="TCP">TCP</option>
-													<option value="UDP">UDP</option>
-												</select>
-											</div>
-											<div>
-												<span style="width: 120px;float:left">描述:</span>
-												<input name="description" th:value="${node.description}" type="text"/>
-												<span style="float:right;padding-right: 50%;">
-													<a title="编辑" class="tip-bottom" href="javascript:void(0);" onclick="editPortMapped(this);"><i class="icon-edit"></i></a>
-												</span>
-										
-											</div>
-										</div>
+									<div th:each="node,itState:${serviceInfo.nodePorts}" style="padding-top: 10px;float: left;">
+											<span>对外访问服务端口：</span>
+											<input th:value="${node.nodePort}" name="nodePort" type="text" class="portMapped tip-top" title="对外访问服务端口"/>
+											<span>容器端口：</span>
+											<input th:value="${node.targetPort}" name="targetPort" type="text" class="portMapped tip-top" title="容器端口"/>
+											<span>协议：</span>
+											<select name="protocol" class="portMapped">
+												<option>TCP</option>
+												<option>UDP</option>
+											</select>
+											<span>描述：</span>
+											<input th:value="${node.description}" name="description" type="text" class="tip-top" title="描述"/>
+											<a title="删除" class="tip-bottom" href="javascript:void(0);" onclick="deleteLoadBalancer(this);"><i class="icon-trash"></i></a>
 								    </div>
+								    <div id="newPortMapped"></div>
                            		
                            		</div>
-                           		<div id="nodeOperation" style="display: none">
-									<a title="确定添加" href="javascript:void(0);" onclick="saveNodePort();" class="btn btn-primary btn-mini"><i class="icon-edit"></i>完成</a>
-									<a title="删除" class="btn btn-primary btn-mini" href="javascript:void(0);" onclick="deleteNodePort();"><i class="icon-trash"></i></a>
-								</div>
-								<!-- <div id="portDisplay" style="padding-top: 10px;display: none;float: left;padding-left: 30%;">
-									<div>
-										<span style="width: 120px;float:left">对外访问服务端口:</span>
-										<input class="disen" type="text" name="iNodePort"/>
-									</div>
-									<div>
-										<span style="width: 120px;float:left">容器端口:</span>
-										<input class="disen" type="text" name="iTargetPort"/>
-									</div>
-									<div>
-										<span style="width: 120px;float:left">协议:</span>
-										<select id="pros" class="disen" name="iProtocol">
-											<option value="TCP">TCP</option>
-											<option value="UDP">UDP</option>
-										</select>
-									</div>
-									<div>
-										<span style="width: 120px;float:left">描述:</span>
-										<input class="disen" name="description" type="text"/>
-										<a title="确定添加" href="javascript:void(0);" onclick="saveNodePort();" class="btn btn-primary btn-mini"><i class="icon-edit"></i>完成</a>
-										<a title="删除" href="javascript:void(0);" onclick="deleteNodePort();" class="btn btn-primary btn-mini"><i class="icon-trash"></i>删除</a>
-									</div>
-								</div> -->
 						    </div>
 						</div>	
 						
