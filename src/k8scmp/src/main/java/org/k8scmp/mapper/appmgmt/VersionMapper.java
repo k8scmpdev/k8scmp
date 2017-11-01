@@ -13,10 +13,10 @@ import org.k8scmp.appmgmt.domain.VersionBase;
 
 @Mapper
 public interface VersionMapper {
-	String BASIC_COLUMNS = " id, versionName, description, state, data, createTime, creatorId, lastModifiedTime, lastModifierId";
+	String BASIC_COLUMNS = " id, versionName, description, state, data, deprecate, createTime, creatorId, lastModifiedTime, lastModifierId";
 	@Insert("INSERT INTO serviceversion"+
-            " (id, versionName, version, serviceId, description, state, data, createTime, creatorId, lastModifiedTime, lastModifierId) values (" +
-            "  #{item.id}, #{item.versionName}, #{item.version}, #{item.serviceId}, #{item.description}, #{item.state}, #{data}, #{item.createTime}, #{item.creatorId}, #{item.lastModifiedTime}, #{item.lastModifierId})")
+            " (id, versionName, version, serviceId, description, state, data, deprecate, createTime, creatorId, lastModifiedTime, lastModifierId) values (" +
+            "  #{item.id}, #{item.versionName}, #{item.version}, #{item.serviceId}, #{item.description}, #{item.state}, #{data}, #{item.deprecate}, #{item.createTime}, #{item.creatorId}, #{item.lastModifiedTime}, #{item.lastModifierId})")
     int insertVersion(@Param("item") Version item, @Param("data") String data);
 
     @Delete("delete from serviceversion where serviceId = #{serviceId}")
@@ -37,7 +37,7 @@ public interface VersionMapper {
     @Select("SELECT MAX(version) FROM serviceversion WHERE serviceId = #{serviceId}")
     Integer getMaxVersion(@Param("serviceId") String serviceId);
     
-    @Select("SELECT versionName,version FROM serviceversion WHERE serviceId = #{serviceId}")
+    @Select("SELECT versionName,version,deprecate FROM serviceversion WHERE serviceId = #{serviceId}")
     List<Version> getVersionNames(@Param("serviceId") String serviceId);
 
     @Update("update serviceversion set data = #{data},lastModifierId=#{item.lastModifierId},lastModifiedTime=#{item.lastModifiedTime} where id = #{item.id}")

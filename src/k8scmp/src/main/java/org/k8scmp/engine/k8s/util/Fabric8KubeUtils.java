@@ -250,7 +250,11 @@ public class Fabric8KubeUtils implements KubeUtils<KubernetesClient> {
     public PodList listPod(Map<String, String> selectors)
             throws K8sDriverException {
         logger.debug("list pod with selectors=" + selectors);
-        return client.pods().withLabels(selectors).list();
+        try {
+        	return client.pods().withLabels(selectors).list();
+		} catch (KubernetesClientException e) {
+			throw new K8sDriverException(e.getMessage());
+		}
     }
 
     @Override
