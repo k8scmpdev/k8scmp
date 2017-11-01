@@ -613,9 +613,9 @@ function loadsVersionDetail(versionDetail){
 				tableStr = "<table class='table table-bordered data-table display' style='border:1px;width:95%'><tr><th>挂载类型</th><th>名称</th><th>是否只读</th><th>主机目录</th><th>挂载目录</th></tr>";
 				for(var j=0;j<volumeMountDrafts.length;j++){	
 					var vm = volumeMountDrafts[j];
-					var volumeType = vm["volumeType"]==null?"-":vm["volumeType"];
+					var volumeType = vm["volumeType"]==null?"-":(vm["volumeType"] == "HOSTPATH"?"主机内目录":"实例内目录");
 					var name = vm["name"]==null?"-":vm["name"];
-					var readOnly = vm["readOnly"]==null?"-":vm["readOnly"];
+					var readOnly = vm["readOnly"]==null?"-":((vm["readOnly"] == "true"|| vm["readOnly"] == true)?"是":"否");
 					var hostPath = vm["hostPath"]==null?"-":vm["hostPath"];
 					var mountPath = vm["mountPath"]==null?"-":vm["mountPath"];
 					tableStr += "<tr><td>"+volumeType+"</td><td>"+name+"</td><td>"+readOnly+"</td><td>"+hostPath+"</td><td>"+mountPath+"</td></tr>";
