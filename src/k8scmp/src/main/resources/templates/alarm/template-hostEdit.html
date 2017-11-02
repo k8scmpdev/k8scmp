@@ -44,16 +44,10 @@
                                     <div class="control-group">
 											<label class="control-label">选择报警主机组</label>
 											<div class="controls">
-												<div hidden="hidden">
-													<select multiple="multiple" class="multiselect" name="hostGrouphide" id="hostGrouphide" style="width: 854px;">	
-														<option th:each="hostGroupBasic:${templateInfo.hostGroupList}" th:value="${hostGroupBasic.id}" 	
-														th:selected="${#strings.contains(hostGroupBasic.hostGroupName,hostGroupBasic.hostGroupName)}"
-														th:text="${hostGroupBasic.hostGroupName}" ></option>	
-													</select>
-												</div>
-												<select multiple="multiple" class="multiselect" name="hostGroup" id="hostGroup" style="width: 854px;" th:field="*{hostGroupList}">	
-													<option th:each="hostGroupBasic:${hostGroupInfoList}" th:value="${hostGroupBasic.id}" 	
-													th:text="${hostGroupBasic.hostGroupName}" ></option>	
+												<select multiple="multiple" class="multiselect" name="hostGroup" id="hostGroup" style="width: 854px;">	
+													<option th:each="hostGroup:${hostGroupInfoList}" th:value="${hostGroup.id}"
+													th:selected="${#strings.contains(hostGroupSelList,hostGroup.hostGroupName)}" 	
+													th:text="${hostGroup.hostGroupName}" ></option>	
 												</select>
 											</div>
 									</div>
@@ -73,13 +67,13 @@
                                         	<div hidden="hidden">
                                         		<select multiple="multiple" class="multiselect" name="userhiden" id="userhiden" style="width: 854px;" required="required">	
 												<option th:each="category:${templateInfo.userList}" th:value="${category.id}" 	
-												th:selected="${#strings.contains(category.loginname,category.loginname)}"
-												th:text="${category.loginname}" ></option>	
+												th:selected="selected" th:text="${category.loginname}" ></option>	
 											</select>
                                         	</div>
                                             <select multiple="multiple" class="multiselect" name="users" id="users" style="width: 854px;" required="required">	
-												<option th:each="category:${userList}" th:value="${category.id}" 	
-												th:text="${category.loginname}" ></option>	
+												<option th:each="user:${userList}" th:value="${user.id}" 
+												th:selected="${#strings.contains(userSelectList,user.loginname)}"	
+												th:text="${user.loginname}" ></option>	
 											</select>
                                         </div>
                                     </div>
@@ -130,30 +124,26 @@
 			$(document).ready(function(){	
 				
 				var templateId = $("#templateId").val();
-				$("select[name='hostGrouphide']").find('option').attr("selected","selected").each(function(){
-					//alert($(this).val());
+				/* $("#hostGrouphide option:selected").each(function(){
 					var hideval = $(this).val();
-					$("#hostGroup").children('option').each(function(){
+					$("select[name*='hostGroup']").find('option').each(function(t,n){
 						if(hideval == $(this).val()){
 							//alert($(this).val());
-							$("select[name='hostGroup']").find("option[value='"+$(this).val()+"']").attr("selected","selected");
-							//alert($(this).text());
+							//$("select[name='users']").find("option[value='"+$(this).val()+"']").attr("selected",true);
+							//$(this).attr("selected","selected");
 						}
 					})
 				})
-				
-				$("select[name='userhiden']").find('option').attr("selected","selected").each(function(){
-					alert($(this).val());
+				$("#userhiden option:selected").each(function(i,v){
 					var hideval = $(this).val();
-					$("#users").children('option').each(function(){
+					$("select[name*='users']").find('option').each(function(t,n){
 						if(hideval == $(this).val()){
-							alert($(this).val());
-							$("select[name='users']").find("option[value='"+$(this).val()+"']").attr("selected","selected");
-							alert($(this).text());
+							//alert($(this).val());
+							//$("select[name='users']").find("option[value='"+$(this).val()+"']").attr("selected",true);
+							//$(this).attr("selected","selected");
 						}
 					})
-				})
-				
+				}) */
 				
 				$.ajax({
 					type: "GET",
@@ -273,9 +263,6 @@
 				var hostGroupList = [];
 				var strategyList = [];
 				var userList = [];
-				var hostGroupInfoBasic = new Object();
-				var user = new Object();
-				//var deploymentInfo = new Object();
 				var callback = new Object();
 				var templateInfo = new Object();
 				templateInfo.id = templateId;
@@ -284,41 +271,41 @@
 				if(templateType == 'host'){
 					//hostGroup
 					$("#hostGroup option:selected").each(function(){ 
+						var hostGroupInfoBasic = new Object();
 						hostGroupInfoBasic.hostGroupName = $(this).text();
 						hostGroupInfoBasic.id = $(this).val();
 						hostGroupList.push(hostGroupInfoBasic);
 					})
 					templateInfo.hostGroupList = hostGroupList;
 				}
-				
 				//strategy
 				var metricList = new Array();
 				$.each($("[name*=metric]"),function(i,v){
-					 metricList.push(v.value);
+					 metricList.push($(this).val());
 				}) 
 				var pointNumList = new Array();
 				 $.each($("[name*=pointNum]"),function(i,v){
-					 pointNumList.push(v.value);
+					 pointNumList.push($(this).val());
 				}) 
 				var aggregateTypeList = new Array();
 				 $.each($("[name*=aggregateType]"),function(i,v){
-					 aggregateTypeList.push(v.value);
+					 aggregateTypeList.push($(this).val());
 				 })
 				 var operatorList = new Array();
 				 $.each($("[name*=operator]"),function(i,v){
-					 operatorList.push(v.value);
+					 operatorList.push($(this).val());
 				 })
 				 var rightValueList = new Array();
 				 $.each($("[name*=rightValue]"),function(i,v){
-					 rightValueList.push(v.value);
+					 rightValueList.push($(this).val());
 				 })
 				 var noteList = new Array();
 				 $.each($("[name*=note]"),function(i,v){
-					 noteList.push(v.value);
+					 noteList.push($(this).val());
 				 })
 				 var maxStepList = new Array();
 				 $.each($("[name*=maxStep]"),function(i,v){
-					 maxStepList.push(v.value);
+					 maxStepList.push($(this).val());
 				 })
 				 for(var i in metricList){
 					var strategyInfo = new Object();
@@ -332,15 +319,14 @@
 					strategyList.push(strategyInfo);
 				 }
 				 templateInfo.strategyList = strategyList; 
-				 
 				//user
 				$("#users option:selected").each(function(){ 
+					var user = new Object();
 					user.loginname = $(this).text();
 					user.id = $(this).val();
 					userList.push(user);
 					});
 				 templateInfo.userList = userList;
-				
 				//callback
 				callback.url = $("#callbackurl").val();
 				callback.beforeCallbackSms = $("#beforeCallbackSms option:selected").val();

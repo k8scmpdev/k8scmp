@@ -12,6 +12,7 @@ import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ClientConfigure;
 import org.k8scmp.engine.k8s.util.NodeWrapper;
+import org.k8scmp.engine.k8s.util.NodeWrapperNew;
 import org.k8scmp.exception.ApiException;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
 import org.k8scmp.monitormgmt.dao.alarm.PortalDao;
@@ -49,6 +50,9 @@ public class HostGroupServiceImpl implements HostGroupService {
     
     @Autowired
     OperationLog operationLog;
+    
+    @Autowired
+    NodeWrapperNew nodeWrapperNew;
     
     @Override
     public List<HostGroupInfo> listHostGroupInfo() {

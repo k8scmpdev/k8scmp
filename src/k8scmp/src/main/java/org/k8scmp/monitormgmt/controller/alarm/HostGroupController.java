@@ -1,15 +1,12 @@
 package org.k8scmp.monitormgmt.controller.alarm;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.k8scmp.basemodel.HttpResponseTemp;
-import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ApiController;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
-import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
 import org.k8scmp.monitormgmt.service.alarm.HostGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -75,8 +72,8 @@ public class HostGroupController extends ApiController {
     @RequestMapping(value = "/bindHostGroup", method = RequestMethod.GET)
     public String bindHostGroup(Model model,@RequestParam("id") int id) {
     	//获取主机列表
-//    	List<HostInfo> nodeList = hostGroupService.getHostInfo();
     	List<HostInfo> nodeList = hostGroupService.getHostList();
+//    	List<LabelBack> labelList = hostGroupService.getHostListByMap();
     	List<HostInfo> bindList = hostGroupService.getHostBindList(id);
     	model.addAttribute("nodeList", nodeList);
     	model.addAttribute("bindList", bindList);

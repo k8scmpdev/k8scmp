@@ -7,8 +7,6 @@ import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
-import org.k8scmp.monitormgmt.domain.monitor.NodeInfo;
-import org.springframework.ui.Model;
 
 /**
  * Created by baokangwang on 2016/4/13.
@@ -69,4 +67,6 @@ public interface HostGroupService {
 	List<HostInfo> getHostList();
 
 	List<HostInfo> getHostBindList(int hostGroupId);
+
+//	List<LabelBack> getHostListByMap();
 }

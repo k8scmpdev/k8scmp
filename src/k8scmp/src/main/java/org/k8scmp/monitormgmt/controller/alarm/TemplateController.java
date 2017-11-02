@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.k8scmp.appmgmt.domain.Instance;
 import org.k8scmp.basemodel.HttpResponseTemp;
+import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ApiController;
 import org.k8scmp.engine.k8s.util.NodeWrapper;
 import org.k8scmp.login.domain.User;
@@ -12,6 +13,7 @@ import org.k8scmp.login.service.UserService;
 import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
+import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateBack;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
@@ -95,6 +97,17 @@ public class TemplateController extends ApiController {
     @ResponseBody
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public HttpResponseTemp<?> createTemplate(@RequestBody TemplateInfo templateInfo) {
+    	List<StrategyInfo> strategyList = templateInfo.getStrategyList();
+    	for (StrategyInfo strategyInfo : strategyList) {
+    		if(strategyInfo.getOperator().equals("le")){
+    			strategyInfo.setOperator("<=");
+    		}else if(strategyInfo.getOperator().equals("ge")){
+    			strategyInfo.setOperator(">=");
+    		}else{
+    			strategyInfo.setOperator("==");
+    		}
+		}
+    	templateInfo.setStrategyList(strategyList);
         return templateService.createTemplate(templateInfo);
     }
     
@@ -102,8 +115,22 @@ public class TemplateController extends ApiController {
     public String editTemplate(Model model, @RequestParam(value="templateId") int templateId, @RequestParam("templateType") String templateType) {
     	TemplateInfo templateInfo = (TemplateInfo)templateService.getTemplateInfo(templateId).getResult();
     	List<HostGroupInfo> hostGroupInfoList = hostGropService.listHostGroupInfo();
+    	List<String> hostGroupSelList = new ArrayList<>();
     	List<User> userList = userService.listAllUserInfo().getResult();
+    	List<String> userSelectList = new ArrayList<>();
+    	if(templateInfo.getHostGroupList() != null){
+    		for(HostGroupInfoBasic hostGroupInfo:templateInfo.getHostGroupList()){
+        		hostGroupSelList.add(hostGroupInfo.getHostGroupName());
+        	}
+    	}
+    	if(templateInfo.getUserList() != null){
+    		for(User user:templateInfo.getUserList()){
+        		userSelectList.add(user.getUsername());
+        	}
+    	}
+    	model.addAttribute("hostGroupSelList", hostGroupSelList);
     	model.addAttribute("hostGroupInfoList", hostGroupInfoList);
+    	model.addAttribute("userSelectList", userSelectList);
     	model.addAttribute("userList", userList);
     	model.addAttribute("templateInfo", templateInfo);
     	if(templateType.equals("host")){
@@ -116,12 +143,35 @@ public class TemplateController extends ApiController {
     @ResponseBody
     @RequestMapping(value = "/getTemp", method=RequestMethod.GET)
     public HttpResponseTemp<?> getTemplate(@RequestParam(value="templateId") int templateId){
-    	return templateService.getTemplateInfo(templateId);
+    	TemplateInfo templateInfo =(TemplateInfo) templateService.getTemplateInfo(templateId).getResult();
+    	List<StrategyInfo> strategyList = templateInfo.getStrategyList();
+    	for (StrategyInfo strategyInfo : strategyList) {
+    		if(strategyInfo.getOperator().equals("<=")){
+    			strategyInfo.setOperator("le");
+    		}else if(strategyInfo.getOperator().equals(">=")){
+    			strategyInfo.setOperator("ge");
+    		}else{
+    			strategyInfo.setOperator("eq");
+    		}
+		}
+    	templateInfo.setStrategyList(strategyList);
+    	return ResultStat.OK.wrap(templateInfo);
     }
     
     @ResponseBody
     @RequestMapping(value = "/modify", method = RequestMethod.POST)
     public HttpResponseTemp<?> modifyTemplate(@RequestBody TemplateInfo templateInfo) {
+    	List<StrategyInfo> strategyList = templateInfo.getStrategyList();
+    	for (StrategyInfo strategyInfo : strategyList) {
+    		if(strategyInfo.getOperator().equals("le")){
+    			strategyInfo.setOperator("<=");
+    		}else if(strategyInfo.getOperator().equals("ge")){
+    			strategyInfo.setOperator(">=");
+    		}else{
+    			strategyInfo.setOperator("==");
+    		}
+		}
+    	templateInfo.setStrategyList(strategyList);
         return templateService.modifyTemplate(templateInfo);
     }
 

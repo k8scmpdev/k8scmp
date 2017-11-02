@@ -23,12 +23,9 @@
 							    	<div>
 							    	<!-- <div class="controls">
 							    		<br/>
-										&nbsp;&nbsp;&nbsp;&nbsp;选择集群&nbsp;<select name="clusterName" id="clusterName" style="width: 65px;">	
-											<option th:each="hostGroupBasic:${templateInfo.hostGroupList}" th:value="${hostGroupBasic.id}" 	
-											th:selected="${#strings.contains(hostGroupBasic,hostGroupBasic.id)}"
-											th:text="${hostGroupBasic.hostGroupName}" ></option>	
-											<option >生产</option>
-											<option>测试</option>
+										&nbsp;&nbsp;&nbsp;&nbsp;选择集群&nbsp;<select name="labelName" id="labelName" style="width: 65px;">	
+											<option th:each="label:${labelList}" th:value="${label.labelName}" 	
+											th:text="${label.labelName}" ></option>
 										</select>
 									</div> -->
 									<br/>
@@ -42,7 +39,7 @@
 							    			<tr>
 							    				<td>
 							    					<div style="text-align: center;width: 40px">
-							    						<input type="checkbox" />
+							    						<input type="checkbox"/>
 							    					</div>
 							    				</td>
 							    				<td>
@@ -62,7 +59,7 @@
 							    				<td>&nbsp;&nbsp;<input type="checkbox" id="hostchecked" name="eCheck" th:onclick="'checkedtable2table(\''+${hostGroupId}+'\',\''+${host.id}+'\')'"/></td>
 							    				<td th:text="${host.hostname}" name="hostname"></td>
 							    				<td th:text="${host.ip}" name="hostip"></td>
-							    			</tr>
+							    			</tr> 
 							    		</tbody>
 							    	</table>
 							    	<br/><br/><br/>
@@ -101,11 +98,11 @@
 								    			</tr>
 								    		</thead>
 								    		<tbody id="bindtbody">
-								    			<tr  th:each="bind,bindStat:${bindList}" id="bindtr">
-								    				<td th:text="${bind.hostname}"></td>
-								    				<td th:text="${bind.ip}"></td>
+								    			<tr  th:each="bind,bindStat:${bindList}">
+								    				<td name="bindName" th:text="${bind.hostname}"></td>
+								    				<td name="bindIp" th:text="${bind.ip}"></td>
 								    				<td th:text="${bind.createTime}"></td>
-								    				<td><a th:onclick="'javascript:$(this).parent().parent().remove();unBinding(\''+${hostGroupId}+'\',\''+${bind.id}+'\')'">解除</a></td>
+								    				<td><a th:onclick="'javascript:$(this).parent().parent().remove();unBinding(\''+${hostGroupId}+'\',\''+${bind.id}+'\',\''+${bind.ip}+'\',\''+1+'\')'">解除</a></td>
 							    				</tr>
 								    		</tbody>
 								    	</table>
@@ -129,26 +126,100 @@
 		<div th:include="/public/commonframe::jsScript(activeMenuNumber=43)" ></div>
 		
 		<script type="text/javascript">
-			function checkedtable2table(hostGroupId,hostId){
+			$(document).ready(function(){
+				//
+				//先进行判断两个table中是否含有相同的主机，相同就将checked 不可选
+				$("#bindtbody").find("tr").each(function(){
+					var bindName = $(this).find('[name="bindName"]').text();
+					$("input[name='eCheck']").each(function(){
+						var $tr = $(this).parent().parent().parent().parent().parent().parent();
+						var hostName = $tr.find('[name="hostname"]').text();
+						if(hostName == bindName){
+							$(this).parent().attr("class","checked");
+							$(this).parent().parent().parent().attr("class","checked");
+							$(this).attr("checked",true);
+							$(this).prop("disabled",true);
+						}
+					})
+				})
+			})
+			
+			/* function getHostList(labeList,hostGroupId){
+				var hostInfo = labeList.hostInfo
+				var labName = $("#labelName option:selected").val();
+				for(var i in labeList){
+					var labelName = labelList[i].labelName;
+					if(labelName == labName){
+						$tr = '<tr id="hosttr">'
+		    				+'<td>&nbsp;&nbsp;<input type="checkbox" id="hostchecked" name="eCheck" onclick="checkedtable2table('+hostGroupId+')"/></td>'
+		    				+'<td th:text="'+t.hostname+'" name="hostname"></td>'
+		    				+'<td th:text="'+t.ip+'" name="hostip"></td>'
+		    				+'</tr>';
+						$("#hosttbody").append($tr);
+				}
+				
+				$.each(labeList,function(i,v){
+					
+					if(v.labelName == labelName){
+						$.each(hostInfo,function(n,t){
+							
+						})
+						
+					}
+					
+				}) 
+			} */
+		
+			function checkedtable2table(hostGroupId){
 				$("input[name='eCheck']").each(function(i,v){
+					var $trId = "tr"+i;
 					if($(this).attr("checked")){
 						var $tr = $(this).parent().parent().parent().parent().parent().parent();
 						var hostname = $tr.find('[name="hostname"]').text();
 						var hostip= $tr.find('[name="hostip"]').text();
 						var date = new Date('2017-10-19 09:39:23');
-						var $tr = '<tr><td>'+hostname+'</td><td>'+hostip+'</td><td>'+date.toLocaleString() +'</td><td><a onclick="javascript:$(this).parent().parent().remove();">解除</a></td></tr>';
-						$("#bindtbody").append($tr);
+						var tr = '<tr id="'+$trId+'"><td>'+hostname+'</td><td>'+hostip+'</td><td>'+date.toLocaleString() +'</td><td><a onclick="javascript:$(this).parent().parent().remove();unChecked(\''+hostip+'\');">解除</a></td></tr>';
+						$("#bindtbody").append(tr);
+					}else{
+						var id = "#"+$trId;
+						$(id).remove();
 					}
 				});
-				
-				
 			}	
 			
-			function unBinding(id,hostId){
-				$.ajax({
-					url:"/hostgroup/bind/"+id+"/"+hostId,
-					type:"delete"
-				});
+			function unChecked(ip){
+				$("input[name='eCheck']").each(function(){
+					if($(this).attr("checked")){
+						var $td = $(this).parent().parent().parent().parent().parent().parent();
+						var hostip= $td.find('[name="hostip"]').text();
+						var hostIp = ip;
+						if(hostip == ip){
+							$(this).parent().removeAttr("class");
+							$(this).parent().parent().parent().removeAttr("class");
+						}
+					}
+				})
+			}
+			
+			function unBinding(id,hostId,ip,isSend){
+				$("input[name='eCheck']").each(function(){
+					if($(this).attr("checked")){
+						var $td = $(this).parent().parent().parent().parent().parent().parent();
+						var hostip= $td.find('[name="hostip"]').text();
+						if(hostip == ip){
+							$(this).parent().removeAttr("class");
+							$(this).parent().parent().parent().removeAttr("class");
+							$(this).prop("disabled",false);
+						}
+					}
+				})
+				if(isSend == "1"){
+					$.ajax({
+						url:"/hostgroup/bind/"+id+"/"+hostId,
+						type:"delete"
+					});
+				}
+				
 			}
 			
 			

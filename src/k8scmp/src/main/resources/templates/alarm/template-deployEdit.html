@@ -62,17 +62,10 @@
 									<div class="control-group">
                                         <label class="control-label">指定报警用户</label>
                                         <div class="controls">
-                                        	<div hidden="hidden">
-                                        		<select multiple="multiple" class="multiselect" name="userhiden" id="userhiden" style="width: 854px;" required="required">	
-												<option th:each="category:${templateInfo.userList}" th:value="${category.id}" 	
-												th:selected="${#strings.contains(category.loginname,category.loginname)}"
-												th:text="${category.loginname}" ></option>	
-											</select>
-                                        	</div>
                                             <select multiple="multiple" class="multiselect" name="users" id="users" style="width: 854px;" required="required">	
-												<option th:each="category:${userList}" th:value="${category.id}"
-												th:selected="${#strings.contains(category,category.loginname)}" 	
-												th:text="${category.loginname}" ></option>	
+												<option th:each="user:${userList}" th:value="${user.id}"
+												th:selected="${#strings.contains(userSelectList,user.loginname)}"
+												th:text="${user.loginname}" ></option>	
 											</select>
                                         </div>
                                     </div>
@@ -124,18 +117,7 @@
 			$(document).ready(function(){	
 				
 				var templateId = $("#templateId").val();
-				$("select[name='userhiden']").find('option').attr("selected","selected").each(function(){
-					//alert($(this).val());
-					var hideval = $(this).val();
-					$("#users").children('option').each(function(){
-						if(hideval == $(this).val()){
-							//alert($(this).val());
-							$("select[name='users']").find("option[value='"+$(this).val()+"']").attr("selected","selected");
-							//alert($(this).text());
-						}
-					})
-				})
-				
+				 
 				$.ajax({
 					type: "GET",
 					data:{
@@ -216,16 +198,16 @@
 					switch(operator)
 					{
 					case 'le':
-						$(this).find("select[name='aggregateType']").find("option[value='le']").attr("selected","selected");
+						$(this).find("select[name='operator']").find("option[value='le']").attr("selected","selected");
 						break;
 					case 'ge':
-						$(this).find("select[name='aggregateType']").find("option[value='ge']").attr("selected","selected");
+						$(this).find("select[name='operator']").find("option[value='ge']").attr("selected","selected");
 						break;
 					case 'eq':
-						$(this).find("select[name='aggregateType']").find("option[value='eq']").attr("selected","selected");
+						$(this).find("select[name='operator']").find("option[value='eq']").attr("selected","selected");
 						break;
 					default:
-						$(this).find("select[name='aggregateType']").find("option[value='le']").attr("selected","selected");
+						$(this).find("select[name='operator']").find("option[value='le']").attr("selected","selected");
 					}
 					
 					var rightValue = strategyInfo.rightValue;
@@ -251,11 +233,9 @@
 				var templateId = $("#templateId").val();
 				var templateName = $("#templateName").val();
 				var templateType = $("#templateType option:selected").val();  
-				//var hostGroupList = [];
 				var strategyList = [];
 				var userList = [];
-				//var hostGroupInfoBasic = new Object();
-				var user = new Object();
+				
 				var deploymentInfo = new Object();
 				var callback = new Object();
 				var templateInfo = new Object();
@@ -273,32 +253,32 @@
 				//strategy
 				
 				var metricList = new Array();
-				$.each($("[name*=metric]"),function(i,v){
-					 metricList.push(v.value);
+				$.each($("[name*=metric] option:selected"),function(i,v){
+					 metricList.push($(this).val());
 				}) 
 				var pointNumList = new Array();
 				 $.each($("[name*=pointNum]"),function(i,v){
-					 pointNumList.push(v.value);
+					 pointNumList.push($(this).val());
 				}) 
 				var aggregateTypeList = new Array();
-				 $.each($("[name*=aggregateType]"),function(i,v){
-					 aggregateTypeList.push(v.value);
+				 $.each($("[name*=aggregateType] option:selected"),function(i,v){
+					 aggregateTypeList.push($(this).val());
 				 })
 				 var operatorList = new Array();
-				 $.each($("[name*=operator]"),function(i,v){
-					 operatorList.push(v.value);
+				 $.each($("[name*=operator] option:selected"),function(i,v){
+					 operatorList.push($(this).val());
 				 })
 				 var rightValueList = new Array();
 				 $.each($("[name*=rightValue]"),function(i,v){
-					 rightValueList.push(v.value);
+					 rightValueList.push($(this).val());
 				 })
 				 var noteList = new Array();
 				 $.each($("[name*=note]"),function(i,v){
-					 noteList.push(v.value);
+					 noteList.push($(this).val());
 				 })
 				 var maxStepList = new Array();
 				 $.each($("[name*=maxStep]"),function(i,v){
-					 maxStepList.push(v.value);
+					 maxStepList.push($(this).val());
 				 })
 				 for(var i in metricList){
 					var strategyInfo = new Object();
@@ -315,6 +295,7 @@
 				 
 				//user
 				$("#users option:selected").each(function(){ 
+					var user = new Object();
 					user.loginname = $(this).text();
 					user.id = $(this).val();
 					userList.push(user);
