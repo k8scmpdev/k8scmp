@@ -13,6 +13,7 @@ import org.k8scmp.appmgmt.domain.Cluster;
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
+import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.engine.k8s.util.Fabric8KubeUtils;
 import org.k8scmp.engine.k8s.util.KubeUtils;
 import org.k8scmp.engine.k8s.util.LabelInfo;
@@ -97,15 +98,17 @@ public class GlobalController {
     
     
     @RequestMapping(value = "/cluster/logic/list", method = RequestMethod.GET)
-    public String showLogicCluster(Model model) {
+    public String showLogicCluster(Model model,
+    		@RequestParam(value = "resultStr", required = false ,defaultValue="") String resultStr) {
     	long userId = AuthUtil.getUserId();
         if (userId <= 0) {
             model.addAttribute("info","请先登录");
         }
         
-	    List<LabelInfo> labelinfos= nodeWrapprtNew.getAllLabels();
+	    List<LabelInfo> labelinfos= nodeWrapprtNew.getAllLabels(true);
 
         model.addAttribute("labelinfos",labelinfos);
+        model.addAttribute("resultStr",resultStr);
         return "/global/cluster-logic-list";
     }
     
@@ -137,11 +140,8 @@ public class GlobalController {
 	    	nslist = globalService.getAllNamesapceNameByCluster(cluster);
 	    	model.addAttribute("clustername",clustername);
 		}
-		//根据第一个cluster和ns查询对于的node
-		
-		
-		
-        model.addAttribute("clusters",clusters);
+
+		model.addAttribute("clusters",clusters);
 //        model.addAttribute("namespaces",nslist);
         model.addAttribute("logicClusterDetail",lci);
         
@@ -161,21 +161,35 @@ public class GlobalController {
     	cluster.setApi(apiserver);
     	String nodeNames = logicClusterDetail.getDescription();
     	List<String> nodelist = new ArrayList<String>();
-    	if(nodeNames.trim().length()>0){
+    	if(nodeNames!=null&&nodeNames.trim().length()>0){
     		String[] nodes = nodeNames.split(",");
     		nodelist = Arrays.asList(nodes);
     	}
+    	String resultStr = "";
+    	String state = "ok";
     	try {
 			KubeUtils<?> client = Fabric8KubeUtils.buildKubeUtils(cluster, null);
 			Map<String,String> label = new HashMap<String,String>();
-			label.put(logicname, logicname);
+			label.put(logicname, GlobalConstant.LABEL_VALUE);
 			
-			nwn.createLabels(client, nodelist, label);
+			resultStr = nwn.createLabels(client, nodelist, label);
 		} catch (K8sDriverException e) {
 			e.printStackTrace();
+			resultStr="FAIL";
+			state = "FAIL";
 		}
+    	operationLog.insertRecord(new OperationRecord(
+				"新增逻辑集群", 
+				ResourceType.CONFIGURATION,
+				OperationType.ADDGROUPMEMBER, 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
+				state, 
+				resultStr, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
     	
-		return "redirect:/cluster/logic/edit?clustername="+clustername+"&apiserver="+apiserver+"&logicname="+logicname+"&nodeNames="+nodeNames;
+		return "redirect:/cluster/logic/edit?clustername="+clustername+"&apiserver="+apiserver+"&logicname="+logicname+"&nodeNames="+nodeNames+"&resultStr="+resultStr;
     }
     
     @RequestMapping(value = "/cluster/logic/edit", method = RequestMethod.GET)
@@ -183,7 +197,8 @@ public class GlobalController {
     		@RequestParam(value = "logicname", required = true ) String logicname,
     		@RequestParam(value = "clustername", required = true ) String clustername,
     		@RequestParam(value = "apiserver", required = true ) String apiserver,
-    		@RequestParam(value = "nodeNames", required = false ) String nodeNames) {
+    		@RequestParam(value = "nodeNames", required = false ) String nodeNames,
+    		@RequestParam(value = "resultStr", required = false ,defaultValue="") String resultStr) {
 //        HttpResponseTemp<?> resp = globalService.listLogicCluster();
 //        List<LogicClusterInfo> logicClusterInfos = (List<LogicClusterInfo>) resp.getResult();
         LogicClusterInfo lci = new LogicClusterInfo();
@@ -193,7 +208,7 @@ public class GlobalController {
         String[] nodes = nodeNames.replace("[", "").replaceAll("]", "").split(",");
     	List<String> nodelist = Arrays.asList(nodes);
     	lci.setNodenames(nodelist);
-    	lci.setDescription(nodeNames.replace("[", "").replaceAll("]", ""));
+    	lci.setDescription(nodeNames);
         
 		//获取点击逻辑集群对于的物理集群、namespace及其列表
 		List<Cluster> clusters = globalService.getAllCluster();
@@ -214,8 +229,100 @@ public class GlobalController {
         model.addAttribute("clusters",clusters);
         model.addAttribute("nodenames_sel",nodelist);
         model.addAttribute("logicClusterDetail",lci);
+        model.addAttribute("resultStr",resultStr);
         
         return "/global/cluster-logic-edit";
+    }
+    
+    @RequestMapping(value = "/cluster/logic/edit/subform", method = RequestMethod.POST)
+    public String editLogicCluster2(Model model,@ModelAttribute LogicClusterInfo logicClusterDetail) {
+    	//前台form传递的值
+    	String clustername = logicClusterDetail.getClustername().split(",")[0];
+    	String apiserver = logicClusterDetail.getClustername().split(",")[1];
+    	String logicname = logicClusterDetail.getName();
+    	
+    	NodeWrapperNew nwn = new NodeWrapperNew();
+    	Cluster cluster = new Cluster(); 
+    	cluster.setName(clustername);
+    	cluster.setApi(apiserver);
+    	String nodeNames = logicClusterDetail.getDescription();
+    	List<String> nodelist = new ArrayList<String>();
+    	if(nodeNames.trim().length()>0){
+    		String[] nodes = nodeNames.split(",");
+    		nodelist = Arrays.asList(nodes);
+    	}
+    	String resultStr = "SUCCESS";
+    	String state = "ok";
+    	try {
+			KubeUtils<?> client = Fabric8KubeUtils.buildKubeUtils(cluster, null);
+			List<String> labels = new ArrayList<String>();
+			labels.add(logicname);
+			Map<String,String> label = new HashMap<String,String>();
+			label.put(logicname, GlobalConstant.LABEL_VALUE);
+			
+			//update --》  先 delete 再 create
+			nwn.removeLabels(client, null, labels);
+			nwn.createLabels(client, nodelist, label);
+			
+		} catch (K8sDriverException e) {
+			e.printStackTrace();
+			resultStr = "FAIL";
+			state="FAIL";
+		}
+    	
+    	operationLog.insertRecord(new OperationRecord(
+				"编辑逻辑集群", 
+				ResourceType.CONFIGURATION,
+				OperationType.MODIFY, 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
+				state, 
+				resultStr, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
+    	
+		return "redirect:/cluster/logic/edit?clustername="+clustername+"&apiserver="+apiserver+"&logicname="+logicname+"&nodeNames="+nodeNames+"&resultStr="+resultStr;
+    }
+    
+    @RequestMapping(value = "/cluster/logic/remove", method = RequestMethod.GET)
+    public String removeLogicCluster(Model model,
+    		@RequestParam(value = "logicname", required = true ) String logicname,
+    		@RequestParam(value = "clustername", required = true ) String clustername,
+    		@RequestParam(value = "apiserver", required = true ) String apiserver,
+    		@RequestParam(value = "nodeNames", required = false ) String nodeNames) {
+    	
+    	NodeWrapperNew nwn = new NodeWrapperNew();
+    	Cluster cluster = new Cluster(); 
+    	cluster.setName(clustername);
+    	cluster.setApi(apiserver);
+    	String resultStr = "SUCCESS";
+    	String state = "ok";
+    	try {
+			KubeUtils<?> client = Fabric8KubeUtils.buildKubeUtils(cluster, null);
+			List<String> labels = new ArrayList<String>();
+			labels.add(logicname);
+			
+			//update --》  先 delete 再 create
+			resultStr = nwn.removeLabels(client, null, labels);
+			
+		} catch (K8sDriverException e) {
+			e.printStackTrace();
+			resultStr = "FAIL";
+			state="FAIL";
+		}
+    	
+    	operationLog.insertRecord(new OperationRecord(
+				"删除逻辑集群", 
+				ResourceType.CONFIGURATION,
+				OperationType.DELETE, 
+				AuthUtil.getCurrentLoginName(), 
+				AuthUtil.getUserName(), 
+				state, 
+				resultStr, 
+				DateUtil.dateFormatToMillis(new Date())
+		));
+    	
+        return "redirect:/cluster/logic/list?resultStr="+resultStr;
     }
     
     @RequestMapping(value="/cluster/edit", method = RequestMethod.POST)
@@ -228,7 +335,7 @@ public class GlobalController {
     		
     	}else{
     		info ="集群仓库配置信息修改失败";
-    		state="fail";
+    		state="FAIL";
     		model.addAttribute("info",info);
     	}
     	operationLog.insertRecord(new OperationRecord(
@@ -279,7 +386,7 @@ public class GlobalController {
     		
     	}else{
     		info ="镜像仓库配置信息修改失败";
-    		state="fail";
+    		state="FAIL";
     		model.addAttribute("info",info);
     	}
     	operationLog.insertRecord(new OperationRecord(
@@ -345,7 +452,7 @@ public class GlobalController {
     		
     	}else{
     		info ="监控配置信息修改失败";
-    		state="fail";
+    		state="FAIL";
     		model.addAttribute("info",info);
     	}
     	operationLog.insertRecord(new OperationRecord(

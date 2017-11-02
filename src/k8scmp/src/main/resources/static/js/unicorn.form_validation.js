@@ -43,6 +43,26 @@ $(document).ready(function(){
 		}
 	});
 	
+	$("#create_logic_validate").validate({
+		rules:{
+			name:{
+				required:true
+			},
+			nodelist:{
+				required:true
+			}
+		},
+		errorClass: "help-inline",
+		errorElement: "span",
+		highlight:function(element, errorClass, validClass) {
+			$(element).parents('.control-group').addClass('error');
+		},
+		unhighlight: function(element, errorClass, validClass) {
+			$(element).parents('.control-group').removeClass('error');
+			$(element).parents('.control-group').addClass('success');
+		}
+	});
+	
     $("#basic_validate").validate({
 		rules:{
 			required:{

@@ -1,3 +1,10 @@
+$(document).ready(function(){
+	var resultStr = $('#resultStr').val();
+	if(resultStr!=''){
+		alert(resultStr);
+	}
+});
+
 $("#cluster").bind(
 		"change",
 		function(event) {
@@ -25,3 +32,7 @@ $("#cluster").bind(
 //			});
 		});
 
+function changeNodes(){
+	var nodelist = $('#nodelist').val();
+	$('#nodelist_real').val(nodelist);
+}

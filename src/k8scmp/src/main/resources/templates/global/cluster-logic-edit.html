@@ -2,6 +2,8 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
 	<head th:include="/public/commonframe :: cssScript" />
 	<body>
+	<input type="hidden" id="resultStr" th:value="${resultStr}" />
+	
 		<div id="common-header">
 			<div th:include="/public/commonframe :: app-header"></div>
 		</div>
@@ -32,7 +34,7 @@
 								<h5>请输入逻辑集群信息</h5>
 							</div>
 							<div class="widget-content nopadding">
-								<form class="form-horizontal" action="#" th:action="@{/cluster/logic/create/subform}" th:object="${logicClusterDetail}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
+								<form class="form-horizontal" action="#" th:action="@{/cluster/logic/edit/subform}" th:object="${logicClusterDetail}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
                                     <div class="control-group">
                                         <label class="control-label">*逻辑集群名</label>
                                         <div class="controls">
@@ -60,11 +62,12 @@
 									<div class="control-group">
                                         <label class="control-label">选择关联主机</label>
                                         <div class="controls">
-                                            <select th:field="*{description}" multiple="multiple" class="multiselect" name="nodelist" id="nodelist" style="width: 854px;" required="required" onchange="">	
+                                            <select  multiple="multiple" class="multiselect" name="nodelist" id="nodelist" style="width: 854px;" required="required" onchange="changeNodes()">	
 												<option th:each="node:*{nodeList}" th:value="${node.name}" 	
 												th:selected="${#strings.contains(nodenames_sel,node.name)}"
 												th:text="${node.name}" ></option>	
 											</select>
+											<input type="hidden" id="nodelist_real" th:value="*{description}" th:field="*{description}"/>
                                         </div>
                                     </div>
                                     
@@ -92,7 +95,8 @@
             <script th:src="@{/js/jquery.validate.js}"></script>
             <script th:src="@{/js/unicorn.js}"></script>
             <script th:src="@{/js/unicorn.form_validation.js}"></script>
-            <script th:src="@{/js/commonDisplay.js}"></script>
+            
+            <script th:src="@{/js/global/cluster-logic.js}"></script>
 	
 	</body>
 </html>

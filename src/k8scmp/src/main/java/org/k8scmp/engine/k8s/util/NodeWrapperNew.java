@@ -59,7 +59,7 @@ public class NodeWrapperNew {
 					for (String key : labels.keySet()) {
 						for (String k : label.keySet()) {
 							if (k.equals(key)) {
-								return "label is alredy exit";
+								return "fail! label is alredy exit";
 							}
 						}
 					}
@@ -72,10 +72,10 @@ public class NodeWrapperNew {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return "fail! label is null";
 	}
 
-	public String removeLabels(KubeUtils<?> client, String nodeName, List<String> labels) {
+	public String removeLabel(KubeUtils<?> client, String nodeName, List<String> labels) {
 		try {
 			Node node = client.deleteNodeLabel(nodeName, labels);
 			Map<String, String> nodeLabel = node.getMetadata().getLabels();
@@ -92,11 +92,42 @@ public class NodeWrapperNew {
 		}
 		return null;
 	}
+	
+	public String removeLabels(KubeUtils client, List<String> nodeName, List<String> labels) {
+		
+		try {
+			Node node = null;
+			if(nodeName !=null && nodeName.size() != 0){
+				
+				for(String nodeStr:nodeName){
+					node = client.deleteNodeLabel(nodeStr, labels);
+				}
+			}else{
+				NodeList listNode = client.listNode();
+				for(Node nodes:listNode.getItems()){
+					node = client.deleteNodeLabel(nodes.getMetadata().getName(), labels);
+				}
+			}
+			Map<String, String> nodeLabel = node.getMetadata().getLabels();
+			for (String label : nodeLabel.keySet()) {
+				for (String str : labels) {
+					if (!str.equals(label)) {
+						return "SUCCESS";
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	/*
 	 * 获取对应namespace下的所有labels
+	 * params:
+	 * isJustCluster: 是否只获取逻辑集群相关label
 	 */
-	public List<LabelInfo> getAllLabels() {
+	public List<LabelInfo> getAllLabels(boolean isJustCluster) {
 		KubeUtils<?> client;
 		try {
 			List<Cluster> clusters = globalService.getAllCluster();
@@ -114,9 +145,19 @@ public class NodeWrapperNew {
 					Map<String, String> labels = node.getMetadata().getLabels();
 					for (String labelkey : labels.keySet()) {
 						if (labelnodes.get(labelkey) == null) {
-							Set<String> set = new HashSet<>();
-							set.add(node.getMetadata().getName());
-							labelnodes.put(labelkey, set);
+							//只需要逻辑集群相关label
+							if(isJustCluster){
+								if(GlobalConstant.LABEL_VALUE.equals(labels.get(labelkey))){
+									Set<String> set = new HashSet<>();
+									set.add(node.getMetadata().getName());
+									labelnodes.put(labelkey, set);
+								}
+							}else{
+								Set<String> set = new HashSet<>();
+								set.add(node.getMetadata().getName());
+								labelnodes.put(labelkey, set);
+							}
+							
 						} else {
 							labelnodes.get(labelkey).add(node.getMetadata().getName());
 						}
@@ -148,6 +189,7 @@ public class NodeWrapperNew {
 		}
 		return null;
 	}
+	
 
 	/**
 	 * 根据cluster，namespace，labels查询node下的pod

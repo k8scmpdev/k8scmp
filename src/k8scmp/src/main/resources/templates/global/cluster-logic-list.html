@@ -16,6 +16,8 @@
 		}
 		</script>
 	<body>
+	<input type="hidden" id="resultStr" th:value="${resultStr}" />
+	
 		<div id="common-header">
 			<div th:include="/public/commonframe :: app-header"></div>
 		</div> 
@@ -72,7 +74,7 @@
 											<td  th:title="*{nodeName}"><span th:text="*{hostCount}"></span></td>
 											<td style="text-align:center">
 												<a title="修改" class="btn btn-primary" th:href="@{/cluster/logic/edit(clustername=*{clusterInfo.name},apiserver=*{clusterInfo.apiserver},logicname=*{labelName},nodeNames=*{nodeName.toString()})}"><i class="icon-pencil icon-white"></i></a>
-												<button title="删除" class="btn btn-danger" th:onclick="''"><i class="icon-remove icon-white"></i></button>
+												<a title="删除" class="btn btn-danger" th:href="@{/cluster/logic/remove(clustername=*{clusterInfo.name},apiserver=*{clusterInfo.apiserver},logicname=*{labelName},nodeNames=*{nodeName.toString()})}"><i class="icon-remove icon-white"></i></a>
 												<form id="frm" name="frm" action="#"  method="get"></form>
 											</td>
 										</tr>
@@ -93,6 +95,15 @@
 		
 
             <div th:include="/public/commonframe::jsScript(activeMenuNumber=23)" ></div>
+            
+            <script type="text/javascript">
+            $(document).ready(function(){
+            	var resultStr = $('#resultStr').val();
+            	if(resultStr!=''){
+            		alert(resultStr);
+            	}
+            });
+            </script>
             
 	</body>
 </html>

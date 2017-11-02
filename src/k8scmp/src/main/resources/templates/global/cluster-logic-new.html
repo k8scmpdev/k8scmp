@@ -2,6 +2,8 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
 	<head th:include="/public/commonframe :: cssScript" />
 	<body>
+	<input type="hidden" id="resultStr" th:value="${resultStr}" />
+	
 		<div id="common-header">
 			<div th:include="/public/commonframe :: app-header"></div>
 		</div>
@@ -32,7 +34,7 @@
 								<h5>请输入逻辑集群信息</h5>
 							</div>
 							<div class="widget-content nopadding">
-								<form class="form-horizontal" action="#" th:action="@{/cluster/logic/create/subform}" th:object="${logicClusterDetail}" method="post" name="create_user_validate" id="create_user_validate" novalidate="novalidate">
+								<form class="form-horizontal" action="#" th:action="@{/cluster/logic/create/subform}" th:object="${logicClusterDetail}" method="post" name="create_logic_validate" id="create_logic_validate" novalidate="novalidate">
                                     <div class="control-group">
                                         <label class="control-label">*逻辑集群名</label>
                                         <div class="controls">
