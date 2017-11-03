@@ -54,4 +54,10 @@ public class AppDaoImpl implements AppDao {
 	public void updateAppState(String id,String state) {
 		mapper.updateAppState(id,state);
 	}
+	
+	@Override
+	public List<String> getAppIdListByClusterId(String clusterId) {
+		return mapper.getAppIdListByClusterId(clusterId);
+	}
+ 
 }

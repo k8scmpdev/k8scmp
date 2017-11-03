@@ -8,6 +8,7 @@ import org.k8scmp.appmgmt.domain.Cluster;
 import org.k8scmp.appmgmt.domain.DeployEvent;
 import org.k8scmp.appmgmt.domain.ServiceConfigInfo;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
+import org.k8scmp.common.SpringContextManager;
 import org.k8scmp.exception.DeploymentEventException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
@@ -80,9 +81,25 @@ public class EventUpdater {
 //        }
     	Cluster cluster = getCluster();
     	checkDeployStatus(cluster);
+    	updateAppStatus(cluster);
     }
 
-    private Cluster getCluster(){
+    public void updateAppStatus(Cluster cluster) {
+		List<String> appIds = appDao.getAppIdListByClusterId(cluster.getId());
+		if (appIds == null || appIds.size() == 0) {
+            return;
+        }
+		AppStatusMgmt appStatusMgmt = SpringContextManager.getBean(AppStatusMgmt.class);
+		for(String appId:appIds){
+			try {
+				appStatusMgmt.init(appId).updateAppState();
+			} catch (Exception e) {
+				logger.error("updateAppState error, appId=" + appId);
+			}
+		}
+	}
+
+	private Cluster getCluster(){
 		GlobalInfo cluster_host = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_HOST);
 		GlobalInfo cluster_name = globalBiz.getGlobalInfoByType(GlobalType.CI_CLUSTER_NAME);
     	Cluster cluster = new Cluster();

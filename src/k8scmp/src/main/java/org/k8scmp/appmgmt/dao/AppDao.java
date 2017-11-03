@@ -21,4 +21,6 @@ public interface AppDao{
 
 	void updateAppState(String id,String state);
 
+	List<String> getAppIdListByClusterId(String clusterId);
+
 }
