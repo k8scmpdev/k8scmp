@@ -37,6 +37,10 @@ public interface ServiceMapper {
     List<ServiceInfo> getServicesByAppId(@Param("appId") String appId);
 	
 	@Select("SELECT s.id, s.serviceCode, s.appId, a.appCode, s.startSeq, s.description, s.state, s.data, s.createTime, s.creatorId, s.lastModifiedTime, s.lastModifierId  FROM service s left join application a"
+			+" on s.appId=a.id where a.clusterId=#{clusterId}")
+    List<ServiceInfo> getServicesByClusterId(@Param("clusterId") String clusterId);
+	
+	@Select("SELECT s.id, s.serviceCode, s.appId, a.appCode, s.startSeq, s.description, s.state, s.data, s.createTime, s.creatorId, s.lastModifiedTime, s.lastModifierId  FROM service s left join application a"
 			+" on s.appId=a.id where s.id=#{id}")
 	ServiceInfo getService(@Param("id") String id);
 	
@@ -57,6 +61,9 @@ public interface ServiceMapper {
     
     @Delete("delete from service where id=#{id}")
 	int deleteService(@Param("id") String id);
+    
+    @Delete("delete from service where appId=#{appId}")
+    int deleteServiceByAppId(@Param("appId") String appId);
     
     @Update("update service set startSeq=#{startSeq} where id=#{id}")
     int updateServiceStartSeq(@Param("item") ServiceInfo item);

@@ -1,5 +1,6 @@
 package org.k8scmp.appmgmt.service.impl;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,11 +35,14 @@ import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ClientConfigure;
 import org.k8scmp.common.GlobalConstant;
+import org.k8scmp.common.SpringContextManager;
 import org.k8scmp.engine.ClusterRuntimeDriver;
 import org.k8scmp.engine.RuntimeDriver;
 import org.k8scmp.engine.exception.DriverException;
 import org.k8scmp.engine.k8s.handler.DeployResourceHandler;
 import org.k8scmp.engine.k8s.handler.impl.DeploymentDeployHandler;
+import org.k8scmp.engine.k8s.updater.AppStatusMgmt;
+import org.k8scmp.engine.k8s.updater.EventChecker;
 import org.k8scmp.engine.k8s.util.NodeWrapper;
 import org.k8scmp.engine.k8s.util.PodUtils;
 import org.k8scmp.exception.ApiException;
@@ -331,7 +335,7 @@ public class ServiceServiceImpl implements ServiceService {
             serviceStatusManager.failedEventForDeployment(serviceId, null, e.getMessage());
             throw ApiException.wrapMessage(ResultStat.SERVICE_START_FAILED, e.getMessage());
         }
-		refreshServiceState(serviceId);
+//		refreshServiceState(serviceId);
 		return serviceId;
 	}
 
@@ -439,7 +443,7 @@ public class ServiceServiceImpl implements ServiceService {
             serviceStatusManager.failedEventForDeployment(serviceId, null, e.getMessage());
             throw ApiException.wrapMessage(ResultStat.SERVICE_STOP_FAILED, e.getMessage());
         }
-		refreshServiceState(serviceId);
+//		refreshServiceState(serviceId);
 	}
 	
 	
@@ -502,7 +506,7 @@ public class ServiceServiceImpl implements ServiceService {
 				"升级版本", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
-		refreshServiceState(serviceId);
+//		refreshServiceState(serviceId);
 	}
 	
 	@Override
@@ -564,7 +568,7 @@ public class ServiceServiceImpl implements ServiceService {
 				"升级版本", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
-		refreshServiceState(serviceId);
+//		refreshServiceState(serviceId);
 	}
 	
 	@Override
@@ -610,7 +614,7 @@ public class ServiceServiceImpl implements ServiceService {
 				"实例扩容", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
-		refreshServiceState(serviceId);
+//		refreshServiceState(serviceId);
 	}
 	
 	@Override
@@ -656,7 +660,7 @@ public class ServiceServiceImpl implements ServiceService {
 				"实例缩容", 
 				DateUtil.dateFormatToMillis(new Date())
 		));
-		refreshServiceState(serviceId);
+//		refreshServiceState(serviceId);
 	}
 	
 	@Override
@@ -958,16 +962,18 @@ public class ServiceServiceImpl implements ServiceService {
 		if(appInfo==null){
 			return null;
 		}
+		return checkServiceStatus(appInfo, serviceInfo);
+	}
+	
+	@Override
+	public String getAppState(String appId)  throws Exception{
+		HashMap<String, String> serviceStatus = getServicesStateByAppId(appId);
+		if(serviceStatus==null){
+			return null;
+		}
 		
-		ServiceConfigInfo serviceConfigInfo = (ServiceConfigInfo) serviceInfo.toModel(ServiceConfigInfo.class);
-		
-		Cluster cluster = getCluster();
-		RuntimeDriver driver = ClusterRuntimeDriver.getClusterDriver(cluster.getId());
-		if (driver == null) {
-            throw ApiException.wrapMessage(ResultStat.CLUSTER_NOT_EXIST, "cluster: " + cluster.toString());
-        }
-		
-		return checkEvent(driver, appInfo, serviceConfigInfo);
+		AppStatusMgmt appStatusMgmt = SpringContextManager.getBean(AppStatusMgmt.class).init(appId);
+		return appStatusMgmt.updateAppState();
 	}
 	
 	@Override
@@ -982,15 +988,9 @@ public class ServiceServiceImpl implements ServiceService {
 			return null;
 		}
 		
-		Cluster cluster = getCluster();
-		RuntimeDriver driver = ClusterRuntimeDriver.getClusterDriver(cluster.getId());
-		if (driver == null) {
-            throw ApiException.wrapMessage(ResultStat.CLUSTER_NOT_EXIST, "cluster: " + cluster.toString());
-        }
-		
 		List<GetServiceStatusTask> serviceInfoTasks = new LinkedList<>();
 		for (ServiceInfo service : serviceInfos) {
-	        serviceInfoTasks.add(new GetServiceStatusTask(driver,appInfo,service));
+	        serviceInfoTasks.add(new GetServiceStatusTask(appInfo,service));
         }
         
 		List<HashMap<String,String>> serviceStatuList = ClientConfigure.executeCompletionService(serviceInfoTasks);
@@ -1005,12 +1005,10 @@ public class ServiceServiceImpl implements ServiceService {
 	}
 	
 	 private class GetServiceStatusTask implements Callable<HashMap<String,String>> {
-		 RuntimeDriver driver;
 		 AppInfo appInfo;
 		 ServiceInfo service;
 
-        private GetServiceStatusTask(RuntimeDriver driver, AppInfo appInfo, ServiceInfo service) {
-        	this.driver = driver;
+        private GetServiceStatusTask(AppInfo appInfo, ServiceInfo service) {
         	this.appInfo = appInfo;
             this.service = service;
         }
@@ -1020,67 +1018,133 @@ public class ServiceServiceImpl implements ServiceService {
         	if (service == null) {
                 return null;
             }
-        	ServiceConfigInfo serviceConfigInfo = (ServiceConfigInfo) service.toModel(ServiceConfigInfo.class);
         	
-        	return checkEvent(driver, appInfo, serviceConfigInfo);
+        	return checkServiceStatus(appInfo, service);
         }
      }
 	 
-	 public HashMap<String, String> checkEvent(RuntimeDriver driver, AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws Exception {
-		 DeployEvent event = serviceEventDao.getNewestEvent(serviceConfigInfo.getId());
-		 if(event == null){
-			 return null;
-		 }
-		 
-		 if(DeployOperation.STOP.equals((event.getOperation()))){
-			 driver.checkStopEvent(appInfo, serviceConfigInfo, event);
-		 }else{
-			 driver.checkBasicEvent(appInfo, serviceConfigInfo, event);
-		 }
-		 
-		 
-		 HashMap<String,String> map = new HashMap<String,String>();
-		 map.put(serviceConfigInfo.getId(), serviceDao.getServiceStatu(serviceConfigInfo.getId()));
+//	 public HashMap<String, String> checkEvent(RuntimeDriver driver, AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws Exception {
+//		 DeployEvent event = serviceEventDao.getNewestEvent(serviceConfigInfo.getId());
+//		 if(event == null){
+//			 return null;
+//		 }
+//		 
+//		 if(DeployOperation.STOP.equals((event.getOperation()))){
+//			 driver.checkStopEvent(appInfo, serviceConfigInfo, event);
+//		 }else{
+//			 driver.checkBasicEvent(appInfo, serviceConfigInfo, event);
+//		 }
+//		 
+//		 
+//		 HashMap<String,String> map = new HashMap<String,String>();
+//		 map.put(serviceConfigInfo.getId(), serviceDao.getServiceStatu(serviceConfigInfo.getId()));
+//		 return map;
+//	 }
+	 
+	 public HashMap<String, String> checkServiceStatus(AppInfo appInfo, ServiceInfo serviceInfo){
+         DeployEvent event = null;
+         event = serviceEventDao.getNewestEvent(serviceInfo.getId());
+         if (event != null) {
+	         if (!serviceInfo.isTerminated() && event.eventTerminated()) {
+	             switch (event.getState()) {
+	                 case FAILED:
+	                     serviceDao.updateServiceStatu(serviceInfo.getId(), ServiceStatus.ERROR.name());
+	                     logger.info("set service statu to error with id " + serviceInfo.getId());
+	                     break;
+	                 case ABORTED:
+	                     if (DeployOperation.ABORT_UPDATE.equals(event.getOperation())) {
+	                         serviceDao.updateServiceStatu(serviceInfo.getId(), ServiceStatus.UPDATE_ABORTED.name());
+	                         logger.info("set service statu to update_aborted with id " + serviceInfo.getId());
+	                     } else if (DeployOperation.ABORT_ROLLBACK.equals(event.getOperation())) {
+	                         serviceDao.updateServiceStatu(serviceInfo.getId(), ServiceStatus.BACKROLL_ABORTED.name());
+	                         logger.info("set service statu to rollback_aborted with id " + serviceInfo.getId());
+	                     } else if (DeployOperation.ABORT_START.equals(event.getOperation())) {
+	                         serviceDao.updateServiceStatu(serviceInfo.getId(), ServiceStatus.STOP.name());
+	                         logger.info("set service statu to stop with id " + serviceInfo.getId());
+	                     } else {
+	                         serviceDao.updateServiceStatu(serviceInfo.getId(), ServiceStatus.RUNNING.name());
+	                         logger.info("set service statu to running with id " + serviceInfo.getId());
+	                     }
+	                     break;
+	                 case SUCCESS:
+	                     if (DeployOperation.STOP.equals(event.getOperation())) {
+	                         serviceDao.updateServiceStatu(serviceInfo.getId(), ServiceStatus.STOP.name());
+	                         logger.info("set service statu to stop with id " + serviceInfo.getId());
+	                     } else {
+	                         serviceDao.updateServiceStatu(serviceInfo.getId(), ServiceStatus.RUNNING.name());
+	                         logger.info("set service statu to running with id " + serviceInfo.getId());
+	                     }
+	                     break;
+	                 default:
+	                     break;
+	             }
+	         } else {
+	             try {
+	             	ServiceConfigInfo serviceConfigInfo = null;
+						try {
+							serviceConfigInfo = serviceInfo.toModel(ServiceConfigInfo.class);
+						} catch (Exception e) {
+							logger.error("get serviceConfigInfo error, serviceId=" + serviceInfo.getId());
+						}
+	             	
+	                 EventChecker eventChecker = new EventChecker(appInfo, serviceConfigInfo, event);
+	                 eventChecker.checkEvent();
+	                 try {
+							if (!event.eventTerminated() && DateUtil.string2timestamp(event.getExpireTime()) < System.currentTimeMillis()) {
+							    event.setMessage("service expired");
+							    eventChecker.checkExpireEvent();
+							}
+						} catch (ParseException e) {
+							logger.error("transform expireTime into Long Type error, expireTime=" + event.getExpireTime());
+						}
+	             } catch (DeploymentEventException e) {
+	                 logger.warn("catch io exception when create event checker, message={}", e.getMessage());
+	             }
+	         }
+         
+         }
+         
+         HashMap<String,String> map = new HashMap<String,String>();
+		 map.put(serviceInfo.getId(), serviceDao.getServiceStatu(serviceInfo.getId()));
 		 return map;
 	 }
 	 
-	 
-	 private class GetStateTask implements Runnable {
-		 String serviceId;
-
-		 public GetStateTask(String serviceId){
-			 this.serviceId = serviceId;
-		 }
-		 public void run() {
-			Map map = null;
-			boolean expire = false;
-			while (!expire) {
-				try {
-					map = getServiceState(serviceId);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				String state = (String) map.get(serviceId);
-				if ((ServiceStatus.STOP.name().equals(state)
-						|| ServiceStatus.RUNNING.name().equals(state))) {
-					expire = true;
-				}
-				System.out.println(state);
-
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	 public void refreshServiceState(String serviceId) throws Exception{
-		 GetStateTask getStateTask = new GetStateTask(serviceId);
-		 new Thread(getStateTask).start();
-	}
+//	 private class GetStateTask implements Runnable {
+//		 String serviceId;
+//
+//		 public GetStateTask(String serviceId){
+//			 this.serviceId = serviceId;
+//		 }
+//		 public void run() {
+//			Map map = null;
+//			boolean expire = false;
+//			while (!expire) {
+//				try {
+//					map = getServiceState(serviceId);
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				String state = (String) map.get(serviceId);
+//				if ((ServiceStatus.STOP.name().equals(state)
+//						|| ServiceStatus.RUNNING.name().equals(state))) {
+//					expire = true;
+//				}
+//				System.out.println(state);
+//
+//				try {
+//					Thread.sleep(5000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+//	}
+//
+//	 public void refreshServiceState(String serviceId) throws Exception{
+//		 GetStateTask getStateTask = new GetStateTask(serviceId);
+//		 new Thread(getStateTask).start();
+//	}
 	 
 }

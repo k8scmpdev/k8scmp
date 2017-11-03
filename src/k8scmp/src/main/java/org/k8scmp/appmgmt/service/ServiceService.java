@@ -59,4 +59,6 @@ public interface ServiceService {
 	long getReplicasByServiceId(String serviceId) throws Exception;
 
 	ServiceConfigInfo getServiceById(String id) throws Exception;
+
+	String getAppState(String appId) throws Exception;
 }

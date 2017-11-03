@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.k8scmp.engine.model.DataModelBase;
+import org.k8scmp.model.ServiceStatus;
 
 public class ServiceInfo extends DataModelBase{
 	
@@ -147,6 +148,13 @@ public class ServiceInfo extends DataModelBase{
 		this.data = data;
 	}
 	
+    public boolean isTerminated() {
+        return ServiceStatus.STOP.name().equals(this.getState())
+                || ServiceStatus.RUNNING.name().equals(this.getState())
+                || ServiceStatus.ERROR.name().equals(this.getState())
+                || ServiceStatus.UPDATE_ABORTED.name().equals(this.getState())
+                || ServiceStatus.BACKROLL_ABORTED.name().equals(this.getState());
+    }
 	
 	public <T extends ServiceInfo> T toModel(Class<T> clazz) throws Exception{
         T result = clazz.newInstance();

@@ -8,7 +8,7 @@ import org.k8scmp.appmgmt.domain.AppInfo;
 public interface AppService {
     Long createApp(AppInfo appInfo);
 
-    void deleteApp(String id);
+    void deleteApp(String id) throws Exception;
 
     void modifyApp(AppInfo appInfo);
 
