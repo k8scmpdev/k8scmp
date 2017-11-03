@@ -19,4 +19,8 @@ public interface AppDao{
 
 	List<AppInfo> getAppsByserviceCode(String serviceCode);
 
+	void updateAppState(String id,String state);
+
+	List<String> getAppIdListByClusterId(String clusterId);
+
 }

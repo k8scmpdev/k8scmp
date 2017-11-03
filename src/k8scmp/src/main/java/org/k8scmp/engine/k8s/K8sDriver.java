@@ -659,18 +659,18 @@ public class K8sDriver implements RuntimeDriver {
         }
     }
 
-//    @Override
-//    public void expiredEvent(ServiceConfigInfo serviceConfigInfo, DeployEvent event) throws DeploymentEventException, IOException, DeploymentTerminatedException {
-//        KubeUtils client;
-//        try {
-//            client = Fabric8KubeUtils.buildKubeUtils(cluster, serviceConfigInfo.getNamespace());
-//        } catch (K8sDriverException e) {
-//            throw new DeploymentEventException(e);
-//        }
-//        PodList podList = getPodListByDeployment(client, serviceConfigInfo);
-//        serviceStatusManager.failedEvent(event.getId(), queryCurrentSnapshotWithPodRunning(podList), "Operation expired. " + event.getMessage());
-//    }
-//
+    @Override
+    public void expiredEvent(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo, DeployEvent event) throws DeploymentEventException, IOException, DeploymentTerminatedException {
+        KubeUtils client;
+        try {
+            client = Fabric8KubeUtils.buildKubeUtils(cluster, appInfo.getNamespace());
+        } catch (K8sDriverException e) {
+            throw new DeploymentEventException(e);
+        }
+        PodList podList = getPodListByDeployment(client, serviceConfigInfo.getId());
+        serviceStatusManager.failedEvent(event.getId(), queryCurrentSnapshotWithPodRunning(podList), "Operation expired. " + event.getMessage());
+    }
+
     @Override
     public List<VersionBase> getCurrnetVersionsByService(AppInfo appInfo, ServiceConfigInfo serviceConfigInfo) throws DeploymentEventException {
         if (serviceConfigInfo == null) {

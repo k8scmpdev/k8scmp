@@ -4,9 +4,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.k8scmp.appmgmt.dao.AppDao;
+import org.k8scmp.appmgmt.dao.ServiceDao;
 import org.k8scmp.appmgmt.domain.AppInfo;
+import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.appmgmt.service.AppService;
 import org.k8scmp.basemodel.ResourceType;
+import org.k8scmp.model.AppStatus;
+import org.k8scmp.model.ServiceStatus;
 import org.k8scmp.operation.OperationLog;
 import org.k8scmp.operation.OperationRecord;
 import org.k8scmp.operation.OperationType;
@@ -27,6 +31,9 @@ public class AppServiceImpl implements AppService {
     AppDao appDao;
     
     @Autowired
+    ServiceDao serviceDao;
+    
+    @Autowired
     OperationLog operationLog;
     
     private static Logger logger = LoggerFactory.getLogger(AppServiceImpl.class);
@@ -34,6 +41,7 @@ public class AppServiceImpl implements AppService {
 	@Override
 	public Long createApp(AppInfo appInfo) {
 		appInfo.setId(UUIDUtil.generateUUID());
+		appInfo.setState(AppStatus.STOP.name());
 		appInfo.setCreatorId("");
 		appInfo.setCreateTime(DateUtil.dateFormatToMillis(new Date()));
 		Long result = appDao.createApp(appInfo);
@@ -52,8 +60,19 @@ public class AppServiceImpl implements AppService {
 	}
 
 	@Override
-	public void deleteApp(String id) {
+	public void deleteApp(String id) throws Exception {
+		List<ServiceInfo> serviceInfos = serviceDao.getServicesByAppId(id);
+		if(serviceInfos!=null && serviceInfos.size()>0){
+			for(ServiceInfo serviceInfo:serviceInfos){
+				if(!(ServiceStatus.STOP.name().equals(serviceInfo.getState()) || ServiceStatus.ERROR.name().equals(serviceInfo.getState()))){
+					throw new Exception("There are not stopped services in the application!");
+				}
+			}
+			
+			serviceDao.deleteServiceByAppId(id);
+		}
 		appDao.deleteApp(id);
+		
 		operationLog.insertRecord(new OperationRecord(
 				id, 
 				ResourceType.APPLICATION,
@@ -88,5 +107,5 @@ public class AppServiceImpl implements AppService {
 		List<AppInfo> apps = appDao.getApps(appInfo);
 		return apps;
 	}
-
+	
 }

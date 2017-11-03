@@ -33,6 +33,14 @@ public interface AppMapper {
     @Select("select"+BASIC_COLUMN+" from application where id=#{id}")
     AppInfo getApp(@Param("id") String id);
     
+    @Select("select id from application where clusterId=#{clusterId}")
+    List<String> getAppIdListByClusterId(@Param("clusterId") String clusterId);
+    
+    @Update("update application" +
+            " set state = #{state}" +
+            " where id = #{id}")
+    int updateAppState(@Param("id") String id,@Param("state") String state);
+    
     @Select("select"+BASIC_COLUMN+" from application where id in(select appId from service where serviceCode=#{serviceCode})")
     List<AppInfo> getAppsByserviceCode(@Param("serviceCode") String serviceCode);
 }

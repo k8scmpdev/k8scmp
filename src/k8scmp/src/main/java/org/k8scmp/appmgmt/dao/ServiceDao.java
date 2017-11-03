@@ -27,5 +27,9 @@ public interface ServiceDao{
 
 	List<ServiceInfo> getNoRunningServicesByStartSeq(String appId, int startSeq);
 
+	List<ServiceInfo> getServicesByClusterId(String clusterId);
+
+	void deleteServiceByAppId(String appId);
+
 
 }
