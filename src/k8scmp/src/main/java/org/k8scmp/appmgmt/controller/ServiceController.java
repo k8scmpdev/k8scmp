@@ -166,6 +166,12 @@ public class ServiceController {
     } 
     
     @ResponseBody
+    @RequestMapping(value = "/getAppState")
+    public HttpResponseTemp<String> getAppState(@RequestParam(value = "appId", required = true) String appId) throws Exception {
+    	return ResultStat.OK.wrap(serviceService.getAppState(appId));
+    } 
+    
+    @ResponseBody
     @RequestMapping(value = "/getServicesStateByAppId")
     public HttpResponseTemp<HashMap<String,String>> getServicesStateByAppId(@RequestParam(value = "appId", required = true) String appId) throws Exception {
     	return ResultStat.OK.wrap(serviceService.getServiceState(appId));
