@@ -19,10 +19,10 @@
 					<div class="span12">
 						<div class="buttons">
 							<a title="添加一个服务" id="addService" class="btn tip-bottom" th:href="@{/app/service/service-new(appId=${#httpServletRequest.getParameter('appId')})}"><i class="icon-plus"></i>添加服务</a>
-							<a title="启动服务" id="startService" data-toggle="modal" class="btn tip-bottom" href="#startServiceDisplay" onclick="startService();"><i class="icon-play"></i>启动</a>
-							<a title="停止服务" id="stopService" class="btn tip-bottom" href="javascript:void(0);" onclick="stopService();"><i class="icon-off"></i>停止</a>
-							<a title="升级/回滚" id="upService" data-toggle="modal" class="btn tip-bottom" href="#updateRollback" onclick="startUpdateRollback();"><i class="icon-repeat"></i>升级/回滚</a>
-							<a title="扩容/缩容" id="extenService" data-toggle="modal" class="btn tip-bottom" href="#scaleUpDown" onclick="scaleUpDown();"><i class="icon-resize-small"></i>扩容/缩容</a>
+							<a title="启动服务" id="startService" data-toggle="modal" class="btn tip-bottom" onclick="startService();"><i class="icon-play"></i>启动</a>
+							<a title="停止服务" id="stopService" class="btn tip-bottom" onclick="stopService();"><i class="icon-off"></i>停止</a>
+							<a title="升级/回滚" id="upService" data-toggle="modal" class="btn tip-bottom" onclick="startUpdateRollback();"><i class="icon-repeat"></i>升级/回滚</a>
+							<a title="扩容/缩容" id="extenService" data-toggle="modal" class="btn tip-bottom" onclick="scaleUpDown();"><i class="icon-resize-small"></i>扩容/缩容</a>
 							<!-- <a title="删除" id="deleteService" class="btn tip-bottom" href="javascript:void(0);" onclick="deleteService();"><i class="icon-remove"></i>删除</a> -->
 							<!-- <div class="input-append" style="float:right">
 								<form id="serviceSearchForm">
@@ -81,20 +81,18 @@
 					</div>
 					<div class="modal-body">
 						<input id="hiddenUnique" type="hidden"/>
-						<div>
-                            <label class="modalStyle" style="padding-right: 10px;">当前版本</label>
-                            <label><span id="currentVersionNum"></span></label>
+						<div style="float:left;text-align:right;width:35%">
+                            <p style="padding-top: 10px">当前版本</p>
+                            <p style="padding-top: 10px">当前实例个数</p>
+                            <p style="padding-top: 10px">期望实例个数</p>
                         </div>
-						<div>
-                            <label class="modalStyle" style="padding-right: 10px;">当前实例个数</label>
-                            <label><span id="instanceNumber"></span>个</label>
+                        <div style="float:right;text-align:left;width:63%">
+                        	<input disabled="disabled" id="scaleCurrVersionNum" type="text" class="portMapped" style="box-sizing:border-box" value="1"/>
+                        	<input disabled="disabled" id="scaleCurrInstanceNum" type="text" class="portMapped" style="box-sizing:border-box" value="1"/>
+                            <input id="scaleaWishInstanceNum" type="text" class="portMapped" style="box-sizing:border-box" value="1"/>
                         </div>
-                        <div>
-                            <label class="modalStyle" style="padding-right: 10px;">期望实例个数</label>
-                            <label><input id="futureNumber" type="text"/>个</label>
-                        </div>
-						<div style="float: right;">
-							<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+						<div style="padding-bottom: 0;padding-left: 40%;">
+							<button class="btn-primary btn-mini cancleScaleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
 							<button id="scaleSubmit" class="btn-primary btn-mini" type="button">确定</button>
 						</div>
 					</div>
@@ -128,21 +126,21 @@
 						<h3>升级回滚</h3>
 					</div>
 					<div class="modal-body">
-						<div>
-                            <label class="modalStyle" style="padding-right: 10px;">当前版本</label>
-                            <label><span id="currentVersionNumber"></span></label>
+						<div style="float:left;text-align:right;width:35%">
+                            <p style="padding-top: 10px">当前版本</p>
+                            <p style="padding-top: 10px">选择版本</p>
+                            <p style="padding-top: 10px">启动实例个数</p>
                         </div>
-                        <div>
-                            <label class="modalStyle" style="padding-right: 10px;">选择版本</label>
-                            <!-- <label><select id="selectVersionNumber"></select></label> -->
-                            <label><input type="text" id="selectVersionNumber"/></label>
+                        <div style="float:right;text-align:left;width:63%">
+                        	<input disabled="disabled" id="rollCurrentVerNum" type="text" class="portMapped" style="box-sizing:border-box" value="1"/>
+                            <select id="rollSelectVerNum" class="portMapped">
+                            	<option>1</option>
+                            	<option>2</option>
+                            </select>
+                            <input id="rollBackInsNumber" type="text" class="portMapped" style="box-sizing:border-box"/>
                         </div>
-                        <div>
-                            <label class="modalStyle" style="padding-right: 10px;">启动实例个数</label>
-                            <label><input id="wishInstanceNumber" type="text"/></label>
-                        </div>
-						<div style="float: right;">
-							<button class="btn-primary btn-mini cancleService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
+						<div style="padding-bottom: 0;padding-left: 40%">
+							<button class="btn-primary btn-mini cancleRollbackService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
 							<button id="rollbackSubmit" class="btn-primary btn-mini" type="button">确定</button>
 						</div>
 					</div>
@@ -154,16 +152,18 @@
 						<h3>启动服务</h3>
 					</div>
 					<div class="modal-body">
-                        <div>
-                            <label class="modalStyle" style="padding-right: 10px;">选择版本</label>
-                           <!--  <label><select id="selectStartVersionNumber"></select></label> -->
-                            <label><input id="selectStartVersionNumber" type="number"/></label>
+						<div style="float:left;text-align:right;width:40%">
+                            <p style="padding-top: 10px">选择版本</p>
+                            <p style="padding-top: 10px">启动实例个数</p>
                         </div>
-                        <div>
-                            <label class="modalStyle" style="padding-right: 10px;">启动实例个数</label>
-                            <label><input id="wishStartInstanceNumber" type="text"/></label>
+                        <div style="float:right;text-align:left;width:58%">
+                            <select id="selectStartVersionNumber" class="portMapped">
+                            	<option>1</option>
+                            	<option>2</option>
+                            </select>
+                            <label><input id="wishStartInstanceNumber" type="text" class="portMapped" style="box-sizing:border-box"/></label>
                         </div>
-						<div style="float: right;">
+						<div style="padding-bottom: 0;padding-left: 40%">
 							<button class="btn-primary btn-mini cancleStartService" type="button">取消</button>&nbsp;&nbsp;&nbsp;
 							<button id="startServiceSubmit" class="btn-primary btn-mini" type="button">确定</button>
 						</div>

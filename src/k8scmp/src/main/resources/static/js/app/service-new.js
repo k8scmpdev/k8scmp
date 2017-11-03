@@ -99,7 +99,7 @@ $(document).ready(function(){
 	$(".dataTables_scrollHeadInner").width("100%");
 	$(".nosearch-table").width("100%");
 	$(".image-table").width("100%");
-	
+	$(".image-table").css();
 	//set imageList width
 	$(".i10").css("width","30%");
 	$(".i10").css("min-width","30%");

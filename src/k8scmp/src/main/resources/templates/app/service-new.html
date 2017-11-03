@@ -212,58 +212,42 @@
 												<table class="table table-bordered image-table display" style="width: 100%;table-layout: fixed;">
 													<thead>
 														<tr>
-															<th style="width: 26%;">选择</th>
-															<th style="width: 26%;">镜像仓库</th>
-															<th style="width: 26%;">镜像名称</th>
-															<th style="width: 26%;">版本</th>
+															<th>选择</th>
+															<th>镜像仓库</th>
+															<th>镜像名称</th>
+															<th>版本</th>
 														</tr>
 													</thead>
 													<tbody id="tImageBody">
 													<tr>
-														<td style="width: 26%;"><input type="checkbox"/></td>
-														<td id="registry" style="width: 26%;" ></td>
-														<td id="id" style="width: 26%;" >nginx</td>
-														<td id="versions" style="width: 26%;">
-																<select name="versions">
-																	<option value="latest">latest</option>
-																</select>
-															
+														<td><input type="checkbox"/></td>
+														<td id="registry"></td>
+														<td id="id">nginx</td>
+														<td id="versions">
+															<select name="versions">
+																<option value="latest">latest</option>
+															</select>
 														</td>
 													</tr>
 													<tr>
-														<td style="width: 26%;"><input type="checkbox"/></td>
-														<td id="registry" style="width: 26%;" ></td>
-														<td id="id" style="width: 26%;" >tomcat</td>
-														<td id="versions" style="width: 26%;">
-																<select name="versions">
-																	<option value="latest">latest</option>
-																</select>
-															
+														<td ><input type="checkbox"/></td>
+														<td id="registry"></td>
+														<td id="id">tomcat</td>
+														<td id="versions">
+															<select name="versions">
+																<option value="latest">latest</option>
+															</select>
 														</td>
 													</tr>
 													<tr>
-														<td style="width: 26%;"><input type="checkbox"/></td>
-														<td id="registry" style="width: 26%;" >http://123.com</td>
-														<td id="id" style="width: 26%;" >dev-java</td>
-														<td id="versions" style="width: 26%;">
-																<select name="versions">
-																	<option value="8.0">8.0</option>
-																	<option value="9.0">9.0</option>
-																</select>
-															
-														</td>
-													</tr>
-													<tr>
-														<td style="width: 26%;"><input type="checkbox"/></td>
-														<td id="registry" style="width: 26%;" >http://123.com</td>
-														<td id="id" style="width: 26%;" >mysql</td>
-														<td id="versions" style="width: 26%;">
-																<select name="versions">
-																	<option value="6.0">6.0</option>
-																	<option value="7.0">7.0</option>
-																	<option value="8.0">8.0</option>
-																</select>
-															
+														<td><input type="checkbox"/></td>
+														<td id="registry">http://123.com</td>
+														<td id="id">dev-java</td>
+														<td id="versions">
+															<select name="versions">
+																<option value="8.0">8.0</option>
+																<option value="9.0">9.0</option>
+															</select>
 														</td>
 													</tr>
 													    <!-- <tr th:each="image,itState:${chooseImagesList}">

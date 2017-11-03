@@ -1,8 +1,3 @@
-/*$(document).ready(function(){
-	//set href
-	$("#addService").attr("th:href","@{/app/service/service-new(appCode=${#httpServletRequest.getParameter('appCode')})}");
-});*/
-
 /*$("#example-select-all").on("click",function(){
 	var rows = table.rows({'search':'applied'}).nodes();
 	$('input[type="checkbox"]', rows).prop('checked', this.checked); 
@@ -25,10 +20,6 @@ function deleteService(){
 	
 	
 }
-function test(){
-	alert("hhhh");
-}
-
 
 //start service submit
 $("#startServiceSubmit").bind("click",function(event){
@@ -64,10 +55,19 @@ $("#startServiceSubmit").bind("click",function(event){
 });
 
 //hide start service
-$("#cancleStartService").bind("click",function(event){
+$("button[class*='cancleStartService']").bind("click",function(event){
 	$("#startServiceDisplay").modal("hide");
 });
 
+//hide scale service
+$("button[class*='cancleScaleService']").bind("click",function(event){
+	$("#scaleUpDown").modal("hide");
+});
+
+//hide rollback service
+$("button[class*='cancleRollbackService']").bind("click",function(event){
+	$("#updateRollback").modal("hide");
+});
 
 //stop service
 function stopService(){
@@ -77,6 +77,7 @@ function stopService(){
 		return;
 	}
 	var serviceId = selectedRow[0]["id"];
+	var serviceState = selectedRow[0]["state"]
 	var AjaxURL = "/app/service/stopService?serviceId="+serviceId;
 	$.ajax({
 		type: "POST",
@@ -99,16 +100,20 @@ function stopService(){
 
 //start service check
 function startService(){
+	var flag = true;
 	var selectedRow = getSelectedRow();
 	if(selectedRow == null || selectedRow.length !=1){
 		alert("请选择一条记录！");
 		return;
 	}
 	var serviceId = selectedRow[0]["id"];
-	//clear start instance number
+	var serviceState = selectedRow[0]["state"];
+	if(!checkServiceState(serviceState,"startService")){
+		alert("不能启动服务，请检查服务状态！");
+		return;
+	}
+	//clear wish start instance number
 	$("#wishStartInstanceNumber").val("");
-	
-	//init start version,get version names
 	var versionList = null;
 	AjaxURL = "/app/version/getVersionNames?serviceId="+serviceId;
 	$.ajax({
@@ -120,26 +125,34 @@ function startService(){
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
 					versionList = eval(data.result);
-					console.log(versionList);
-//					var selectSecond = $("#selectStartVersionNumber");
-//					selectSecond.empty();
-//					for(var i=0;i<versionList.length;i++){
-//						$("#selectStartVersionNumber").append("<option value='"+versionList[i].version+"' selected='selected'>"+versionList[i].versionName+"</option>");
-//					}
-//					$("#selectStartVersionNumber").val();
+					var selectSecond = $("#selectStartVersionNumber");
+					selectSecond.empty();
+					for(var i=0;i<versionList.length;i++){
+						$("#selectStartVersionNumber").append("<option value='"+versionList[i].version+"' selected='selected'>"+versionList[i].versionName+"</option>");
+					}
 				}
+			}else{
+				alert("获取版本信息出错！");
+				flag = false;
 			}
 		},
 		error: function(data) {
 			alert("error!");
+			flag = false;
 		}
 	});
 	
+	if(!flag){
+		return;
+	}
+	//show modal until all data init
+	$("#startServiceDisplay").modal();
 }
 
 //upgrade rollback
 function startUpdateRollback(){
 	//get current version number
+	var flag = true;
 	var currentVersionNum = "";
 	var selectedRow = getSelectedRow();
 	if(selectedRow == null || selectedRow.length !=1){
@@ -147,53 +160,77 @@ function startUpdateRollback(){
 		return;
 	}
 	var serviceId = selectedRow[0]["id"];
+	var serviceState = selectedRow[0]["state"];
+	if(!checkServiceState(serviceState,"upRollBack")){
+		alert("不能升级或回滚服务，请检查服务状态！");
+		return;
+	}
+	$("#rollBackInsNumber").val();
 	var AjaxURL = "/app/service/getCurrentVersionNum?serviceId="+serviceId;
+	//get current version num,syn
 	$.ajax({
 		type: "POST",
 		dataType: "json",
 		url: AjaxURL,
+		async:false,
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
 					currentVersionNum = data.result.join(",");
-					//set init value
-					$("#currentVersionNumber").html(currentVersionNum);
+					$("#rollCurrentVerNum").val(currentVersionNum);
+				}else{
+					alert('获取当前版本信息出错！');
+					flag = false;
 				}
+			}else{
+				alert('获取当前版本信息出错！');
+				flag = false;
 			}
 		},
 		error: function(data) {
 			alert("error!");
+			flag = false;
 		}
 	});
+	if(!flag){
+		return;
+	}
 	
-	//get version names
+	//get version names,syn
 	var versionList = null;
 	AjaxURL = "/app/version/getVersionNames?serviceId="+serviceId;
 	$.ajax({
 		type: "POST",
 		dataType: "json",
 		url: AjaxURL,
+		async:false,
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
 					versionList = eval(data.result);
-					var selectSecond = $("#selectVersionNumber");
+					var selectSecond = $("#rollSelectVerNum");
 					selectSecond.empty();
 					for(var i=0;i<versionList.length;i++){
-						/*var opt= new Option();
-						opt.value=versionList[i].version;
-						opt.text = versionList[i].versionName;
-						selectSecond.options.add(opt);*/
+						$("#rollSelectVerNum").append("<option value='"+versionList[i].version+"' selected='selected'>"+versionList[i].versionName+"</option>");
 					}
 				}
+			}else{
+				alert("获取版本信息出错！");
+				flag = false;
 			}
 		},
 		error: function(data) {
 			alert("error!");
+			flag = false;
 		}
 	});
+	if(!flag){
+		return;
+	}
+	//show modal until all data init
+	$("#updateRollback").modal();
 }
 
 //show service modify page
@@ -233,57 +270,73 @@ $("#cancleModifyService").bind("click",function(event){
 
 //show scale up or down
 function scaleUpDown(){
+	var flag = true;
 	var selectedRow = getSelectedRow();
 	if(selectedRow == null || selectedRow.length!=1){
 		alert("请选择一条记录！");
 		return;
 	}
 	var serviceId = selectedRow[0]["id"];
+	var serviceState = selectedRow[0]["state"];
+	if(!checkServiceState(serviceState,"scaleUpDown")){
+		alert("不能扩容或缩容服务，请检查服务状态！");
+		return;
+	}
+	$("#scaleaWishInstanceNum").val();
 	var AjaxURL = "/app/service/getReplicasByServiceId?serviceId="+serviceId;
-	var instanceNumber = 0;
-	var currentVersionNum = 0;
 	
-	//get current instance count
+	//get current replicas,syn
 	$.ajax({
 		type: "GET",
 		dataType: "json",
 		url: AjaxURL,
+		async:false,
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
-				instanceNumber = data.result;
+				$("#scaleCurrInstanceNum").val(data.result==null?"":data.result);
 			}
 		},
 		error: function(data) {
 			alert("error!");
+			flag = false;
 		}
 	});
 	
+	if(!flag){
+		return;
+	}
+	
 	AjaxURL = "/app/service/getCurrentVersionNum?serviceId="+serviceId;
-	//get current version num
+	//get current version num,syn
 	$.ajax({
 		type: "POST",
 		dataType: "json",
 		url: AjaxURL,
+		async:false,
 		contentType:"application/json",
 		success: function (data) {
 			if(data.resultCode == 200){
 				if(data.result != null && data.result.length>0){
-					currentVersionNum = data.result.join(",");
-					$("#currentVersionNum").html(currentVersionNum==null?"":currentVersionNum);
-					
-					//set current instance number
-					$("#instanceNumber").html(instanceNumber);
+					$("#scaleCurrVersionNum").val(data.result.join(",")==null?"":data.result.join(","));
 				}
+			}else{
+				alert("获取当前版本信息出错!");
+				flag = false;
 			}
 		},
 		error: function(data) {
-			alert("error!");
+			alert("获取当前版本信息出错!");
+			flag = false;
 		}
 	});
 	
-	//set current version number
+	if(!flag){
+		return;
+	}
 	
+	//show modal until all data init
+	$("#scaleUpDown").modal();
 }
 
 //sacle up or down submit
@@ -291,13 +344,14 @@ $("#scaleSubmit").bind("click",function(event){
 	var scaleFlag = false;
 	var selectedRow = getSelectedRow();
 	var serviceId = selectedRow[0]["id"];
-	var currentNumber = $("#instanceNumber").html();
-	var futureNumber = $("#futureNumber").val();
-	var currentVersionNumer = $("#currentVersionNum").html();
+	var currentNumber = $("#scaleCurrInstanceNum").val();
+	var futureNumber = $("#scaleaWishInstanceNum").val();
+	var currentVersionNumer = $("#scaleCurrVersionNum").val();
 	var ajaxUrl = "";
 	var paramData = {"serviceId":serviceId,"replicas":futureNumber};
 	if(futureNumber == currentNumber){
 		alert("期望实例个数与当前实例个数相等，无法进行扩容缩容！");
+		return;
 	}
 	
 	//up
@@ -336,9 +390,9 @@ $("#rollbackSubmit").bind("click",function(event){
 	var rollFlag = false;
 	var selectedRow = getSelectedRow();
 	var serviceId = selectedRow[0]["id"];
-	var currentVersionNumber = $("#currentVersionNumber").html();
-	var selectVersionNumber = $("#selectVersionNumber").val();
-	var wishReplies = $("#wishInstanceNumber").val();
+	var currentVersionNumber = $("#rollCurrentVerNum").val();
+	var selectVersionNumber = $("#rollSelectVerNum").val();
+	var wishReplies = $("#rollBackInsNumber").val();
 	var ajaxUrl = "";
 	
 	if(selectVersionNumber == currentVersionNumber){
@@ -386,10 +440,25 @@ function getSelectedRow(){
 		tmpObj = $(this).parent().parent().parent().parent().parent().parent().parent();
 		var tr = {};
 		var serviceIdtd = tmpObj.children("td").eq(6);
+		var stateTd = tmpObj.children("td").eq(3);
 		tr["id"] = serviceIdtd.attr("name");
+		tr["state"] = stateTd.html();
 		returnObj.push(tr);
 	});
 	return returnObj;
+}
+
+//check service state
+function checkServiceState(state,operation){
+	var flag = false;
+	switch(operation){
+	case "startService": flag=(state=="STOP");break;
+	case "stopService":
+	case "scaleUpDown":
+	case "upRollBack" : flag=(state=="RUNNING");break;	
+	default:(flag=false);break;
+	}
+	return flag;
 }
 
 
