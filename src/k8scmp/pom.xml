@@ -67,7 +67,19 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector}</version>
         </dependency>
-
+		
+		<!-- groovy 搭建邮件服务器 -->
+		<dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>http-builder</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+		
         <!-- Junit -->
         <dependency>
             <groupId>junit</groupId>
