@@ -2,6 +2,8 @@ package org.k8scmp.monitormgmt.dao.alarm.impl;
 
 import java.util.List;
 
+import org.k8scmp.appmgmt.dao.ServiceDao;
+import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.mapper.alarm.AlarmEventInfoMapper;
 import org.k8scmp.mapper.alarm.CallbackInfoMapper;
@@ -50,6 +52,8 @@ public class AlarmDaoImpl implements AlarmDao{
 	HostGroupHostBindMapper hostGroupHostBindMapper;
 	@Autowired
 	HostInfoMapper hostInfoMapper;
+	@Autowired
+	ServiceDao serviceDao;
 	
 	@Override
 	public TemplateInfoBasic getTemplateInfoBasicByName(String templateName) {
@@ -252,9 +256,23 @@ public class AlarmDaoImpl implements AlarmDao{
 		return templateInfoBasicMapper.getTemplateInfoByName(templateName);
 	}
 
+//	@Override
+//	public DeploymentInfo getDeploymentByTemplateId(int id) {
+//		return templateInfoBasicMapper.getDeploymentByTemplateId(id);
+//	}
+	 @Override
+    public ServiceInfo getDeploymentByTemplateId(int templateId) {
+        String serviceId = templateInfoBasicMapper.getServiceIdByTemplateId(templateId);
+        if (serviceId == null) {
+            return null;
+        }
+        return serviceDao.getService(serviceId);
+    }
+	
+	
 	@Override
-	public DeploymentInfo getDeploymentByTemplateId(int id) {
-		return templateInfoBasicMapper.getDeploymentByTemplateId(id);
+	public HostInfo getHostInfoByHostname(String hostname) {
+		return hostInfoMapper.getHostInfoByHostname(hostname);
 	}
 
 

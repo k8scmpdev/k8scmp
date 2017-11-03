@@ -15,42 +15,42 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * Created by baokangwang on 2016/5/6.
  */
 @Controller
-@RequestMapping("/api")
+@RequestMapping("/alarm")
 public class AlarmSenderController extends ApiController {
-//
-//    @Autowired
-//    AlarmSenderService alarmSenderService;
-//
-//    @ResponseBody
-//    @RequestMapping(value = "/alarm/send/sms", method = RequestMethod.POST)
-//    public HttpResponseTemp<?> SendAlarmSMS(@RequestParam("tos") String tos,
-//                                            @RequestParam("content") String content,
-//                                            @RequestParam("subject") String subject,
-//                                            @RequestParam(value = "sender", required = false) String sender) {
-//        content = EncodingTool.encodeStr(content);
-//        subject = EncodingTool.encodeStr(subject);
-//        return alarmSenderService.sendSMS(tos, content, subject, sender);
-//    }
-//
-//    @ResponseBody
-//    @RequestMapping(value = "/alarm/send/mail", method = RequestMethod.POST)
-//    public HttpResponseTemp<?> SendAlarmMail(@RequestParam("tos") String tos,
-//                                             @RequestParam("content") String content,
-//                                             @RequestParam("subject") String subject,
-//                                             @RequestParam(value = "sender", required = false) String sender) {
-//        content = EncodingTool.encodeStr(content);
-//        subject = EncodingTool.encodeStr(subject);
-//        return alarmSenderService.sendMail(tos, content, subject, sender);
-//    }
-//
-//    @ResponseBody
-//    @RequestMapping(value = "/alarm/send/wechat", method = RequestMethod.POST)
-//    public HttpResponseTemp<?> SendAlarmWechat(@RequestParam("tos") String tos,
-//                                               @RequestParam("content") String content,
-//                                               @RequestParam("subject") String subject,
-//                                               @RequestParam(value = "sender", required = false) String sender) {
-//        content = EncodingTool.encodeStr(content);
-//        subject = EncodingTool.encodeStr(subject);
-//        return alarmSenderService.sendWechat(tos, content, subject, sender);
-//    }
+
+    @Autowired
+    AlarmSenderService alarmSenderService;
+
+    @ResponseBody
+    @RequestMapping(value = "/send/sms", method = RequestMethod.POST)
+    public HttpResponseTemp<?> SendAlarmSMS(@RequestParam("tos") String tos,
+                                            @RequestParam("content") String content,
+                                            @RequestParam("subject") String subject,
+                                            @RequestParam(value = "sender", required = false) String sender) {
+        content = EncodingTool.encodeStr(content);
+        subject = EncodingTool.encodeStr(subject);
+        return alarmSenderService.sendSMS(tos, content, subject, sender);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/send/mail", method = RequestMethod.POST)
+    public HttpResponseTemp<?> SendAlarmMail(@RequestParam("tos") String tos,
+                                             @RequestParam("content") String content,
+                                             @RequestParam("subject") String subject,
+                                             @RequestParam(value = "sender", required = false) String sender) {
+        content = EncodingTool.encodeStr(content);
+        subject = EncodingTool.encodeStr(subject);
+        return alarmSenderService.sendMail(tos, content, subject, sender);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/send/wechat", method = RequestMethod.POST)
+    public HttpResponseTemp<?> SendAlarmWechat(@RequestParam("tos") String tos,
+                                               @RequestParam("content") String content,
+                                               @RequestParam("subject") String subject,
+                                               @RequestParam(value = "sender", required = false) String sender) {
+        content = EncodingTool.encodeStr(content);
+        subject = EncodingTool.encodeStr(subject);
+        return alarmSenderService.sendWechat(tos, content, subject, sender);
+    }
 }

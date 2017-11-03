@@ -11,7 +11,7 @@ public interface AlarmEventService {
      *
      * @return
      */
-//    HttpResponseTemp<?> listAlarmEventInfo();
+    HttpResponseTemp<?> listAlarmEventInfo();
 
     /**
      *

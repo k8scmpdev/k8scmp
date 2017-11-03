@@ -2,15 +2,32 @@ package org.k8scmp.monitormgmt.service.alarm.impl;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
+import org.k8scmp.appmgmt.dao.ServiceDao;
+import org.k8scmp.appmgmt.domain.Cluster;
+import org.k8scmp.appmgmt.domain.Container;
+import org.k8scmp.appmgmt.domain.Instance;
+import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
+import org.k8scmp.common.ClientConfigure;
+import org.k8scmp.engine.k8s.util.NodeWrapper;
+import org.k8scmp.engine.k8s.util.NodeWrapperNew;
 import org.k8scmp.exception.ApiException;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
 import org.k8scmp.globalmgmt.domain.GlobalInfo;
 import org.k8scmp.globalmgmt.domain.GlobalType;
+import org.k8scmp.globalmgmt.service.GlobalService;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
+import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfo;
+import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
+import org.k8scmp.monitormgmt.domain.alarm.DeploymentAlarmInfo;
+import org.k8scmp.monitormgmt.domain.alarm.TemplateType;
 import org.k8scmp.monitormgmt.service.alarm.AlarmEventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,17 +50,23 @@ public class AlarmEventServiceImpl implements AlarmEventService {
 
     @Autowired
     GlobalBiz globalBiz;
-
+    
+    @Autowired
+    GlobalService globalService;
+    
+    @Autowired
+    ServiceDao serviceDao;
+    
+    @Autowired
+    NodeWrapperNew nodeWrapperNew;
 //    @Autowired
 //    ClusterBiz clusterBiz;
-//
 //    @Autowired
 //    InstanceService instanceService;
-//
 //    @Autowired
 //    DeployAlarmPortalManager deployAlarmPortalManager;
 
-    /*@Override
+    @Override
     public HttpResponseTemp<?> listAlarmEventInfo() {
 
 //        AuthUtil.collectionVerify(CurrentThreadInfo.getUserId(), GlobalConstant.alarmGroupId, resourceType, OperationType.GET, 0);
@@ -60,7 +83,7 @@ public class AlarmEventServiceImpl implements AlarmEventService {
         List<AlarmEventInfo> alarmEventInfos = ClientConfigure.executeCompletionService(alarmEventInfoTasks);
         Collections.sort(alarmEventInfos, new AlarmEventInfo.AlarmEventInfoComparator());
         return ResultStat.OK.wrap(alarmEventInfos);
-    }*/
+    }
 
     @Override
     public HttpResponseTemp<?> ignoreAlarms(String alarmString) {
@@ -130,7 +153,7 @@ public class AlarmEventServiceImpl implements AlarmEventService {
     }
 
     // notice: template or host group can be deleted while alarm event still reserved
-    /*private class AlarmEventInfoTask implements Callable<AlarmEventInfo> {
+    private class AlarmEventInfoTask implements Callable<AlarmEventInfo> {
         AlarmEventInfoDraft alarmEventInfoDraft;
 
         public AlarmEventInfoTask(AlarmEventInfoDraft alarmEventInfoDraft) {
@@ -158,29 +181,37 @@ public class AlarmEventServiceImpl implements AlarmEventService {
             } else if (alarmEventInfo.getTemplateType().equals(TemplateType.deploy.name())) {
                 DeploymentAlarmInfo deploymentAlarmInfo = new DeploymentAlarmInfo();
                 deploymentAlarmInfo.setContainerId(convertContainerIdByCounter(alarmEventInfoDraft.getCounter()));
-                Deployment deployment = alarmDao.getDeploymentByTemplateId(alarmEventInfoDraft.getTemplate_id());
-                if (deployment == null) {
-                    deploymentAlarmInfo.setId(0);
+//                Deployment deployment = alarmDao.getDeploymentByTemplateId(alarmEventInfoDraft.getTemplate_id());
+                ServiceInfo serviceInfo = alarmDao.getDeploymentByTemplateId(alarmEventInfoDraft.getTemplate_id());
+                
+                if (serviceInfo == null) {
+                    deploymentAlarmInfo.setId("0");
                     deploymentAlarmInfo.setDeploymentName("non-existed deployment");
                 } else {
-                    deploymentAlarmInfo.setId(deployment.getId());
-                    Cluster cluster = clusterBiz.getClusterById(deployment.getClusterId());
-                    if (cluster == null) {
-                        deploymentAlarmInfo.setClusterName("non-existed cluster");
-                    } else {
-                        deploymentAlarmInfo.setClusterName(cluster.getName());
+                    deploymentAlarmInfo.setId(serviceInfo.getId());
+//                    Cluster cluster = clusterBiz.getClusterById(deployment.getClusterId());
+                    //TODO 目前cluster只有一个
+                    List<Cluster> clusters = globalService.getAllCluster();
+                    for(Cluster cluster:clusters){
+                    	 if (cluster == null) {
+                             deploymentAlarmInfo.setClusterName("non-existed cluster");
+                         } else {
+                             deploymentAlarmInfo.setClusterName(cluster.getName());
+                         }
                     }
-                    deploymentAlarmInfo.setDeploymentName(deployment.getName());
-                    deploymentAlarmInfo.setNamespace(deployment.getNamespace());
-                    deploymentAlarmInfo.setHostEnv(deployment.getHostEnv());
+                    deploymentAlarmInfo.setDeploymentName(serviceInfo.getServiceCode());
+//                    deploymentAlarmInfo.setNamespace(deployment.getNamespace());
+//                    deploymentAlarmInfo.setHostEnv(deployment.getHostEnv());
                     try {
-                        List<Instance> instances = instanceService.getInstances(deployment.getId());
+                    	List<Instance> instances = nodeWrapperNew.getAllInstance();
+//                        List<Instance> instances = instanceService.getInstances(deployment.getId());
                         if (instances != null && instances.isEmpty()) {
                             for (Instance instance : instances) {
                                 for (Container container : instance.getContainers()) {
                                     if (container.getContainerId().equals(deploymentAlarmInfo.getContainerId())) {
                                         deploymentAlarmInfo.setInstanceName(instance.getInstanceName());
                                         deploymentAlarmInfo.setInstanceHostIp(instance.getHostIp());
+                                        deploymentAlarmInfo.setNamespace(instance.getNamespace());
                                         deploymentAlarmInfo.setInstanceCreateTime(instance.getStartTime());
                                         break;
                                     }
@@ -191,12 +222,11 @@ public class AlarmEventServiceImpl implements AlarmEventService {
                             }
                         }
                     } catch (Exception e) {
-                        logger.warn("get instances for deployment " + deployment.getName() + " error: " + e.getMessage());
+                        logger.warn("get instances for deployment " + serviceInfo.getServiceCode() + " error: " + e.getMessage());
                     }
                 }
                 alarmEventInfo.setDeploymentAlarmInfo(deploymentAlarmInfo);
             }
-
             alarmEventInfo.setMetric(convertMetricByCounter(alarmEventInfoDraft.getCounter()));
             alarmEventInfo.setTag(convertTagByCounter(alarmEventInfoDraft.getCounter()));
             alarmEventInfo.setLeftValue(Double.valueOf(alarmEventInfoDraft.getLeft_value()));
@@ -206,12 +236,11 @@ public class AlarmEventServiceImpl implements AlarmEventService {
             alarmEventInfo.setCurrentStep(alarmEventInfoDraft.getCurrent_step());
             alarmEventInfo.setMaxStep(alarmEventInfoDraft.getMax_step());
             alarmEventInfo.setTimeStamp(alarmEventInfoDraft.getTimestamp() * 1000);
-
             return alarmEventInfo;
         }
-    }*/
+    }
 
-    /*private static String convertMetricByCounter(String counter) {
+    private static String convertMetricByCounter(String counter) {
 
         String metricWithEndpoint = counter.substring(0, counter.indexOf(" "));
 
@@ -263,7 +292,7 @@ public class AlarmEventServiceImpl implements AlarmEventService {
             }
         }
         return null;
-    }*/
+    }
 
 
 }

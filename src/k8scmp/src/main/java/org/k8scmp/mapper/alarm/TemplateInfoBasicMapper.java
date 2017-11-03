@@ -54,7 +54,9 @@ public interface TemplateInfoBasicMapper {
             "= #{hostGroupId} AND alarm_template_info.isRemoved = 0 order by alarm_template_host_group_bind.bindTime")
     List<TemplateInfoBasic> getTemplateInfoBasicByHostGroupId(@Param("hostGroupId") int hostGroupId);
 	
-	@Select("SELECT deploymentName FROM alarm_template_info WHERE isRemoved = 0 AND id=#{id}")
-	DeploymentInfo getDeploymentByTemplateId(int id);
+//	@Select("SELECT deploymentName FROM alarm_template_info WHERE isRemoved = 0 AND id=#{id}")
+//	DeploymentInfo getDeploymentByTemplateId(int id);
 	
+	@Select("SELECT serviceId FROM alarm_template_info WHERE isRemoved = 0 AND id=#{id}")
+	String getServiceIdByTemplateId(int id);
 }

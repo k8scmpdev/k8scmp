@@ -2,6 +2,7 @@ package org.k8scmp.monitormgmt.dao.alarm;
 
 import java.util.List;
 
+import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
@@ -97,7 +98,9 @@ public interface AlarmDao {
 
 	List<TemplateInfoBasic> getTemplateInfoByName(String templateName);
 
-	DeploymentInfo getDeploymentByTemplateId(int id);
+	ServiceInfo getDeploymentByTemplateId(int id);
+
+	HostInfo getHostInfoByHostname(String endpoint);
 
 
 

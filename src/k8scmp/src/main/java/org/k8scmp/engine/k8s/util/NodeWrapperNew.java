@@ -11,7 +11,10 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
+import org.k8scmp.appmgmt.dao.ServiceDao;
 import org.k8scmp.appmgmt.domain.Cluster;
+import org.k8scmp.appmgmt.domain.Instance;
+import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.common.ClientConfigure;
 import org.k8scmp.common.GlobalConstant;
 import org.k8scmp.globalmgmt.dao.GlobalBiz;
@@ -50,7 +53,9 @@ public class NodeWrapperNew {
 	GlobalBiz globalBiz;
 	@Autowired
 	GlobalService globalService;
-
+	@Autowired
+    private static ServiceDao serviceDao;
+	
 	public String createLabels(KubeUtils<?> client, List<String> nodeNames, Map<String, String> label) {
 		try {
 			if (label != null && label.size() != 0) {
@@ -543,5 +548,111 @@ public class NodeWrapperNew {
 		}
 		return nodeInfo;
 	}
+	
+	public List<Instance> getAllInstance() throws ParseException {
+		KubeUtils<?> client = null;
+		List<Cluster> allCluster = globalService.getAllCluster();
+		Set<Instance> instanceSet = new HashSet<>();
+		List<Instance> instanceList = new ArrayList<>();
+		for (Cluster cluster : allCluster) {
+			try {
+				NamespaceList allNamespace = client.listAllNamespace();
+				
+				for(Namespace namespace:allNamespace.getItems()){
+					List<GetInstanceTask> infoTasks = new LinkedList<>();
+					infoTasks.add(new GetInstanceTask(cluster,namespace.getMetadata().getName()));
+					List<List<Instance>> list = ClientConfigure.executeCompletionService(infoTasks);
+					for (List<Instance> list2 : list) {
+						for (Instance instance : list2) {
+							instanceSet.add(instance);
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		for (Instance instance : instanceSet) {
+			instanceList.add(instance);
+		}
+        return instanceList;
+    }
+	
+	private class GetInstanceTask implements Callable<List<Instance>> {
+		KubeUtils<?> client;
+		GetInstanceTask(Cluster cluster, String namespace) throws Exception {
+			this.client = Fabric8KubeUtils.buildKubeUtils(cluster, namespace);
+		}
+
+		@Override
+		public List<Instance> call() throws Exception {
+			 PodList podList = getAllPods(client);
+		        if (podList != null && !podList.getItems().isEmpty()) {
+		            List<Instance> instances = new ArrayList<>(podList.getItems().size());
+		            for (Pod pod : podList.getItems()) {
+		                try {
+		                    Instance instance = transferPodToInstance(pod);
+		                    if (instance != null && !instance.getStatus().equalsIgnoreCase("Completed")) {
+		                        instances.add(instance);
+		                    }
+		                } catch (Exception ignored) {
+		                	ignored.printStackTrace();
+		                }
+		            }
+		            return instances;
+		        }
+			return null;
+		}
+	}
+	
+	
+	private PodList getAllPods(KubeUtils<?> client) {
+        try {
+            return client.listAllPod();
+        } catch (Exception e) {
+            logger.warn("get deployment pod list by labels error, message is " + e.getMessage());
+            return null;
+        }
+    }
+	
+    private Instance transferPodToInstance(Pod pod) throws ParseException {
+        if (pod == null) {
+            return null;
+        }
+        Instance instance = new Instance();
+        instance.setHostName(pod.getSpec().getNodeName());
+        if (pod.getMetadata() != null) {
+            instance.setInstanceName(pod.getMetadata().getName());
+            instance.setNamespace(pod.getMetadata().getNamespace());
+            if (pod.getMetadata().getLabels() != null) {
+                if (pod.getMetadata().getLabels().containsKey(GlobalConstant.DEPLOY_ID_STR) &&
+                        pod.getMetadata().getLabels().containsKey(GlobalConstant.VERSION_STR)) {
+                    String serviceId = pod.getMetadata().getLabels().get(GlobalConstant.DEPLOY_ID_STR);
+//                    int versionId = Integer.valueOf(pod.getMetadata().getLabels().get(GlobalConstant.VERSION_STR));
+                    instance.setServiceId(serviceId);
+                    ServiceInfo service = serviceDao.getService(serviceId);
+                    instance.setServiceCode(service.getServiceCode());
+//                    instance.setVersion(versionId);
+                }
+            }
+        }
+        if (pod.getStatus() != null) {
+            instance.setStartTime(pod.getStatus().getStartTime());
+            instance.setPodIp(pod.getStatus().getPodIP());
+            instance.setHostIp(pod.getStatus().getHostIP());
+            if (pod.getStatus().getContainerStatuses() != null) {
+                for (ContainerStatus containerStatus : pod.getStatus().getContainerStatuses()) {
+                    if (StringUtils.isBlank(containerStatus.getContainerID())) {
+                        continue;
+                    }
+                    String containerId = containerStatus.getContainerID().split("docker://")[1];
+                    instance.addContainer(new org.k8scmp.appmgmt.domain.Container(containerId,
+                            containerStatus.getName(), containerStatus.getImage()));
+                }
+            }
+        }
+        instance.setStatus(PodUtils.getPodStatus(pod));
+        return instance;
+    }
 
 }

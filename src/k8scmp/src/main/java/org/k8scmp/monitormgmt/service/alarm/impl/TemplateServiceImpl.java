@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResourceType;
 import org.k8scmp.basemodel.ResultStat;
@@ -148,20 +149,30 @@ public class TemplateServiceImpl implements TemplateService {
         if (templateInfoBasic.getTemplateType().equals(TemplateType.host.name())) {
             templateInfo.setHostGroupList(alarmDao.listHostGroupInfoBasicByTemplateId(id));
         } else if (templateInfoBasic.getTemplateType().equals(TemplateType.deploy.name())) {
-            /*Deployment deployment = alarmDao.getDeploymentByTemplateId(id);
-            DeploymentInfo deploymentInfo;
-            if (deployment == null) {
-                deploymentInfo = new DeploymentInfo(0, null, "non-existed deployment", HostEnv.TEST);
-            } else {
-                deploymentInfo = new DeploymentInfo(deployment);
-                Cluster cluster = clusterBiz.getClusterById(deployment.getClusterId());
-                if (cluster != null) {
-                    deploymentInfo.setClusterName(cluster.getName());
-                }
-            }
-            templateInfo.setDeploymentInfo(deploymentInfo);*/
-        	DeploymentInfo deploymentInfo = alarmDao.getDeploymentByTemplateId(id);
-        	templateInfo.setDeploymentInfo(deploymentInfo);
+//            Deployment deployment = alarmDao.getDeploymentByTemplateId(id);
+//            DeploymentInfo deploymentInfo;
+//            if (deployment == null) {
+//                deploymentInfo = new DeploymentInfo(0, null, "non-existed deployment", HostEnv.TEST);
+//            } else {
+//                deploymentInfo = new DeploymentInfo(deployment);
+//                Cluster cluster = clusterBiz.getClusterById(deployment.getClusterId());
+//                if (cluster != null) {
+//                    deploymentInfo.setClusterName(cluster.getName());
+//                }
+//            }
+//            templateInfo.setDeploymentInfo(deploymentInfo);
+        	ServiceInfo serviceInfo = alarmDao.getDeploymentByTemplateId(id);
+        	DeploymentInfo deploymentInfo;
+        	if(serviceInfo == null){
+        		deploymentInfo = new DeploymentInfo("0","non-existed deployment");
+        	}else{
+        		deploymentInfo = new DeploymentInfo();
+        		deploymentInfo.setId(serviceInfo.getId());
+        		deploymentInfo.setDeploymentName(serviceInfo.getServiceCode());
+        		templateInfo.setDeploymentInfo(deploymentInfo);
+        	}
+        	
+        	
         }
         templateInfo.setStrategyList(alarmDao.listStrategyInfoByTemplateId(id));
         List<User> userInfos = new LinkedList<>();
