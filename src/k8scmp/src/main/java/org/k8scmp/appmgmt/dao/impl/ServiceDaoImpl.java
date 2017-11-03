@@ -37,6 +37,11 @@ public class ServiceDaoImpl implements ServiceDao {
 	}
 
 	@Override
+	public void deleteServiceByAppId(String appId) {
+		 mapper.deleteServiceByAppId(appId);
+	}
+
+	@Override
 	public ServiceInfo getService(String id) {
 		return mapper.getService(id);
 	}
@@ -49,6 +54,11 @@ public class ServiceDaoImpl implements ServiceDao {
 	@Override
 	public List<ServiceInfo> getServicesByAppId(String appId) {
 		return mapper.getServicesByAppId(appId);
+	}
+	
+	@Override
+	public List<ServiceInfo> getServicesByClusterId(String clusterId) {
+		return mapper.getServicesByClusterId(clusterId);
 	}
 	
 	@Override

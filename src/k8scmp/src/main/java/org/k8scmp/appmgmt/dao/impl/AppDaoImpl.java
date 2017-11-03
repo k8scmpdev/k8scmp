@@ -49,4 +49,9 @@ public class AppDaoImpl implements AppDao {
 	public List<AppInfo> getAppsByserviceCode(String serviceCode) {
 		return mapper.getAppsByserviceCode(serviceCode);
 	}
+	
+	@Override
+	public void updateAppState(String id,String state) {
+		mapper.updateAppState(id,state);
+	}
 }
