@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
 	<head th:include="/public/commonframe :: cssScript" />
+	<link rel="stylesheet" th:href="@{/css/select2.css}" />
 	<body>
 	<input type="hidden" id="resultStr" th:value="${resultStr}" />
 	
@@ -92,10 +93,10 @@
             
             <script th:src="@{/js/jquery.uniform.js}"></script>
             <script th:src="@{/js/select2.min.js}"></script>
+            <script th:src="@{/js/unicorn.form_validation2.js}"></script>
+            <script th:src="@{/js/unicorn.tables2.js}"></script>
             <script th:src="@{/js/jquery.validate.js}"></script>
             <script th:src="@{/js/unicorn.js}"></script>
-            <script th:src="@{/js/unicorn.form_validation.js}"></script>
-            <script th:src="@{/js/commonDisplay.js}"></script>
             
             <script th:src="@{/js/global/cluster-logic.js}"></script>
 	

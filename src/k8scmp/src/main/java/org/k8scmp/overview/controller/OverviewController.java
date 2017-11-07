@@ -56,6 +56,8 @@ public class OverviewController {
      	
      	//获取操作日志
      	List<OperationRecord> operecords = operationLog.listOperationRecord4Overview();
+     	//获取告警信息
+     	
      	
      	model.addAttribute("operecords", operecords);
         return "overview/index";
