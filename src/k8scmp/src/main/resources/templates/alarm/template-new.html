@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head th:include="/public/commonframe :: cssScript" />
+	<link rel="stylesheet" th:href="@{/css/select2.css}" />
 	<body>
 		<div id="common-header">
 			<div th:include="/public/commonframe :: app-header"></div>
@@ -60,7 +61,7 @@
 												</select>-->
 												
 												<select name="deploymentName" id="deploymentName">	
-													<option th:each="deployment:${templateBack.deploymentInfos}" th:value="${deployment.deploymentName}" 	
+													<option th:each="deployment:${templateBack.deploymentInfos}" th:value="${deployment.id}" 	
 													th:selected="${#strings.contains(deployment,deployment.deploymentName)}"
 													th:text="${deployment.deploymentName}" ></option>	
 												</select>
@@ -127,7 +128,9 @@
 			</div>
 		</div>	
 		<div th:include="/public/commonframe::jsScript(activeMenuNumber=43)" ></div>
-		
+		<script th:src="@{/js/select2.min.js}"></script>
+		<script th:src="@{/js/unicorn.form_validation2.js}"></script>
+        <script th:src="@{/js/unicorn.tables2.js}"></script>
 		<script type="text/javascript">
 			$(document).ready(function() {
 				getHostOrDeploy();
@@ -180,6 +183,7 @@
 					/* deploymentInfo.clusterName = $("#clusterName option:selected").text();
 					deploymentInfo.hostEnv = $("#hostEnv option:selected").text(); */
 					deploymentInfo.deploymentName = $("#deploymentName option:selected").text();
+					deploymentInfo.id = $("#deploymentName option:selected").val();
 					templateInfo.deploymentInfo = deploymentInfo;
 				}
 				
@@ -251,6 +255,7 @@
 					 success: function(data) {
 						window.location.href = "/alarm";
 					 }
+					 
 				 });
 			}
 		

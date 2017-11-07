@@ -84,6 +84,7 @@ public class TemplateController extends ApiController {
     	for(Instance instance:nodeWrapper.getInstance()){
     		DeploymentInfo deploymentInfo = new DeploymentInfo();
     		deploymentInfo.setDeploymentName(instance.getInstanceName());
+    		deploymentInfo.setId(instance.getServiceId());
     		deploymentList.add(deploymentInfo);
     	}
     	templateBack.setHostGroupList(hostGroupInfoList);

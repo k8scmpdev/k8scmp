@@ -227,8 +227,8 @@ public class TemplateServiceImpl implements TemplateService {
                 alarmDao.addTemplateHostGroupBind(templateId, hostGroupInfoBasic.getId(), current);
             }
         } else if (templateInfo.getTemplateType().equals(TemplateType.deploy.name())) {
-//            alarmDao.setTemplateDeployIdByTemplateId(templateId, templateInfo.getDeploymentInfo().getId());
-        	alarmDao.setTemplateDeployIdByTemplateId(templateId, templateInfo.getDeploymentInfo().getDeploymentName());
+            alarmDao.setTemplateDeployIdByTemplateId(templateId, templateInfo.getDeploymentInfo().getId());
+        	//alarmDao.setTemplateDeployIdByTemplateId(templateId, templateInfo.getDeploymentInfo().getDeploymentName());
         }
 
         // for strategy

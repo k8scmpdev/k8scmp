@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head th:include="/public/commonframe :: cssScript" />
+	<link rel="stylesheet" th:href="@{/css/select2.css}" />
 	<body>
 		<div id="common-header">
 			<div th:include="/public/commonframe :: app-header"></div>
@@ -120,6 +121,9 @@
 			</div>
 		</div>	
 		<div th:include="/public/commonframe::jsScript(activeMenuNumber=43)" ></div>
+		<script th:src="@{/js/select2.min.js}"></script>
+		<script th:src="@{/js/unicorn.form_validation2.js}"></script>
+        <script th:src="@{/js/unicorn.tables2.js}"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){	
 				

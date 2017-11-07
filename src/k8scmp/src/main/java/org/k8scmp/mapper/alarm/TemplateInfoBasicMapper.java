@@ -31,8 +31,8 @@ public interface TemplateInfoBasicMapper {
 //	@Update("UPDATE alarm_template_info SET deployId=#{deployId} WHERE id=#{id}")
 //    int setTemplateDeployIdByTemplateId(@Param("id") int id, @Param("deployId") int deployId);
 	
-	@Update("UPDATE alarm_template_info SET deploymentName=#{deploymentName} WHERE id=#{id}")
-    int setTemplateDeployIdByTemplateId(@Param("id") int id, @Param("deploymentName") String deploymentName);
+	@Update("UPDATE alarm_template_info SET serviceId=#{serviceId} WHERE id=#{id}")
+    int setTemplateDeployIdByTemplateId(@Param("id") int id, @Param("serviceId") String serviceId);
 
 	@Update("UPDATE alarm_template_info SET callbackId=#{callbackId} WHERE id=#{id}")
     int setTemplateCallbackIdByTemplateId(@Param("id") int id, @Param("callbackId") int callbackId);
