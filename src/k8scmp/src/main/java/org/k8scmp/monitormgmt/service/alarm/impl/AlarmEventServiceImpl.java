@@ -2,6 +2,7 @@ package org.k8scmp.monitormgmt.service.alarm.impl;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,6 +84,26 @@ public class AlarmEventServiceImpl implements AlarmEventService {
         List<AlarmEventInfo> alarmEventInfos = ClientConfigure.executeCompletionService(alarmEventInfoTasks);
         Collections.sort(alarmEventInfos, new AlarmEventInfo.AlarmEventInfoComparator());
         return ResultStat.OK.wrap(alarmEventInfos);
+    }
+    
+    @Override
+    public List<AlarmEventInfo> searchAlarmEvent(String eventName){
+    	if(eventName != null && "".equals(eventName)){
+    		List<AlarmEventInfo> alarmEventInfos = (List<AlarmEventInfo>)listAlarmEventInfo().getResult();
+    		List<AlarmEventInfo> alarmEventInfoList = new ArrayList<>();
+    		for (AlarmEventInfo alarmEventInfo : alarmEventInfos) {
+				
+				if(alarmEventInfo.getHostInfo().getHostname().indexOf(eventName) >= 0){
+					alarmEventInfoList.add(alarmEventInfo);
+				}
+				if(alarmEventInfo.getDeploymentAlarmInfo().getInstanceName().indexOf(eventName) >= 0){
+					alarmEventInfoList.add(alarmEventInfo);
+				}
+			}
+    		return alarmEventInfoList;
+    	}
+    	
+    	return null;
     }
 
     @Override

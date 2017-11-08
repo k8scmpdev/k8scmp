@@ -1,0 +1,44 @@
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			共<strong><span id="total" class="text" th:text="${total}"></span></strong>台主机&nbsp;&nbsp;
+			<div class="input-append" style="float:right">
+              	<input id="alarmName" type="text" placeholder="请输入报警对象查询内容"/><button class="btn prepend" onclick="getAlarmByName();"><i class="icon-search"></i> </button>
+          	</div>
+			<br/>
+			<div class="widget-box">
+				<div class="widget-title">
+					<h5>未恢复报警</h5>
+				</div>
+				<div class="widget-content nopadding">
+					<table class="table table-bordered data-table" style="table-layout: fixed;">
+						<thead>
+							<tr>
+								<!-- <th data-field="id" width="10%">id</th> -->
+								<th data-field="alarmName">报警对象</th>
+								<th data-field="templateType">报警类型</th>
+								<th data-field="metric">报警指标</th>
+								<th data-field="currentStep">报警次数</th>
+								<th data-field="timeStamp">报警时间</th>
+								<th data-field="operation">操作</th>
+							</tr>
+						</thead>
+						<tbody id="hostEventTbody">
+							<tr th:each="alarmEvent:${alarmEventList}">
+								<td th:if="${alarmEvent.templateType=='host'}" th:text="${alarmEvent.hostInfo.hostname}"></td>
+								<td th:unless="${alarmEvent.templateType=='deploy'}" th:text="${alarmEvent.deploymentAlarmInfo.instanceName}"></td>
+								<td th:text="${alarmEvent.templateType}"></td>
+								<td th:text="${alarmEvent.metric}"></td>
+								<td th:text="${alarmEvent.currentStep}"></td>
+								<td th:text="${alarmEvent.timeStamp}"></td>
+								<td>
+									<a title='单击删除组' th:onclick="'ignoreAlarm(\''+${alarmEvent.id}+'\')'" class="tip-top"><i class="icon-trash"></i><span>删除</span></a>
+								</td>
+							</tr>
+						</tbody> 
+					</table>  
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -20,7 +20,7 @@
 					<a target="/hostgroup/list" data-toggle="tab">主机组</a>
 				</li>
 				<li>
-					<!-- <a href="#userTemplate" data-toggle="tab" >用户</a> -->
+					<a target="/alarmEvent/list" data-toggle="tab" >未恢复报警</a> 
 				</li>
 			</ul>
 			<div id="myTabContent" class="tab-content">
@@ -60,8 +60,8 @@
 						 },
 					 	 type:"delete",
 					 	 dataType:"json",
-					 	 success:function(data){
-					 		var redata = eval(data);
+					 	 success:function(){
+					 		//var redata = eval(data);
 							$.get("/alarm/templatelist",function(data){
 								$('#myTabContent').html(data);
 							});
@@ -103,21 +103,23 @@
 			 //主机组
 			 //删除主机组
 			 function deleteHostGroup(id){
-				 alert("您确定删除该组吗？");
-				 $.ajax({
-					 url:"/hostgroup/delete/"+id,
-					 data:{
-						 id:id
-					 },
-				 	 type:"delete",
-				 	 dataType:"json",
-				 	 success:function(data){
-				 		var redata = eval(data);
-						$.get("/hostgroup/list",function(data){
-							$('#myTabContent').html(data);
-						});
-				 	 }
-				 });
+				 var r = confirm("您确定删除该组吗？");
+				 if(r == true){
+					 $.ajax({
+						 url:"/hostgroup/delete/"+id,
+						 data:{
+							 id:id
+						 },
+					 	 type:"delete",
+					 	 dataType:"json",
+					 	 success:function(){
+					 		//var redata = eval(data);
+							$.get("/hostgroup/list",function(data){
+								$('#myTabContent').html(data);
+							});
+					 	 }
+					 }); 
+				 }
 			 }
 			 //修改主机组名
 			 function editHostGroup(id){
@@ -211,6 +213,65 @@
 					 	 }
 					}) 
 			 }
+			 
+			 //未恢复报警
+			 function getAlarmByName(){
+				  var alarmName = $("#alarmName").val();
+					 $.ajax({
+						url:"/alarmEvent/search",
+						data:{
+							eventName : alarmName
+						},
+						type:"post",
+						dataType:"json",
+						success:function(data){
+							var alarmEventList = eval(data.result);
+							$("#hostEventTbody").empty();
+							var total = 0;
+							$.each(alarmEventList,function(k,v){
+								total++;
+								var td1;
+								if(v.templateType == 'host'){
+									td1 = '<td>'+ v.hostInfo.hostname +'</td>';
+								}else{
+									td1 = '<td>'+ v.deploymentAlarmInfo.instanceName +'</td>'
+								}
+								var td2 = '<td>'+ v.templateType +'</td>'+
+								'<td>'+ v.metric +'</td>'+
+								'<td>'+ v.currentStep +'</td>'+
+								'<td>'+ v.timeStamp +'</td>'+
+								'<td>'+
+									'<a title='单击删除组' onclick="ignoreAlarm('+ v.id +')" class="tip-top"><i class="icon-trash"></i><span>删除</span></a>'+
+								'</td>';
+								
+								var tr = '<tr>'+ td1 + td2 + '</tr>';;
+								$("#hostEventTbody").append(tr);
+							});
+							$("#total").text(total);
+					 	 }
+					}) 
+			 }
+			 
+			 function ignoreAlarm(eventId){
+				 var r = confirm("忽略该报警？");
+				 if(r == true){
+					 $.ajax({
+						 url:"/alarmEvent/event/ignore",
+						 data:{
+							 alarmString:eventId
+						 },
+					 	 type:"post",
+					 	 dataType:"json",
+					 	 success:function(){
+					 		//var redata = eval(data);
+							$.get("/alarmEvent/list",function(data){
+								$('#myTabContent').html(data);
+							});
+					 	 }
+					 }); 
+				 } 
+			 }
+			 
 			 
 		</script>
 	</body>
