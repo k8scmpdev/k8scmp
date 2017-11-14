@@ -2,6 +2,7 @@ package org.k8scmp.monitormgmt.dao.alarm;
 
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
+import org.k8scmp.monitormgmt.domain.alarm.falcon.Action;
 
 public interface PortalDao {
 
@@ -22,5 +23,7 @@ public interface PortalDao {
 	void deleteGroupHostBind(int id, int hostId);
 
 	void deleteHostGroupById(int id);
+	
+	Action getActionById(long id);
 
 }

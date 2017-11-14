@@ -59,4 +59,9 @@ public interface TemplateInfoBasicMapper {
 	
 	@Select("SELECT serviceId FROM alarm_template_info WHERE isRemoved = 0 AND id=#{id}")
 	String getServiceIdByTemplateId(int id);
+
+	@Select("SELECT * FROM alarm_template_info LEFT OUTER JOIN alarm_template_user_group_bind ON " +
+            "alarm_template_info.id = alarm_template_user_group_bind.templateId WHERE alarm_template_user_group_bind.userGroupId " +
+            "= #{userGroupId} AND alarm_template_info.isRemoved = 0 order by alarm_template_user_group_bind.bindTime")
+    List<TemplateInfoBasic> getTemplateInfoBasicByUserGroupId(@Param("userGroupId") long hostGroupId);
 }

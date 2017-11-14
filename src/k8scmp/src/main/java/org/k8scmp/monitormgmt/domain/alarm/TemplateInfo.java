@@ -21,15 +21,15 @@ public class TemplateInfo {
     private List<HostGroupInfoBasic> hostGroupList;
     private DeploymentInfo deploymentInfo;
     private List<StrategyInfo> strategyList;
-//    private List<UserGroupInfo> userGroupList;
-    private List<User> userList;
+    private List<UserGroupInfo> userGroupList;
+//    private List<User> userList;
     private CallBackInfo callback;
 
     public TemplateInfo() {
     }
 
     public TemplateInfo(int id, String templateName, String templateType, int creatorId, String creatorName,
-                        String createTime, String updateTime, List<HostGroupInfoBasic> hostGroupList, List<User> userList,
+                        String createTime, String updateTime, List<HostGroupInfoBasic> hostGroupList, List<UserGroupInfo> userGroupList,
                         DeploymentInfo deploymentInfo, List<StrategyInfo> strategyList, CallBackInfo callback) {
         this.id = id;
         this.templateName = templateName;
@@ -41,8 +41,8 @@ public class TemplateInfo {
         this.hostGroupList = hostGroupList;
         this.deploymentInfo = deploymentInfo;
         this.strategyList = strategyList;
-        this.userList = userList;
-//        this.userGroupList = userGroupList;
+//        this.userList = userList;
+        this.userGroupList = userGroupList;
         this.callback = callback;
     }
 
@@ -136,21 +136,21 @@ public class TemplateInfo {
         this.strategyList = strategyList;
     }
 
-//    public List<UserGroupInfo> getUserGroupList() {
-//        return userGroupList;
-//    }
-//
-//    public void setUserGroupList(List<UserGroupInfo> userGroupList) {
-//        this.userGroupList = userGroupList;
-//    }
+    public List<UserGroupInfo> getUserGroupList() {
+        return userGroupList;
+    }
+
+    public void setUserGroupList(List<UserGroupInfo> userGroupList) {
+        this.userGroupList = userGroupList;
+    }
     
-    public List<User> getUserList() {
-	      return userList;
-	  }
-	
-	  public void setUserList(List<User> userList) {
-	      this.userList = userList;
-	  }
+//    public List<User> getUserList() {
+//	      return userList;
+//	  }
+//	
+//	  public void setUserList(List<User> userList) {
+//	      this.userList = userList;
+//	  }
     
     public CallBackInfo getCallback() {
         return callback;

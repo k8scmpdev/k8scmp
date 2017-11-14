@@ -21,16 +21,16 @@ public class TemplateBack {
     private List<HostGroupInfoBasic> hostGroupList;
     private List<DeploymentInfo> deploymentInfos;
     private List<StrategyInfo> strategyList;
-//    private List<UserGroupInfo> userGroupList;
-    private List<User> userList;
-    private CallBackInfo callback;
+    private List<UserGroupInfo> userGroupList;
+//    private List<User> userList;
+    private String callback;
 
     public TemplateBack() {
     }
 
     public TemplateBack(int id, String templateName, String templateType, int creatorId, String creatorName,
-                        String createTime, String updateTime, List<HostGroupInfoBasic> hostGroupList, List<User> userList,
-                        List<DeploymentInfo> deploymentInfos, List<StrategyInfo> strategyList, CallBackInfo callback) {
+                        String createTime, String updateTime, List<HostGroupInfoBasic> hostGroupList, List<UserGroupInfo> userGroupList,
+                        List<DeploymentInfo> deploymentInfos, List<StrategyInfo> strategyList, String callback) {
         this.id = id;
         this.templateName = templateName;
         this.templateType = templateType;
@@ -41,8 +41,8 @@ public class TemplateBack {
         this.hostGroupList = hostGroupList;
         this.deploymentInfos = deploymentInfos;
         this.strategyList = strategyList;
-        this.userList = userList;
-//        this.userGroupList = userGroupList;
+//        this.userList = userList;
+        this.userGroupList = userGroupList;
         this.callback = callback;
     }
 
@@ -136,55 +136,28 @@ public class TemplateBack {
         this.strategyList = strategyList;
     }
 
-//    public List<UserGroupInfo> getUserGroupList() {
-//        return userGroupList;
-//    }
-//
-//    public void setUserGroupList(List<UserGroupInfo> userGroupList) {
-//        this.userGroupList = userGroupList;
-//    }
+    public List<UserGroupInfo> getUserGroupList() {
+        return userGroupList;
+    }
+
+    public void setUserGroupList(List<UserGroupInfo> userGroupList) {
+        this.userGroupList = userGroupList;
+    }
     
-    public List<User> getUserList() {
-	      return userList;
-	  }
-	
-	  public void setUserList(List<User> userList) {
-	      this.userList = userList;
-	  }
+//    public List<User> getUserList() {
+//	      return userList;
+//	  }
+//	
+//	  public void setUserList(List<User> userList) {
+//	      this.userList = userList;
+//	  }
     
-    public CallBackInfo getCallback() {
+    public String getCallback() {
         return callback;
     }
 
-    public void setCallback(CallBackInfo callback) {
+    public void setCallback(String callback) {
         this.callback = callback;
     }
 
-    public String checkLegality() {
-        if (StringUtils.isBlank(templateName)) {
-            return "template name is blank";
-        }
-        if (templateType == null) {
-            return "template type is blank";
-        }
-        if (templateType.equals(TemplateType.host.name()) && hostGroupList == null) {
-            return "host group is blank";
-        }
-        if (templateType.equals(TemplateType.deploy.name()) && deploymentInfos == null) {
-            return "deployment info is blank";
-        }
-        if (!templateType.equals(TemplateType.host.name()) && !templateType.equals(TemplateType.deploy.name())) {
-            return "illegal template type";
-        }
-        if (strategyList == null) {
-            return "strategy list is blank";
-        }
-//        if (userGroupList == null) {
-//            return "user group list is blank";
-//        }
-        if (callback == null) {
-            return "callback is blank";
-        }
-        return null;
-    }
 }

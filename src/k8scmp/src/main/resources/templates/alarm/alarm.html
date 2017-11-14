@@ -22,6 +22,9 @@
 				<li>
 					<a target="/alarmEvent/list" data-toggle="tab" >未恢复报警</a> 
 				</li>
+				<li>
+					<a target="/api/list" data-toggle="tab" >用户组</a> 
+				</li>
 			</ul>
 			<div id="myTabContent" class="tab-content">
 			
@@ -48,6 +51,7 @@
 					});
 				});
 			});  
+			
 			//规则
 			//删除规则
 			 function deleteTemplate(id){
@@ -215,6 +219,7 @@
 			 }
 			 
 			 //未恢复报警
+			 //搜索
 			 function getAlarmByName(){
 				  var alarmName = $("#alarmName").val();
 					 $.ajax({
@@ -251,7 +256,7 @@
 					 	 }
 					}) 
 			 }
-			 
+			 //忽略告警
 			 function ignoreAlarm(eventId){
 				 var r = confirm("忽略该报警？");
 				 if(r == true){
@@ -272,7 +277,77 @@
 				 } 
 			 }
 			 
-			 
+			//用户组
+			//创建用户组
+			 function postUserGroupName(){
+				var userGroupDraft = new Object();
+				userGroupDraft.userGroupName = $('#userGroupNameInput').val();
+				$.ajax({
+					 url:"/api/alarm/usergroup", 
+					 data:JSON.stringify(userGroupDraft), 
+					 type: "post",
+					 dataType: "json",
+					 contentType : "application/json;charset=utf-8",
+					 success: function(data) {
+						var redata = eval(data);
+						$.get("/api/list",function(data){
+							$('#myTabContent').html(data);
+						});
+					 }
+				 })
+			 }
+			 //搜索用户组
+			  function searchUserGroup(){
+				  var userGroupName = $("#searchUserGroup").val();
+					 $.ajax({
+						url:"/api/search",
+						data:{
+							userGroupName : userGroupName
+						},
+						type:"post",
+						dataType:"json",
+						success:function(data){
+							var userGroupList = eval(data.result);
+							$("#userGroupTbody").empty();
+							$.each(userGroupList,function(k,v){
+								var $id = 'utbody'+k
+								var tr = '<tr>'
+								+'<td>'+v.id+'</td>'
+								+'<td>'+v.userGroupName+'</td>'
+								+'<td>'+v.creatorName+'</td>'
+								+'<td>'+v.createTime+'</td>'
+								+'<td >'+v.updateTime+'</td>'
+								+'<td>'
+									+'<a title="单击添加组成员" onclick="addUsers('+v.id+')" class="tip-top">添加组成员</a>&nbsp;&nbsp;'
+									+'<a title="单击删除组" onclick="deleteUserGroup('+v.id+')" class="tip-top">删除</a>'
+								+'</td>'
+							+'</tr>';
+								$("#userGroupTbody").append(tr);	
+								
+							});
+					 	 }
+					}) 
+			 }
+			  //删除用户组
+			 function deleteUserGroup(id){
+				 var r = confirm("您确定删除该组吗？");
+				 if(r == true){
+					 $.ajax({
+						 url:"/api/alarm/usergroup/"+id,
+					 	 type:"delete",
+					 	 dataType:"json",
+					 	 success:function(){
+							$.get("/api/list",function(data){
+								$('#myTabContent').html(data);
+							});
+					 	 }
+					 }); 
+				 }
+			 }
+			 //添加组成员
+			function addUsers(id){
+				window.location.href = "/api/addUsers/"+id;
+			 }
 		</script>
 	</body>
 </html>

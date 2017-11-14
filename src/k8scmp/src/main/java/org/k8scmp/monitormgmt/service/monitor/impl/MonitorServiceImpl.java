@@ -86,15 +86,24 @@ public class MonitorServiceImpl implements MonitorService {
 	    	for (NodeInfo nodeInfo : nodeInfoList) {
 	    		if(hostName != null && !hostName.equals("") && nodeInfo.getName().indexOf(hostName) >= 0){
 	    			NodeInfoBack nodeInfoBack = new NodeInfoBack();
-	    	
 		    		nodeInfoBack.setHostName(nodeInfo.getName());
 		    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
 		    		if("Ready".equalsIgnoreCase(nodeInfo.getStatus())){
-			    		nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
-			    		nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
-			    		nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
-	//		    		nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
-	//		    		nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
+		    			if(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName()) != null){
+			    			nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
+						}
+						if(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName()) != null){
+							nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
+						}
+						if(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName()) != null){
+							nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
+						}
+//						if(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName()) != null){
+//							nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
+//						}
+//						if(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName()) != null){
+//							nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
+//						}
 		    		}
 		    		nodeInfoBack.setState(nodeInfo.getStatus());
 		    		nodeInfoBackList.add(nodeInfoBack);
@@ -105,11 +114,21 @@ public class MonitorServiceImpl implements MonitorService {
 		    		nodeInfoBack.setHostName(nodeInfo.getName());
 		    		nodeInfoBack.setLogicCluster(monitorBiz.getLogicClusterById());
 		    		if("Ready".equalsIgnoreCase(nodeInfo.getStatus())){
-			    		nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
-			    		nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
-			    		nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
-	//		    		nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
-	//		    		nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
+			    		if(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName()) != null){
+			    			nodeInfoBack.setCPUPercent(formatDouble(result.getCounterResults().get("cpu.busy").get(0).get(nodeInfo.getName())));
+						}
+						if(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName()) != null){
+							nodeInfoBack.setMemoryPercent(formatDouble(result.getCounterResults().get("mem.memused.percent").get(0).get(nodeInfo.getName())));
+						}
+						if(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName()) != null){
+							nodeInfoBack.setDiskPercent(formatDouble(result.getCounterResults().get("df.bytes.used.percent/mount=/").get(0).get(nodeInfo.getName())));
+						}
+//						if(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName()) != null){
+//							nodeInfoBack.setNetin(formatDouble(result.getCounterResults().get("net.if.in.bytes").get(0).get(nodeInfo.getName())));
+//						}
+//						if(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName()) != null){
+//							nodeInfoBack.setNetout(formatDouble(result.getCounterResults().get("net.if.out.bytes").get(0).get(nodeInfo.getName())));
+//						}
 		    		}
 		    		nodeInfoBack.setState(nodeInfo.getStatus());
 		    		nodeInfoBackList.add(nodeInfoBack);
@@ -152,22 +171,37 @@ public class MonitorServiceImpl implements MonitorService {
 		    					instenceInfoBack.setAppName(app.getAppCode());
 		    					instenceInfoBack.setServiceName(service.getServiceCode());
 		    					instenceInfoBack.setInstanceName(instance.getInstanceName());
-		    					instenceInfoBack.setCPUUsed(formatDouble(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(instance.getInstanceName())));
-		    					instenceInfoBack.setMemoryUsed(formatDouble(result.getCounterResults().get("container.mem.usage.percent").get(0).get(instance.getInstanceName())));
-		    					instenceInfoBack.setNetInput(formatDouble(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(instance.getInstanceName())));
-		    					instenceInfoBack.setNetOutput(formatDouble(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(instance.getInstanceName())));
-					}else if(serviceName != null && !serviceName.equals("") && instance.getServiceCode().indexOf(serviceName)<0){
+		    					if(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(instance.getInstanceName()) != null){
+		    						instenceInfoBack.setCPUUsed(formatDouble(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(instance.getInstanceName())));
+								}
+								if(result.getCounterResults().get("container.mem.usage.percent").get(0).get(instance.getInstanceName()) != null){
+									instenceInfoBack.setMemoryUsed(formatDouble(result.getCounterResults().get("container.mem.usage.percent").get(0).get(instance.getInstanceName())));
+								}
+								if(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(instance.getInstanceName()) != null){
+									instenceInfoBack.setNetInput(formatDouble(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(instance.getInstanceName())));
+								}
+								if(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(instance.getInstanceName()) != null){
+									instenceInfoBack.setNetOutput(formatDouble(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(instance.getInstanceName())));
+								}
+		    		}else if(serviceName != null && !serviceName.equals("") && instance.getServiceCode().indexOf(serviceName)<0){
 						continue;
 					}else{
 						AppInfo app = appDao.getApp(service.getAppId());
 						instenceInfoBack.setAppName(app.getAppCode());
 						instenceInfoBack.setServiceName(service.getServiceCode());
 						instenceInfoBack.setInstanceName(instance.getInstanceName());
-						instenceInfoBack.setCPUUsed(formatDouble(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(instance.getInstanceName())));
-						instenceInfoBack.setMemoryUsed(formatDouble(result.getCounterResults().get("container.mem.usage.percent").get(0).get(instance.getInstanceName())));
-						instenceInfoBack.setNetInput(formatDouble(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(instance.getInstanceName())));
-						instenceInfoBack.setNetOutput(formatDouble(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(instance.getInstanceName())));
-						
+						if(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(instance.getInstanceName()) != null){
+    						instenceInfoBack.setCPUUsed(formatDouble(result.getCounterResults().get("container.cpu.usage.busy").get(0).get(instance.getInstanceName())));
+						}
+						if(result.getCounterResults().get("container.mem.usage.percent").get(0).get(instance.getInstanceName()) != null){
+							instenceInfoBack.setMemoryUsed(formatDouble(result.getCounterResults().get("container.mem.usage.percent").get(0).get(instance.getInstanceName())));
+						}
+						if(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(instance.getInstanceName()) != null){
+							instenceInfoBack.setNetInput(formatDouble(result.getCounterResults().get("container.net.if.in.bytes").get(0).get(instance.getInstanceName())));
+						}
+						if(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(instance.getInstanceName()) != null){
+							instenceInfoBack.setNetOutput(formatDouble(result.getCounterResults().get("container.net.if.out.bytes").get(0).get(instance.getInstanceName())));
+						}
 					}
 	    		}
 	    		instenceList.add(instenceInfoBack);

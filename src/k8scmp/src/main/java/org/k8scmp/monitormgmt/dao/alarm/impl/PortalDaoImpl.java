@@ -29,6 +29,8 @@ import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateType;
+import org.k8scmp.monitormgmt.domain.alarm.UserGroupBasic;
+import org.k8scmp.monitormgmt.domain.alarm.UserGroupInfo;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Action;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Group;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.GroupHost;
@@ -36,6 +38,7 @@ import org.k8scmp.monitormgmt.domain.alarm.falcon.GroupTemplate;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Mockcfg;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Strategy;
 import org.k8scmp.monitormgmt.domain.alarm.falcon.Template;
+import org.k8scmp.monitormgmt.service.alarm.AlarmEventService;
 import org.k8scmp.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,8 +58,8 @@ public class PortalDaoImpl implements PortalDao {
 	PortalActionMapper portalActionMapper;
 	@Autowired
     AlarmEventInfoMapper alarmEventInfoMapper;
-//	@Autowired
-//    AlarmEventService alarmEventService;
+	@Autowired
+    AlarmEventService alarmEventService;
 	@Autowired
 	PortalGroupHostMapper portalGroupHostMapper;
 	@Autowired
@@ -118,26 +121,37 @@ public class PortalDaoImpl implements PortalDao {
         }
         
         // create action
-        return createAction(templateInfo.getUserList(), templateInfo.getCallback());
+        return createAction(templateInfo.getUserGroupList(), templateInfo.getCallback());
 	}
 	
-	private long createAction(List<User> userList, CallBackInfo callback) {
+	private long createAction(List<UserGroupInfo> userGroupList, CallBackInfo callback) {
 
         Action action = new Action();
         StringBuilder uicBuilder = new StringBuilder();
-        for (User userInfo : userList) {
-            User user = alarmDao.getUserById(userInfo.getId());
-            if (user == null) {
+//        for (User userInfo : userList) {
+//            User user = alarmDao.getUserById(userInfo.getId());
+//            if (user == null) {
+//                continue;
+//            }
+//            String userName = user.getUsername();
+//            if (StringUtils.isBlank(userName)) {
+//                continue;
+//            }
+//            uicBuilder.append(userName).append(",");
+//        }
+        for (UserGroupInfo userGroupInfo : userGroupList) {
+            UserGroupBasic userGroupBasic = alarmDao.getUserGroupInfoBasicById(userGroupInfo.getId());
+            if (userGroupBasic == null) {
                 continue;
             }
-            String userName = user.getUsername();
-            if (StringUtils.isBlank(userName)) {
+            String userGroupName = userGroupBasic.getUserGroupName();
+            if (StringUtils.isBlank(userGroupName)) {
                 continue;
             }
-            uicBuilder.append(userName).append(",");
+            uicBuilder.append(userGroupName).append(",");
         }
         String uic = uicBuilder.toString();
-        if (userList.size() == 0) {
+        if (userGroupList.size() == 0) {
             action.setUic("");
         } else {
             action.setUic(uic.substring(0, uic.length() - 1));
@@ -333,17 +347,17 @@ public class PortalDaoImpl implements PortalDao {
 
 	        // delete action & strategy & group-bind
 	        portalActionMapper.deleteActionById(template.getAction_id());
-//	        List<String> alarmEventIds = alarmEventInfoMapper.listAlarmEventInfoIdByTemplateId(template.getId());
-//	        String alarmString = "";
-//	        if (alarmEventIds != null) {
-//	            for (String alarmEventId : alarmEventIds) {
-//	                alarmString = alarmString + alarmEventId + ",,";
-//	            }
-//	        }
-//	        if (!StringUtils.isBlank(alarmString)) {
-//	            alarmString = alarmString.substring(0, alarmString.length() - 2);
-//	            alarmEventService.ignoreAlarmsInside(alarmString);
-//	        }
+	        List<String> alarmEventIds = alarmEventInfoMapper.listAlarmEventInfoIdByTemplateId(template.getId());
+	        String alarmString = "";
+	        if (alarmEventIds != null) {
+	            for (String alarmEventId : alarmEventIds) {
+	                alarmString = alarmString + alarmEventId + ",,";
+	            }
+	        }
+	        if (!StringUtils.isBlank(alarmString)) {
+	            alarmString = alarmString.substring(0, alarmString.length() - 2);
+	            alarmEventService.ignoreAlarmsInside(alarmString);
+	        }
 	        portalStrategyMapper.deleteStrategyByTemplateId(template.getId());
 	        if (templateType.equals(TemplateType.deploy.name())) {
 	            portalGroupHostMapper.deleteByTemplate(template.getId());
@@ -452,6 +466,11 @@ public class PortalDaoImpl implements PortalDao {
 
         // update nodata config
         updateNodataObj(getHostGroupList());
+	}
+
+	@Override
+	public Action getActionById(long id) {
+		return portalActionMapper.getActionById(id);
 	} 
 	 
 	 

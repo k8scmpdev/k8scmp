@@ -166,7 +166,8 @@ public class HostGroupServiceImpl implements HostGroupService {
 
         // update host group info in portal database
         portalBiz.updateHostGroupByHostGroupBasicInfo(updatedHostGroupInfoBasic);
-
+        
+        
         return ResultStat.OK.wrap(null);
     }
 

@@ -20,6 +20,8 @@ import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateType;
+import org.k8scmp.monitormgmt.domain.alarm.UserGroupBasic;
+import org.k8scmp.monitormgmt.domain.alarm.UserGroupInfo;
 import org.k8scmp.monitormgmt.service.alarm.TemplateService;
 import org.k8scmp.util.AuthUtil;
 import org.k8scmp.util.DateUtil;
@@ -175,20 +177,34 @@ public class TemplateServiceImpl implements TemplateService {
         	
         }
         templateInfo.setStrategyList(alarmDao.listStrategyInfoByTemplateId(id));
-        List<User> userInfos = new LinkedList<>();
-        List<Long> userIds = alarmDao.listUserIdByTemplateId(id);
-        for (Long userId : userIds) {
-            if (userId == null) {
+//        List<User> userInfos = new LinkedList<>();
+//        List<Long> userIds = alarmDao.listUserIdByTemplateId(id);
+//        for (Long userId : userIds) {
+//            if (userId == null) {
+//                continue;
+//            }
+//            User userBasic = alarmDao.getUserById(userId);
+//            if (userBasic == null || userBasic.getUsername() == null) {
+//                continue;
+//            }
+////            String userGroupName = userBasic.getUsername();
+//            userInfos.add(userBasic);
+//        }
+//        templateInfo.setUserList(userInfos);
+        List<UserGroupInfo> userGroupInfos = new LinkedList<>();
+        List<Integer> userGroupIds = alarmDao.listUserGroupIdByTemplateId(id);
+        for (Integer userGroupId : userGroupIds) {
+            if (userGroupId == null) {
                 continue;
             }
-            User userBasic = alarmDao.getUserById(userId);
-            if (userBasic == null || userBasic.getUsername() == null) {
+            UserGroupBasic userGroupBasic = alarmDao.getUserGroupInfoBasicById(userGroupId);
+            if (userGroupBasic == null || userGroupBasic.getUserGroupName() == null) {
                 continue;
             }
-//            String userGroupName = userBasic.getUsername();
-            userInfos.add(userBasic);
+            String userGroupName = userGroupBasic.getUserGroupName();
+            userGroupInfos.add(new UserGroupInfo(userGroupId, userGroupName));
         }
-        templateInfo.setUserList(userInfos);
+        templateInfo.setUserGroupList(userGroupInfos);
         templateInfo.setCallback(alarmDao.getCallbackInfoByTemplateId(id));
 
         return ResultStat.OK.wrap(templateInfo);
@@ -238,15 +254,23 @@ public class TemplateServiceImpl implements TemplateService {
             }
             strategyInfo.setCreateTime(DateUtil.dateFormat(new Date()));
             strategyInfo.setTemplateId(templateId);
-            alarmDao.addStrategyInfo(strategyInfo);
+//            alarmDao.addStrategyInfo(strategyInfo);
+            int strategyId = createStrategy(strategyInfo);
+            alarmDao.addTemplateStrategyBind(templateId, strategyId, current);
         }
         
         // for user group
-        for (User userInfo : templateInfo.getUserList()) {
-            if (userInfo == null) {
+//        for (User userInfo : templateInfo.getUserList()) {
+//            if (userInfo == null) {
+//                continue;
+//            }
+//            alarmDao.addTemplateUserGroupBind(templateId, userInfo.getId(), current);
+//        }
+        for (UserGroupInfo userGroupInfo : templateInfo.getUserGroupList()) {
+            if (userGroupInfo == null) {
                 continue;
             }
-            alarmDao.addTemplateUserGroupBind(templateId, userInfo.getId(), current);
+            alarmDao.addTemplateUserGroupBind(templateId, userGroupInfo.getId(), current);
         }
         // for callback
         CallBackInfo callbackInfo = templateInfo.getCallback();
@@ -267,11 +291,16 @@ public class TemplateServiceImpl implements TemplateService {
         }
         // for strategy
         alarmDao.deleteStrategyInfoByTemplateId(templateId);
-//        alarmDao.deleteTemplateStrategyBindByTemplateId(templateId);
+        alarmDao.deleteTemplateStrategyBindByTemplateId(templateId);
         // for user group
         alarmDao.deleteTemplateUserBindByTemplateId(templateId);
         // for callback
         alarmDao.deleteCallbackInfoByTemplateId(templateId);
     }
+    
+    private Integer createStrategy(StrategyInfo strategyInfo) {
 
+        alarmDao.addStrategyInfo(strategyInfo);
+        return strategyInfo.getId();
+    }
 }

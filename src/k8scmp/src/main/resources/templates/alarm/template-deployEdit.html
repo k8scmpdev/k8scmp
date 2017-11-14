@@ -42,7 +42,7 @@
                                         <label class="control-label">选择报警容器</label>
 										<div class="controls">
 											<select name="deploymentName" id="deploymentName">	
-												<option th:each="deployment:${templateInfo.deploymentInfo}" th:value="${deployment.deploymentName}" 	
+												<option th:each="deployment:${templateInfo.deploymentInfo}" th:value="${deployment.id}" 	
 												th:selected="${#strings.contains(deployment,deployment.deploymentName)}"
 												th:text="${deployment.deploymentName}" ></option>	
 											</select>
@@ -60,12 +60,12 @@
 									</div>
 									
 									<div class="control-group">
-                                        <label class="control-label">指定报警用户</label>
+                                        <label class="control-label">指定报警用户组</label>
                                         <div class="controls">
-                                            <select multiple="multiple" class="multiselect" name="users" id="users" style="width: 854px;" required="required">	
-												<option th:each="user:${userList}" th:value="${user.id}"
-												th:selected="${#strings.contains(userSelectList,user.loginname)}"
-												th:text="${user.loginname}" ></option>	
+											<select multiple="multiple" class="multiselect" name="userGroups" id="userGroups" style="width: 854px;" required="required">	
+												<option th:each="userGroup:${userGroupList}" th:value="${userGroup.id}" 
+												th:selected="${#strings.contains(userSelectList,userGroup.userGroupName)}"	
+												th:text="${userGroup.userGroupName}" ></option>	
 											</select>
                                         </div>
                                     </div>
@@ -73,16 +73,15 @@
                                     <div class="control-group" hidden="true">
                                         <label class="control-label">指定报警回调</label>
                                         <div class="controls">
-                                        	<input type="text" placeholder="请指定报警地址" id="callbackurl"
-                                        	pattern="：/^[a-z]([a-z0-9]*[-_]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?$/i"/><br/><br/>
+                                        	<input type="text" placeholder="请指定报警地址" id="callbackurl" th:value="${templateInfo.callback.url}"/><br/><br/>
                                                                                报警前发提醒短信:&nbsp;<select name="beforeCallbackSms" id="beforeCallbackSms">	
 												<option value="true">是</option>	
 												<option value="false" selected="selected">否</option>
 											</select>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											报警前发提醒邮件:&nbsp;<select name="beforeCallbackMail" id="beforeCallbackMail">	
-												<option value="true">是</option>	
-												<option value="false" selected="selected">否</option>
+												<option value="true" selected="selected">是</option>	
+												<option value="false">否</option>
 											</select>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											报警后发结果短信:&nbsp;<select name="afterCallbackSms" id="afterCallbackSms">	
@@ -91,8 +90,8 @@
 											</select>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											报警后发结果邮件:&nbsp;<select name="afterCallbackMail" id="afterCallbackMail">	
-												<option value="true">是</option>	
-												<option value="false" selected="selected">否</option>
+												<option value="true" selected="selected">是</option>	
+												<option value="false">否</option>
 											</select>
                                         </div>
                                     </div>
@@ -237,7 +236,7 @@
 				var templateName = $("#templateName").val();
 				var templateType = $("#templateType option:selected").val();  
 				var strategyList = [];
-				var userList = [];
+				var userGroupList = [];
 				
 				var deploymentInfo = new Object();
 				var callback = new Object();
@@ -250,6 +249,7 @@
 					//deploymentInfo.clusterName = $("#clusterName option:selected").text();
 					//deploymentInfo.hostEnv = $("#hostEnv option:selected").text(); 
 					deploymentInfo.deploymentName = $("#deploymentName option:selected").text();
+					deploymentInfo.id = $("#deploymentName option:selected").val();
 					templateInfo.deploymentInfo = deploymentInfo;
 				} 
 				
@@ -297,13 +297,13 @@
 				 templateInfo.strategyList = strategyList; 
 				 
 				//user
-				$("#users option:selected").each(function(){ 
-					var user = new Object();
-					user.loginname = $(this).text();
-					user.id = $(this).val();
-					userList.push(user);
+				$("#userGroups option:selected").each(function(){ 
+					var userGroup = new Object();
+					userGroup.userGroupName = $(this).text();
+					userGroup.id = $(this).val();
+					userGroupList.push(userGroup);
 					});
-				 templateInfo.userList = userList;
+				 templateInfo.userGroupList = userGroupList;
 				
 				//callback
 				callback.url = $("#callbackurl").val();

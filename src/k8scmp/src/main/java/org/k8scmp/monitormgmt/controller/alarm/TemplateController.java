@@ -8,6 +8,8 @@ import org.k8scmp.basemodel.HttpResponseTemp;
 import org.k8scmp.basemodel.ResultStat;
 import org.k8scmp.common.ApiController;
 import org.k8scmp.engine.k8s.util.NodeWrapper;
+import org.k8scmp.globalmgmt.dao.GlobalBiz;
+import org.k8scmp.globalmgmt.domain.GlobalType;
 import org.k8scmp.login.domain.User;
 import org.k8scmp.login.service.UserService;
 import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
@@ -17,8 +19,11 @@ import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateBack;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
+import org.k8scmp.monitormgmt.domain.alarm.UserGroupDetail;
+import org.k8scmp.monitormgmt.domain.alarm.UserGroupInfo;
 import org.k8scmp.monitormgmt.service.alarm.HostGroupService;
 import org.k8scmp.monitormgmt.service.alarm.TemplateService;
+import org.k8scmp.monitormgmt.service.alarm.UserGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,7 +48,9 @@ public class TemplateController extends ApiController {
     @Autowired
     HostGroupService hostGropService;
     @Autowired
-    UserService userService;
+    UserGroupService userGroupService;
+    @Autowired
+    GlobalBiz globalBiz;
     
     @RequestMapping(value = "")
     public String getTemplate() throws Exception {
@@ -65,7 +72,6 @@ public class TemplateController extends ApiController {
     
     @RequestMapping(value = "/templatenew")
     public String createTemplate(Model model) throws Exception {
-    	
     	TemplateBack templateBack = new TemplateBack();
     	//获取hostGroup
     	List<HostGroupInfo> hostGroupInfos = hostGropService.listHostGroupInfo();
@@ -77,7 +83,14 @@ public class TemplateController extends ApiController {
     		hostGroupInfoList.add(hostGroupInfoBasic);
 		}
     	//获取user
-    	List<User> userList = userService.listAllUserInfo().getResult();
+    	List<UserGroupDetail> userList = (List<UserGroupDetail>)userGroupService.listUserGroupInfo().getResult();
+    	List<UserGroupInfo> userGroupList = new ArrayList<>();
+    	for (UserGroupDetail userGroupDetail : userList) {
+    		UserGroupInfo userGroupInfo = new UserGroupInfo();
+    		userGroupInfo.setId(userGroupDetail.getId());
+    		userGroupInfo.setUserGroupName(userGroupDetail.getUserGroupName());
+    		userGroupList.add(userGroupInfo);
+		}
     	//获取deployment
     	NodeWrapper nodeWrapper = new NodeWrapper().init("default");
     	List<DeploymentInfo> deploymentList = new ArrayList<>();
@@ -87,11 +100,13 @@ public class TemplateController extends ApiController {
     		deploymentInfo.setId(instance.getServiceId());
     		deploymentList.add(deploymentInfo);
     	}
+    	//callback url
+    	String callback = globalBiz.getGlobalInfoByType(GlobalType.MONITOR_API_MAIL).getValue();
+    	templateBack.setCallback(callback);
     	templateBack.setHostGroupList(hostGroupInfoList);
-    	templateBack.setUserList(userList);
+    	templateBack.setUserGroupList(userGroupList);
     	templateBack.setDeploymentInfos(deploymentList);
     	model.addAttribute("templateBack", templateBack);
-    	model.addAttribute("TemplateBack", new TemplateInfo());
         return "alarm/template-new";
     }
     
@@ -117,22 +132,30 @@ public class TemplateController extends ApiController {
     	TemplateInfo templateInfo = (TemplateInfo)templateService.getTemplateInfo(templateId).getResult();
     	List<HostGroupInfo> hostGroupInfoList = hostGropService.listHostGroupInfo();
     	List<String> hostGroupSelList = new ArrayList<>();
-    	List<User> userList = userService.listAllUserInfo().getResult();
+//    	List<User> userList = userService.listAllUserInfo().getResult();
+    	List<UserGroupDetail> userList = (List<UserGroupDetail>)userGroupService.listUserGroupInfo().getResult();
+    	List<UserGroupInfo> userGroupList = new ArrayList<>();
+    	for (UserGroupDetail userGroupDetail : userList) {
+    		UserGroupInfo userGroupInfo = new UserGroupInfo();
+    		userGroupInfo.setId(userGroupDetail.getId());
+    		userGroupInfo.setUserGroupName(userGroupDetail.getUserGroupName());
+    		userGroupList.add(userGroupInfo);
+		}
     	List<String> userSelectList = new ArrayList<>();
     	if(templateInfo.getHostGroupList() != null){
     		for(HostGroupInfoBasic hostGroupInfo:templateInfo.getHostGroupList()){
         		hostGroupSelList.add(hostGroupInfo.getHostGroupName());
         	}
     	}
-    	if(templateInfo.getUserList() != null){
-    		for(User user:templateInfo.getUserList()){
-        		userSelectList.add(user.getUsername());
+    	if(templateInfo.getUserGroupList() != null){
+    		for(UserGroupInfo userGroup:templateInfo.getUserGroupList()){
+        		userSelectList.add(userGroup.getUserGroupName());
         	}
     	}
     	model.addAttribute("hostGroupSelList", hostGroupSelList);
     	model.addAttribute("hostGroupInfoList", hostGroupInfoList);
     	model.addAttribute("userSelectList", userSelectList);
-    	model.addAttribute("userList", userList);
+    	model.addAttribute("userGroupList", userGroupList);
     	model.addAttribute("templateInfo", templateInfo);
     	if(templateType.equals("host")){
     		return "alarm/template-hostEdit";

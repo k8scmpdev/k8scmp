@@ -1,0 +1,46 @@
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<div style="float:left">
+				<input id="userGroupNameInput" name="userGropName" type="text" placeholder="请输入用户组名称" style="font-size: 11px;font-style: italic" />
+				<button class="tip-top" title="添加用户组" style="margin-top:-10px" onclick="postUserGroupName();"><i class="icon-plus"></i>添加用户组</button>
+			</div>
+			<div class="input-append" style="float:right">
+               	<input id="searchUserGroup" type="text" placeholder="请输入查询内容"/><button class="btn prepend" onclick="searchUserGroup();"><i class="icon-search"></i> </button>
+           	</div>
+			<br/>
+			<div class="widget-box">
+				<div class="widget-title">
+					<h5>主机组</h5>
+				</div>
+				<div class="widget-content nopadding">
+					<table class="table table-bordered data-table" style="table-layout: fixed;">
+						<thead>
+							<tr>
+								<th data-field="id" width="10%">id</th>
+								<th data-field="userGroupName" width="10%">组名</th>
+								<th data-field="counts" width="10%">成员数</th>
+								<th data-field="createTime" width="20%">创建时间</th>
+								<th data-field="updateTime" width="30%">更新时间</th>
+								<th data-field="operation" width="20%">操作</th>
+							</tr>
+						</thead>
+						<tbody id="userGroupTbody">
+							<tr th:each="userGroup,userGroupStat:${userGroupList}">
+								<td th:text="${userGroup.id}"></td>
+								<td th:text="${userGroup.userGroupName}"></td>
+								<td th:text="${userGroup.creatorName}"></td>
+								<td th:text="${userGroup.createTime}"></td>
+								<td th:text="${userGroup.updateTime}"></td>
+								<td>
+									<a title='单击添加组成员' th:onclick="'addUsers(\''+${userGroup.id}+'\')'" class="tip-top">添加组成员</a>&nbsp;&nbsp;
+									<a title='单击删除组' th:onclick="'deleteUserGroup(\''+${userGroup.id}+'\')'" class="tip-top">删除</a>
+								</td>
+							</tr>
+						</tbody> 
+					</table>  
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

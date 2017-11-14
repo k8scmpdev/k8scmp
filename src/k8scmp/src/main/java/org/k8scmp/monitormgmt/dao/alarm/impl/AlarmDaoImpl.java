@@ -5,6 +5,7 @@ import java.util.List;
 import org.k8scmp.appmgmt.dao.ServiceDao;
 import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.login.domain.User;
+import org.k8scmp.login.domain.related.UserInfo;
 import org.k8scmp.mapper.alarm.AlarmEventInfoMapper;
 import org.k8scmp.mapper.alarm.CallbackInfoMapper;
 import org.k8scmp.mapper.alarm.HostGroupHostBindMapper;
@@ -13,16 +14,22 @@ import org.k8scmp.mapper.alarm.HostInfoMapper;
 import org.k8scmp.mapper.alarm.StrategyInfoMapper;
 import org.k8scmp.mapper.alarm.TemplateHostGroupBindMapper;
 import org.k8scmp.mapper.alarm.TemplateInfoBasicMapper;
+import org.k8scmp.mapper.alarm.TemplateStrategyBindMapper;
 import org.k8scmp.mapper.alarm.TemplateUserBindMapper;
+import org.k8scmp.mapper.alarm.TemplateUserGroupBindMapper;
+import org.k8scmp.mapper.alarm.UserGroupInfoBasicMapper;
+import org.k8scmp.mapper.alarm.UserGroupUserBindMapper;
 import org.k8scmp.mapper.login.UserMapper;
+import org.k8scmp.monitormapper.portal.LinkMapper;
 import org.k8scmp.monitormgmt.dao.alarm.AlarmDao;
 import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
-import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
 import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
+import org.k8scmp.monitormgmt.domain.alarm.UserGroupBasic;
+import org.k8scmp.monitormgmt.domain.alarm.asist.Link;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +61,16 @@ public class AlarmDaoImpl implements AlarmDao{
 	HostInfoMapper hostInfoMapper;
 	@Autowired
 	ServiceDao serviceDao;
+	@Autowired
+    LinkMapper linkMapper;
+	@Autowired
+    UserGroupInfoBasicMapper userGroupInfoBasicMapper;
+	@Autowired
+    UserGroupUserBindMapper userGroupUserBindMapper;
+	@Autowired
+    TemplateStrategyBindMapper templateStrategyBindMapper;
+	@Autowired
+    TemplateUserGroupBindMapper templateUserGroupBindMapper;
 	
 	@Override
 	public TemplateInfoBasic getTemplateInfoBasicByName(String templateName) {
@@ -101,7 +118,7 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public User getUserById(long id) {
+	public User getUserById(int id) {
 		return userMapper.getUserById(id);
 	}
 
@@ -131,7 +148,7 @@ public class AlarmDaoImpl implements AlarmDao{
 	}
 
 	@Override
-	public List<Long> listUserIdByTemplateId(int templateId) {
+	public List<Integer> listUserIdByTemplateId(int templateId) {
 		return templateUserBindMapper.listUserIdByTemplateId(templateId);
 	}
 
@@ -275,7 +292,96 @@ public class AlarmDaoImpl implements AlarmDao{
 		return hostInfoMapper.getHostInfoByHostname(hostname);
 	}
 
+	@Override
+	public void addLink(Link link) {
+		linkMapper.addLink(link);
+	}
 
+	@Override
+	public Link getLinkById(int linkId) {
+		return linkMapper.getLinkById(linkId);
+	}
+
+	@Override
+	public List<UserGroupBasic> listUserGroupInfoBasic() {
+		return userGroupInfoBasicMapper.listUserGroupInfoBasic();
+	}
+
+	@Override
+	public UserGroupBasic getUserGroupInfoBasicByName(String userGroupName) {
+		 return userGroupInfoBasicMapper.getUserGroupInfoBasicByName(userGroupName);
+	}
+
+	@Override
+	public void addUserGroupInfoBasic(UserGroupBasic userGroupBasic) {
+		userGroupInfoBasicMapper.addUserGroupInfoBasic(userGroupBasic);
+	}
+
+	@Override
+	public UserGroupBasic getUserGroupInfoBasicById(int id) {
+		return userGroupInfoBasicMapper.getUserGroupInfoBasicById(id);
+	}
+
+	@Override
+	public void updateUserGroupInfoBasicById(UserGroupBasic userGroupBasic) {
+		userGroupInfoBasicMapper.updateUserGroupInfoBasicById(userGroupBasic);
+	}
+
+	@Override
+	public void deleteUserGroupUserBindByUserGroupId(int userGroupId) {
+		userGroupUserBindMapper.deleteUserGroupUserBindByUserGroupId(userGroupId);
+	}
+
+	@Override
+	public void deleteUserGroupInfoBasicById(int id) {
+		userGroupInfoBasicMapper.deleteUserGroupInfoBasicById(id);
+	}
+
+	@Override
+	public String getUserGroupUserBindTime(int userGroupId, int userId) {
+		return userGroupUserBindMapper.getUserGroupUserBindTime(userGroupId, userId);
+	}
+
+	@Override
+	public void updateUserGroupUserBind(int userGroupId, int userId, String bindTime) {
+		userGroupUserBindMapper.updateUserGroupUserBind(userGroupId, userId, bindTime);
+	}
+
+	@Override
+	public void addUserGroupUserBind(int userGroupId, int userId, String bindTime) {
+		userGroupUserBindMapper.addUserGroupUserBind(userGroupId, userId, bindTime);
+	}
+
+	@Override
+	public void deleteUserGroupUserBind(int userGroupId, int userId) {
+		userGroupUserBindMapper.deleteUserGroupUserBind(userGroupId, userId);
+	}
+
+
+	@Override
+	public List<TemplateInfoBasic> getTemplateInfoBasicByUserGroupId(int userGroupId) {
+		return templateInfoBasicMapper.getTemplateInfoBasicByUserGroupId(userGroupId);
+	}
+
+    @Override
+    public List<User> getUserInfoByUserGroupId(int hostGroupId) {
+        return userGroupUserBindMapper.getUserInfoByUserGroupId(hostGroupId);
+    }
+
+	@Override
+	public void deleteTemplateStrategyBindByTemplateId(int templateId) {
+		templateStrategyBindMapper.deleteTemplateStrategyBindByTemplateId(templateId);
+	}
+
+	@Override
+	public void addTemplateStrategyBind(int templateId, int strategyId, String bindTime) {
+		templateStrategyBindMapper.addTemplateStrategyBind(templateId, strategyId, bindTime);
+	}
+
+	@Override
+	public List<Integer> listUserGroupIdByTemplateId(int templateId) {
+		return templateUserGroupBindMapper.listUserGroupIdByTemplateId(templateId);
+	}
 	
 
 	

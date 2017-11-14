@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.k8scmp.appmgmt.domain.ServiceInfo;
 import org.k8scmp.login.domain.User;
+import org.k8scmp.login.domain.related.UserInfo;
 import org.k8scmp.monitormgmt.domain.alarm.AlarmEventInfoDraft;
 import org.k8scmp.monitormgmt.domain.alarm.CallBackInfo;
 import org.k8scmp.monitormgmt.domain.alarm.DeploymentInfo;
@@ -11,6 +12,8 @@ import org.k8scmp.monitormgmt.domain.alarm.HostGroupInfoBasic;
 import org.k8scmp.monitormgmt.domain.alarm.HostInfo;
 import org.k8scmp.monitormgmt.domain.alarm.StrategyInfo;
 import org.k8scmp.monitormgmt.domain.alarm.TemplateInfoBasic;
+import org.k8scmp.monitormgmt.domain.alarm.UserGroupBasic;
+import org.k8scmp.monitormgmt.domain.alarm.asist.Link;
 
 /**
  * Created by baokangwang on 2016/4/13.
@@ -36,7 +39,7 @@ public interface AlarmDao {
 
 	List<TemplateInfoBasic> listTemplateInfoBasic();
 
-	User getUserById(long userId);
+	User getUserById(int userId);
 
 	TemplateInfoBasic getTemplateInfoBasicById(int id);
 
@@ -48,7 +51,7 @@ public interface AlarmDao {
 
 	List<StrategyInfo> listStrategyInfoByTemplateId(int id);
 
-	List<Long> listUserIdByTemplateId(int id);
+	List<Integer> listUserIdByTemplateId(int id);
 
 	CallBackInfo getCallbackInfoByTemplateId(int id);
 
@@ -102,14 +105,40 @@ public interface AlarmDao {
 
 	HostInfo getHostInfoByHostname(String endpoint);
 
+	void addLink(Link link);
 
+	Link getLinkById(int linkId);
 
+	List<UserGroupBasic> listUserGroupInfoBasic();
 
+	UserGroupBasic getUserGroupInfoBasicByName(String userGroupName);
 
+	void addUserGroupInfoBasic(UserGroupBasic userGroupBasic);
 
+	UserGroupBasic getUserGroupInfoBasicById(int id);
 
+	void updateUserGroupInfoBasicById(UserGroupBasic updatedUserGroupBasic);
 
+	void deleteUserGroupUserBindByUserGroupId(int id);
 
-	
-	
+	void deleteUserGroupInfoBasicById(int id);
+
+	String getUserGroupUserBindTime(int id, int userId);
+
+	void updateUserGroupUserBind(int id, int userId, String currentTimeMillis);
+
+	void addUserGroupUserBind(int id, int userId, String currentTimeMillis);
+
+	void deleteUserGroupUserBind(int id, int userId);
+
+	List<User> getUserInfoByUserGroupId(int userGroupId);
+
+	List<TemplateInfoBasic> getTemplateInfoBasicByUserGroupId(int userGroupId);
+
+	void deleteTemplateStrategyBindByTemplateId(int templateId);
+
+	void addTemplateStrategyBind(int templateId, int strategyId, String current);
+
+	List<Integer> listUserGroupIdByTemplateId(int id);
+
 }
